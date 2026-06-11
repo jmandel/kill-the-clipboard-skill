@@ -84,12 +84,27 @@ you're expected to perform:
 
 1. Find the document body you actually have locally — original bytes (PDF/RTF) if
    available, otherwise extracted plaintext.
-2. Rebuild `content` as a single attachment: `contentType` matching what you embed
-   (`application/pdf`, `text/rtf`, `text/plain`...), `data` base64-encoded; drop
-   every `url` entry.
-3. Keep the rest of the DocumentReference (type, date, category, author display)
-   verbatim. If you have no local body at all, the document can't ride along — say
-   so rather than including an empty shell.
+2. **Prefer a PDF body.** PDF is the only attachment format the KTC spec guarantees
+   receivers can handle. Original PDF bytes: embed as-is. Anything else (extracted
+   plaintext, RTF text): render it to PDF with the skill's own tooling —
+
+   ```bash
+   bun <skill-dir>/scripts/md-to-pdf.ts note.md note.pdf --theme summary \
+     --title "Neurology consult — Dr. Rivera" --date 2024-03-12
+   ```
+
+   (plaintext is fine as input — unknown markdown constructs degrade to plain
+   paragraphs; spot-check with `preview-pdf.ts`). Embedding `text/plain` directly is
+   legal US Core but not guaranteed-supported — use PDF when in doubt.
+3. Rebuild `content` as a single attachment: `contentType` matching what you embed
+   (usually `application/pdf` after step 2), `data` base64-encoded; drop every
+   `url` entry.
+4. Keep the rest of the DocumentReference **verbatim** — especially `type` and
+   `category` codings (that's how the receiver knows what the note IS), date, and
+   author display. Do NOT relabel provider-authored notes with the patient-story
+   type or patient-asserted security labels: re-sharing doesn't change authorship.
+   If you have no local body at all, the document can't ride along — say so rather
+   than including an empty shell.
 
 Treat the FHIR as hostile: optional-chain everything, never assume `display` strings
 or `text` exist, tolerate unknown categories and extension noise. Real exports are
