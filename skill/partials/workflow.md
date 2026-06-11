@@ -130,8 +130,8 @@ you're expected to perform:
 
    Type comes from `--content-type`, extension, or content sniffing. PDF inputs pass
    through byte-identical; RTF/HTML/text render line-faithfully. (md-to-pdf.ts is for
-   content YOU authored as markdown — the Patient Story — never for note bodies, whose
-   line structure markdown would reflow into run-on prose.)
+   content YOU authored as markdown — the Patient Story — never for note bodies,
+   whose line structure markdown would reflow into run-on prose.)
 3. Rebuild `content` as a single attachment: `contentType: application/pdf`,
    `data` base64-encoded; drop every `url` entry.
 4. Keep the rest of the DocumentReference **verbatim** — especially `type` and
@@ -171,11 +171,7 @@ bun <skill-dir>/scripts/md-to-pdf.ts story.md story.pdf
 ```
 
 The patient already approved the words; the render is mechanical and the layout
-engine is heavily tested — a successful exit means it rendered correctly. Offer to
-show the patient their finished page (`preview-pdf.ts story.pdf` makes PNGs; no
-poppler? just present the PDF file itself — chat platforms display PDFs fine) but
-don't make it a gate, and don't inspect it yourself unless something was unusual
-about the content.
+engine is heavily tested — a successful exit means it rendered correctly. Move on.
 
 ### Step 5: Assemble the bundle
 
