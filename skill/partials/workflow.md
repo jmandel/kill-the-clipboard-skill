@@ -269,17 +269,15 @@ secrets section).
 
 ### Step 9: Hand off to the patient
 
-The patient needs two things: the **QR/share link** (what the clinic scans — `qr.png`
-/ `shlink.txt`) and their **owner page** (`owner-link.txt` — QR display, access log,
-re-arm/pause/destroy controls, hosted at {{BASE_URL}}/s). Deliver per platform
-following the secrets conventions: on a machine with a filesystem, point at the files
-or open the owner page in the browser without echoing the URL; on a hosted chat, relay
-the owner link once and never repeat it.
+One move: read `owner-link.txt` and **present the owner page link to the patient** as
+a clickable link (plus `qr.png` if your platform shows or delivers files). The owner
+page has everything — the QR to present at check-in, the access log, and the
+re-arm/pause/destroy controls. That's the handoff; don't deliberate about it.
 
-> "You're set. Your owner page is open in the browser — it shows the QR code to
-> present at check-in, plus who's accessed it and buttons to extend or kill the link.
-> The QR is also saved at shl-out/qr.png if you'd rather print it or save it to your
-> phone's photos."
+> "You're set — here's your link page: [owner link]. Open it and keep it; it shows
+> the QR code to present at check-in, who's accessed your records, and buttons to
+> extend or kill the link. The QR is also saved at shl-out/qr.png if you'd rather
+> print it or save it to your phone's photos."
 
 **Preview (recommended):** offer to show the patient what a recipient sees —
 `viewer-link.txt` holds a viewer-prefixed copy of the link that opens a view-only
