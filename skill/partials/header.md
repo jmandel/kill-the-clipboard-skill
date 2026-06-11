@@ -31,7 +31,8 @@ bun install --cwd "$SCRIPTS"   # once per install; pulls the pinned PDF/QR libra
 ```
 
 Every command in this document writes `<skill-dir>/scripts/` — substitute your
-`$SCRIPTS`. If a script exits 1 with no JSON on stdout, run it by itself and read
-stderr: `error: Module not found` means the path is wrong (re-locate); anything else
-is a real error message. Don't chain script invocations with `&&` until each has
-succeeded once on its own.
+`$SCRIPTS`. **Never discard stderr** (no `2>/dev/null` on these scripts — progress
+and every error explanation live there). If a script exits 1 with no JSON on stdout,
+run it by itself and read stderr: `error: Module not found` means the path is wrong
+(re-locate); anything else is a real error message. Don't chain script invocations
+with `&&` until each has succeeded once on its own.

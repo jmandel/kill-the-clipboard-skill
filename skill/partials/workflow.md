@@ -201,6 +201,14 @@ assembly flags) and rerun the pipeline from the broken step — don't patch
 `bundle.json` by hand. Loop until clean. Resolve warnings when you can; explain to the
 patient any you accept.
 
+**Expected, acceptable warnings:** `reference-unresolved` for practitioners,
+organizations, encounters, and other bookkeeping the patient's curated subset
+deliberately leaves out. Every curated share produces these; receivers handle
+display-only references fine, and the names already appear in the readable summary.
+Accept them without deliberation — they only warrant attention when the dangling
+reference is to *clinical* content the patient meant to include (a Medication a
+selected MedicationRequest points to, a result a report needs).
+
 ### Step 8: Create the link
 
 First, two approvals — **⚠️ CRITICAL: get explicit approval of the story PDF and the
