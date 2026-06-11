@@ -185,6 +185,7 @@ button:focus-visible, input:focus-visible { outline: none; box-shadow: var(--sha
   font: 600 13px var(--font-sans); color: var(--brand);
   background: var(--surface); border: 1px solid var(--brand);
   border-radius: var(--radius-sm); padding: 6px 12px;
+  white-space: nowrap; /* "Open ↗" must never wrap when a long title squeezes the row */
 }
 .btn-mini:hover { background: var(--info-wash); }
 .res-list { list-style: none; margin: 0 0 8px; padding: 0; }
@@ -193,6 +194,8 @@ button:focus-visible, input:focus-visible { outline: none; box-shadow: var(--sha
   font-size: 14px; line-height: 1.45;
 }
 .res-list li.doc-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.doc-row > span:first-child { min-width: 0; }
+.doc-row .btn-mini { flex-shrink: 0; }
 .res-primary { color: var(--fg-1); font-weight: var(--fw-medium); }
 .doc-pill {
   display: inline-block; font-size: 11px; font-weight: var(--fw-bold);

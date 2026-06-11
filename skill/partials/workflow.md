@@ -265,7 +265,8 @@ stdout contract:
     "shlink": "/abs/path/shl-out/shlink.txt",
     "viewerLink": "/abs/path/shl-out/viewer-link.txt",
     "qrPng": "/abs/path/shl-out/qr.png",
-    "meta": "/abs/path/shl-out/link-meta.json"
+    "meta": "/abs/path/shl-out/link-meta.json",
+    "handoff": "/abs/path/shl-out/handoff.md"
   }
 }
 ```
@@ -275,27 +276,22 @@ locally, uploads ciphertext, and writes the secret-bearing artifacts to files �
 **stdout never contains the secrets, and neither should your messages** (see the
 secrets section).
 
-### Step 8: Hand off — one closing message
+### Step 8: Hand off — paste handoff.md
 
-One move: present BOTH links to the patient, each named by its role so they can't be
-confused — the owner page as a labeled markdown link, the shareable shlink as code
-text (visibly a different kind of thing) — with the what-happens-next woven into the
-same message. Plus `qr.png` if your platform shows or delivers files. Don't
-deliberate about it.
+Your closing message is already written: `artifacts.handoff` (`handoff.md`) holds the
+hand-off text with both links named by role — the owner page as a labeled markdown
+link, the shareable shlink as code text — and the expiry/use figures filled in. Read
+the file and paste its contents **verbatim** as the body of your final message; you
+may add to it (the patient's name, a platform note), but don't reconstruct it. Also
+deliver `qr.png` if your platform shows or delivers files.
 
-> "You're set!
->
-> **[Your link setup & control page](owner link)** — keep this one private. It shows
-> the QR code to present at check-in, who's accessed your records, and buttons to
-> extend or kill the link.
->
-> **To share:** show the QR from that page (also saved at shl-out/qr.png if you'd
-> rather print it or save it to your photos). If a clinic's online check-in form asks
-> for a SMART Health Link, paste this one: `shlink:/eyJ...`
->
-> At the clinic, they scan it and everything you chose lands in your chart, labeled
-> as coming from you — and if they can't scan these yet, nothing's lost; you check
-> in the usual way."
+**The one requirement that survives every platform habit: both links appear in your
+message TEXT — the owner page as a clickable markdown link, the shlink as inline
+code.** The owner page is the patient's control surface and the shlink is the thing
+they'll paste into a check-in form; a path to `owner-link.txt` or a file attachment is
+not a handoff — the patient should click, not open files. If your platform pushes you
+toward "send files with a short caption," resist: the files are supplementary, the
+message text carries the links.
 
 (The control page is the capability that manages the link; the `shlink:/...` string
 is the link itself — never swap their roles in the message.)

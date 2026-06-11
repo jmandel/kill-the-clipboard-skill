@@ -118,8 +118,9 @@ export interface CreateShlOutput {
   exp: number;
   maxUses: number | null;
   files: { contentType: string; size: number }[];
-  /** Paths to secret-bearing artifacts written to disk. */
-  artifacts: { ownerLink: string; shlink: string; viewerLink: string; qrPng: string; meta: string };
+  /** Paths to secret-bearing artifacts written to disk. `handoff` is the ready-made
+   * closing message (markdown, links pre-formatted) the agent pastes verbatim. */
+  artifacts: { ownerLink: string; shlink: string; viewerLink: string; qrPng: string; meta: string; handoff: string };
 }
 
 export interface ValidateOutput {

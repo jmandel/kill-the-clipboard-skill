@@ -332,6 +332,16 @@ describe('create-shl', () => {
     expect(out.artifacts.viewerLink.endsWith('viewer-link.txt')).toBeTrue();
     expect(out.artifacts.qrPng.endsWith('qr.png')).toBeTrue();
     expect(out.artifacts.meta.endsWith('link-meta.json')).toBeTrue();
+    expect(out.artifacts.handoff.endsWith('handoff.md')).toBeTrue();
+
+    // handoff.md is the verbatim closing message: owner page as a markdown link,
+    // shlink as inline code, lifetime filled in. Pasteable as-is.
+    const handoff = readFileSync(out.artifacts.handoff, 'utf8');
+    const ownerLinkText = readFileSync(out.artifacts.ownerLink, 'utf8').trim();
+    expect(handoff).toContain(`**[Your link setup & control page](${ownerLinkText})**`);
+    expect(handoff).toContain(`\`${readFileSync(out.artifacts.shlink, 'utf8').trim()}\``);
+    expect(handoff).toContain(out.artifacts.qrPng);
+    expect(handoff).toContain('5 opens');
 
     // Viewer-prefixed form (decision 11): page URL + '#' + the exact bare shlink.
     const viewerText = readFileSync(out.artifacts.viewerLink, 'utf8').trim();

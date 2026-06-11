@@ -22,6 +22,10 @@
 //                             never the form presented for scanning
 //   <outdir>/shlink.txt       bare shlink URI (contains the encryption key)   — SECRET
 //   <outdir>/qr.png           QR of the bare shlink                           — SECRET
+//   <outdir>/handoff.md       ready-made closing message (owner link as markdown,
+//                             shlink as code) — paste VERBATIM into the chat; the
+//                             owner link must reach the patient as a clickable link
+//                             in message text, never only as a file attachment
 //   <outdir>/link-meta.json   non-secret metadata (id, label, exp, ...)
 // The master secret, derived key/auth, shlink, and owner link NEVER appear on
 // stdout/stderr or in error messages.
@@ -148,6 +152,7 @@ async function main(): Promise<void> {
     viewerLink: resolve(outDir, 'viewer-link.txt'),
     qrPng: resolve(outDir, 'qr.png'),
     meta: resolve(outDir, 'link-meta.json'),
+    handoff: resolve(outDir, 'handoff.md'),
   };
 
   progress('-> writing artifacts ...');
@@ -155,6 +160,7 @@ async function main(): Promise<void> {
   await Bun.write(paths.shlink, shlink + '\n');
   await Bun.write(paths.viewerLink, viewerLink + '\n');
   await QRCode.toFile(paths.qrPng, shlink, { errorCorrectionLevel: 'M' });
+  await Bun.write(paths.handoff, buildHandoff({ ownerLink, shlink, qrPng: paths.qrPng, exp, maxUses }));
   const meta = {
     id,
     label,
@@ -178,6 +184,41 @@ async function main(): Promise<void> {
     artifacts: paths,
   };
   console.log(JSON.stringify(output));
+}
+
+/**
+ * The closing chat message, pre-composed so the agent pastes it verbatim instead of
+ * reconstructing it (where the owner link tends to drift into a file attachment).
+ * Secret-bearing by design — it lives in a file, never on stdout.
+ */
+function buildHandoff(args: {
+  ownerLink: string;
+  shlink: string;
+  qrPng: string;
+  exp: number;
+  maxUses: number | null;
+}): string {
+  const expText = new Date(args.exp * 1000).toLocaleString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+  const lifetime =
+    args.maxUses === null
+      ? `The link works until ${expText}.`
+      : `The link works until ${expText} or ${args.maxUses} opens, whichever comes first.`;
+  return `You're set!
+
+**[Your link setup & control page](${args.ownerLink})** — keep this one private. It shows the QR code to present at check-in, who's accessed your records, and buttons to extend or kill the link.
+
+**To share:** show the QR from that page (also saved at ${args.qrPng} if you'd rather print it or save it to your photos). If a clinic's online check-in form asks for a SMART Health Link, paste this one:
+
+\`${args.shlink}\`
+
+At the clinic, they scan it and everything you chose lands in your chart, labeled as coming from you — and if they can't scan these yet, nothing's lost; you check in the usual way. ${lifetime}
+`;
 }
 
 main().catch((err: unknown) => {

@@ -46,7 +46,7 @@ const err = (message: string, status: number): Response => json({ error: message
 const notFound = (): Response => err('not found', 404);
 const preflight = (): Response => new Response(null, { status: 204, headers: DATA_CORS });
 
-type Handler = (req: Request & { params?: Record<string, string> }) => Response | Promise<Response>;
+type Handler = (req: Request & { params: Record<string, string> }) => Response | Promise<Response>;
 /** Data-plane wrapper: OPTIONS preflight + DATA_CORS on every response, errors included
  * (a cross-origin viewer can only read a 401/404 outcome if the error carries CORS too). */
 const corsify = (routes: Record<string, Handler>): Record<string, Handler> => {
@@ -285,7 +285,7 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
       '/shl/:id': corsify({
         // U-flag direct fetch: ?recipient= is REQUIRED by the KTC profile
         GET: async (req) => {
-          const id = req.params.id;
+          const id = req.params.id ?? '';
           const recipient = new URL(req.url).searchParams.get('recipient');
           if (!recipient) return err('recipient query parameter is required', 400);
           const link = store.getLinkById(db, id);
@@ -306,7 +306,7 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
 
         // Manifest request (non-U links; harmless on U links too)
         POST: async (req) => {
-          const id = req.params.id;
+          const id = req.params.id ?? '';
           let body: ManifestRequest;
           try {
             body = (await req.json()) as ManifestRequest;
@@ -359,7 +359,7 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
 
       '/shl/:id/f/:fileId': corsify({
         GET: async (req) => {
-          const { id, fileId } = req.params;
+          const { id = '', fileId = '' } = req.params;
           const t = new URL(req.url).searchParams.get('t');
           if (!t || !(await ticketer.verify(t, id, fileId))) return notFound();
           const file = store.getFile(db, id, fileId);
