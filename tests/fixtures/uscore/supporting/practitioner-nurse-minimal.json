@@ -1,0 +1,22 @@
+{
+  "resourceType": "Practitioner",
+  "id": "practitioner-nurse-minimal",
+  "identifier": [
+    {
+      "system": "http://terminology.hl7.org/NamingSystem/NCSBNID",
+      "value": "87654321"
+    }
+  ],
+  "name": [
+    { "family": "Sample-Nurse" }
+  ],
+  "qualification": [
+    {
+      "code": {
+        "coding": [
+          { "system": "http://terminology.hl7.org/CodeSystem/v2-0360", "code": "RN" }
+        ]
+      }
+    }
+  ]
+}

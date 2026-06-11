@@ -1,0 +1,70 @@
+{
+  "family": "problems",
+  "uscoreVersion": "9.0.0",
+  "profiles": {
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition-problems-health-concerns": {
+      "mustSupport": [
+        "meta.lastUpdated",
+        "extension:assertedDate",
+        "clinicalStatus",
+        "verificationStatus",
+        "category",
+        "category:us-core (problem-list-item | health-concern, SHOULD sdoh)",
+        "code",
+        "subject",
+        "onset[x]",
+        "abatement[x]",
+        "recordedDate",
+        "recorder",
+        "asserter"
+      ],
+      "covered": {
+        "meta.lastUpdated": ["condition-hypertension-active.json", "condition-pneumonia-resolved.json", "condition-food-insecurity-health-concern.json"],
+        "extension:assertedDate": ["condition-hypertension-active.json"],
+        "clinicalStatus": ["condition-hypertension-active.json", "condition-pneumonia-resolved.json", "condition-food-insecurity-health-concern.json", "condition-osteoarthritis-inactive.json"],
+        "verificationStatus": ["condition-hypertension-active.json", "condition-pneumonia-resolved.json", "condition-food-insecurity-health-concern.json", "condition-tobacco-entered-in-error.json", "condition-osteoarthritis-inactive.json"],
+        "category": ["condition-hypertension-active.json", "condition-pneumonia-resolved.json", "condition-food-insecurity-health-concern.json", "condition-tobacco-entered-in-error.json", "condition-osteoarthritis-inactive.json"],
+        "category:us-core (problem-list-item | health-concern, SHOULD sdoh)": ["condition-hypertension-active.json", "condition-food-insecurity-health-concern.json"],
+        "code": ["condition-hypertension-active.json", "condition-pneumonia-resolved.json", "condition-food-insecurity-health-concern.json", "condition-tobacco-entered-in-error.json", "condition-osteoarthritis-inactive.json"],
+        "subject": ["condition-hypertension-active.json", "condition-pneumonia-resolved.json", "condition-food-insecurity-health-concern.json", "condition-tobacco-entered-in-error.json", "condition-osteoarthritis-inactive.json"],
+        "onset[x]": ["condition-hypertension-active.json", "condition-pneumonia-resolved.json", "condition-osteoarthritis-inactive.json"],
+        "abatement[x]": ["condition-pneumonia-resolved.json", "condition-osteoarthritis-inactive.json"],
+        "recordedDate": ["condition-hypertension-active.json", "condition-pneumonia-resolved.json", "condition-food-insecurity-health-concern.json", "condition-tobacco-entered-in-error.json", "condition-osteoarthritis-inactive.json"],
+        "recorder": ["condition-hypertension-active.json", "condition-pneumonia-resolved.json", "condition-tobacco-entered-in-error.json"],
+        "asserter": ["condition-hypertension-active.json", "condition-food-insecurity-health-concern.json"]
+      },
+      "gaps": []
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition-encounter-diagnosis": {
+      "mustSupport": [
+        "category:us-core (encounter-diagnosis)",
+        "code",
+        "subject",
+        "encounter",
+        "recordedDate",
+        "recorder"
+      ],
+      "covered": {
+        "category:us-core (encounter-diagnosis)": ["condition-ankle-sprain-encounter-diagnosis.json", "condition-headache-encounter-diagnosis-textonly.json"],
+        "code": ["condition-ankle-sprain-encounter-diagnosis.json", "condition-headache-encounter-diagnosis-textonly.json"],
+        "subject": ["condition-ankle-sprain-encounter-diagnosis.json", "condition-headache-encounter-diagnosis-textonly.json"],
+        "encounter": ["condition-ankle-sprain-encounter-diagnosis.json", "condition-headache-encounter-diagnosis-textonly.json"],
+        "recordedDate": ["condition-ankle-sprain-encounter-diagnosis.json", "condition-headache-encounter-diagnosis-textonly.json"],
+        "recorder": ["condition-ankle-sprain-encounter-diagnosis.json", "condition-headache-encounter-diagnosis-textonly.json"]
+      },
+      "gaps": [
+        "encounter references point at Encounter ids / display-only that are not part of this corpus (no encounter family fixture is guaranteed); renderer must tolerate unresolvable references"
+      ]
+    }
+  },
+  "variants": {
+    "clinicalStatus": ["active", "resolved", "inactive", "absent (entered-in-error per con-5)"],
+    "verificationStatus": ["confirmed", "unconfirmed", "provisional", "entered-in-error", "absent (condition-headache-encounter-diagnosis-textonly.json)"],
+    "onset[x]": ["onsetDateTime", "onsetPeriod", "onsetAge", "none"],
+    "abatement[x]": ["abatementDateTime", "abatementString", "none"],
+    "category": ["problem-list-item", "health-concern", "health-concern + sdoh (dual category)", "encounter-diagnosis"],
+    "code": ["SNOMED+ICD-10-CM dual coding", "single SNOMED coding", "code-only coding without display (condition-osteoarthritis-inactive.json)", "text-only no coding (condition-headache-encounter-diagnosis-textonly.json)", "very long code.text (condition-pneumonia-resolved.json)", "unicode in code.text (condition-food-insecurity-health-concern.json)"],
+    "references": ["constant patient urn", "recorder by reference+display", "recorder/asserter display-only", "encounter display-only", "asserter = patient self-report display"],
+    "quirks": ["Epic-style proprietary extension (condition-pneumonia-resolved.json)", "Epic urn:oid category translation coding (condition-food-insecurity-health-concern.json)"]
+  }
+}

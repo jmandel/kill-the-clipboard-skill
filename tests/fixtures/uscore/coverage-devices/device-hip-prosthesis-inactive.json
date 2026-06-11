@@ -1,0 +1,36 @@
+{
+  "resourceType": "Device",
+  "id": "device-hip-prosthesis-inactive",
+  "extension": [
+    {
+      "url": "http://example.org/fhir/StructureDefinition/device-extract-noise",
+      "valueCode": "implant-history-import"
+    }
+  ],
+  "udiCarrier": [
+    {
+      "deviceIdentifier": "08717648200274",
+      "issuer": "http://hl7.org/fhir/NamingSystem/gs1-di",
+      "jurisdiction": "http://hl7.org/fhir/NamingSystem/fda-udi"
+    }
+  ],
+  "status": "inactive",
+  "manufacturer": "Breadth Test Orthopaedics LLC",
+  "manufactureDate": "2018-06-01",
+  "lotNumber": "HIP-LOT-7781",
+  "type": {
+    "coding": [
+      { "system": "http://snomed.info/sct", "code": "468063009", "display": "Coated femoral stem prosthesis, modular" },
+      { "system": "http://snomed.info/sct", "code": "304120007" }
+    ]
+  },
+  "patient": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "note": [
+    {
+      "text": "Right total hip arthroplasty component explanted 2025-04-10 during revision surgery at Breadth Test Medical Center; device record retained as inactive. Carrier HRF unavailable for this legacy import — only the device identifier portion of the UDI was captured by the source system, which is a common pattern for implants documented before scanner deployment."
+    }
+  ]
+}

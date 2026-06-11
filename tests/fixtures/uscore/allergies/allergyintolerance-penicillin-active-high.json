@@ -1,0 +1,121 @@
+{
+  "resourceType": "AllergyIntolerance",
+  "id": "allergyintolerance-penicillin-active-high",
+  "clinicalStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical",
+        "code": "active",
+        "display": "Active"
+      }
+    ],
+    "text": "Active"
+  },
+  "verificationStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-verification",
+        "code": "confirmed",
+        "display": "Confirmed"
+      }
+    ],
+    "text": "Confirmed"
+  },
+  "type": "allergy",
+  "category": ["medication"],
+  "criticality": "high",
+  "code": {
+    "coding": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "code": "7980",
+        "display": "penicillin G"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "code": "373270004",
+        "display": "Substance with penicillin structure and antibacterial mechanism of action (substance)"
+      }
+    ],
+    "text": "Penicillin"
+  },
+  "patient": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "onsetDateTime": "2024-03-15T09:30:00-05:00",
+  "recordedDate": "2024-03-15T14:02:00-05:00",
+  "recorder": {
+    "display": "Dr. Sample Renderer"
+  },
+  "asserter": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "reaction": [
+    {
+      "substance": {
+        "coding": [
+          {
+            "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+            "code": "7984",
+            "display": "penicillin V"
+          }
+        ],
+        "text": "Penicillin VK 500 mg oral tablet"
+      },
+      "manifestation": [
+        {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "39579001",
+              "display": "Anaphylaxis (disorder)"
+            }
+          ],
+          "text": "Anaphylaxis"
+        },
+        {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "126485001",
+              "display": "Urticaria (disorder)"
+            }
+          ],
+          "text": "Hives"
+        },
+        {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "267036007",
+              "display": "Dyspnea (finding)"
+            }
+          ],
+          "text": "Shortness of breath"
+        }
+      ],
+      "description": "Within 20 minutes of first oral dose developed generalized hives, throat tightness, and difficulty breathing; treated with IM epinephrine in urgent care.",
+      "onset": "2024-03-15T09:10:00-05:00",
+      "severity": "severe",
+      "exposureRoute": {
+        "coding": [
+          {
+            "system": "http://snomed.info/sct",
+            "code": "26643006",
+            "display": "Oral route (qualifier value)"
+          }
+        ],
+        "text": "Oral"
+      }
+    }
+  ],
+  "note": [
+    {
+      "authorString": "Dr. Sample Renderer",
+      "time": "2024-03-15T14:05:00-05:00",
+      "text": "ANAPHYLAXIS TO PENICILLIN — confirmed by allergist at Breadth Test Medical Center. Patient counseled to avoid ALL penicillin-class antibiotics including amoxicillin, ampicillin, amoxicillin-clavulanate, piperacillin-tazobactam, and to use caution with cephalosporins given possible cross-reactivity (estimated 1-2% with newer generation cephalosporins, higher with first-generation agents sharing similar R1 side chains). Patient was prescribed an epinephrine auto-injector (carries two), educated on use, and given an anaphylaxis action plan. Medical alert bracelet recommended and obtained. This note is deliberately long to exercise the renderer's handling of multi-sentence annotation text that wraps across several lines in the generated PDF output."
+    }
+  ]
+}

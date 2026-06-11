@@ -1,0 +1,27 @@
+{
+  "resourceType": "PractitionerRole",
+  "id": "practitionerrole-pharmacist-endpoint",
+  "organization": {
+    "reference": "Organization/organization-breadth-test-medical",
+    "display": "Breadth Test Medical Center"
+  },
+  "code": [
+    { "text": "Clinical pharmacist (inpatient anticoagulation service)" }
+  ],
+  "specialty": [
+    {
+      "coding": [
+        { "system": "http://nucc.org/provider-taxonomy", "code": "183500000X" }
+      ]
+    }
+  ],
+  "location": [
+    { "display": "Breadth Test Pharmacy, 1st Floor, Main Hospital Building" }
+  ],
+  "endpoint": [
+    {
+      "reference": "Endpoint/endpoint-breadth-direct",
+      "display": "Direct: pharmacy@direct.breadth-test-medical.example.org"
+    }
+  ]
+}

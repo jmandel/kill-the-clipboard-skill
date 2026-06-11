@@ -1,0 +1,40 @@
+{
+  "resourceType": "Observation",
+  "id": "observation-simple-smartdata",
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+          "code": "social-history",
+          "display": "Social History"
+        }
+      ]
+    },
+    {
+      "coding": [
+        {
+          "system": "urn:oid:1.2.840.114350.1.13.535.2.7.10.798268.30",
+          "code": "smartdata",
+          "display": "SmartData"
+        }
+      ],
+      "text": "smartdata"
+    }
+  ],
+  "code": {
+    "text": "LIVING SITUATION - SMARTDATA ELEMENT (EPIC#38000123456)"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "effectiveDateTime": "2025-01-22T09:30:00Z",
+  "performer": [
+    {
+      "display": "Breadth Test Medical Center"
+    }
+  ],
+  "valueString": "Lives alone in a single-story apartment; daughter visits weekly and helps with groceries."
+}

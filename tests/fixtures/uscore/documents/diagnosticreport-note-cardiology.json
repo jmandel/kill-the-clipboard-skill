@@ -1,0 +1,63 @@
+{
+  "resourceType": "DiagnosticReport",
+  "id": "diagnosticreport-note-cardiology",
+  "identifier": [
+    {
+      "system": "https://breadth-test-medical.example.org/report-id",
+      "value": "RPT-2024-7741"
+    }
+  ],
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "LP29708-2",
+          "display": "Cardiology"
+        }
+      ],
+      "text": "Cardiology"
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "34752-6",
+        "display": "Cardiology Note"
+      }
+    ],
+    "text": "Cardiology Note"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "encounter": {
+    "reference": "Encounter/encounter-amb-office",
+    "display": "Office visit, Breadth Test Cardiology Associates"
+  },
+  "effectiveDateTime": "2024-11-05T17:30:00Z",
+  "issued": "2024-11-06T09:15:00Z",
+  "performer": [
+    {
+      "reference": "Organization/organization-breadth-test-medical",
+      "display": "Breadth Test Medical Center"
+    }
+  ],
+  "resultsInterpreter": [
+    {
+      "reference": "Practitioner/practitioner-sample-renderer",
+      "display": "Dr. Sample Renderer"
+    }
+  ],
+  "presentedForm": [
+    {
+      "contentType": "text/plain",
+      "data": "Q0FSRElPTE9HWSBOT1RFClBhdGllbnQ6IENhc2V5IEJyZWFkdGgtVGVzdGVyICBET0IgMTk4MC0wMi0yOSAgTVJOIEJSRUFEVEgtMDAwMQpEYXRlIG9mIHNlcnZpY2U6IDIwMjQtMTEtMDUgICAgSW50ZXJwcmV0ZWQgYnk6IERyLiBTYW1wbGUgUmVuZGVyZXIsIE1ECgpBbWJ1bGF0b3J5IEVDRyBtb25pdG9yIGhvb2t1cCBwZXJmb3JtZWQgdG9kYXkgYWZ0ZXIgY2xpbmljIGNvbnN1bHRhdGlvbiBmb3IgcGFscGl0YXRpb25zLgpCYXNlbGluZSByaHl0aG0gc2ludXMgYXQgNzIgYnBtLiBQYXRpZW50IGluc3RydWN0ZWQgb24gZGlhcnkgdXNlIGFuZCBzeW1wdG9tIGJ1dHRvbi4KUHJlbGltaW5hcnkgaW1wcmVzc2lvbjogbm8gYXJyaHl0aG1pYSBkdXJpbmcgaG9va3VwOyBmdWxsIDE0LWRheSByZXBvcnQgdG8gZm9sbG93Lgo=",
+      "title": "Cardiology Note 2024-11-05",
+      "creation": "2024-11-06T09:10:00Z"
+    }
+  ]
+}

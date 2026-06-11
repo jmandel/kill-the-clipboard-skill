@@ -1,0 +1,60 @@
+{
+  "resourceType": "Location",
+  "id": "location-breadth-hospital",
+  "identifier": [
+    {
+      "system": "https://breadth-test-medical.example.org/facility-id",
+      "value": "FAC-HOSP-01"
+    },
+    {
+      "system": "http://hl7.org/fhir/sid/us-npi",
+      "value": "1999999984"
+    }
+  ],
+  "status": "active",
+  "name": "Breadth Test General Hospital",
+  "alias": ["BTGH", "Hôpital Général de Test d'Étendue"],
+  "type": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+          "code": "HOSP",
+          "display": "Hospital"
+        },
+        {
+          "system": "http://snomed.info/sct",
+          "code": "22232009",
+          "display": "Hospital (environment)"
+        }
+      ]
+    },
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+          "code": "ER",
+          "display": "Emergency room"
+        }
+      ],
+      "text": "Emergency department on site"
+    }
+  ],
+  "telecom": [
+    {
+      "system": "phone",
+      "value": "555-555-0100",
+      "use": "work"
+    }
+  ],
+  "address": {
+    "line": ["900 Edge Case Boulevard"],
+    "city": "Sample City",
+    "state": "WA",
+    "postalCode": "98109-4321",
+    "country": "US"
+  },
+  "managingOrganization": {
+    "display": "Breadth Test Medical Center (display-only reference)"
+  }
+}

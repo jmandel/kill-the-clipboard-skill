@@ -1,0 +1,41 @@
+{
+  "resourceType": "Observation",
+  "id": "observation-clinical-ef",
+  "meta": { "lastUpdated": "2025-06-18T21:10:00Z" },
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        { "system": "http://terminology.hl7.org/CodeSystem/observation-category", "code": "imaging", "display": "Imaging" }
+      ],
+      "text": "Imaging"
+    }
+  ],
+  "code": {
+    "coding": [
+      { "system": "http://loinc.org", "code": "10230-1", "display": "Left ventricular Ejection fraction" }
+    ],
+    "text": "LV Ejection Fraction"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "encounter": {
+    "display": "Echocardiogram, Breadth Test Medical Center Cardiology, 2025-06-18"
+  },
+  "effectiveDateTime": "2025-06-18T14:30:00-05:00",
+  "issued": "2025-06-18T21:05:00Z",
+  "performer": [
+    { "display": "Dr. Sample Renderer, MD (Cardiology)" }
+  ],
+  "valueQuantity": {
+    "value": 55,
+    "unit": "%",
+    "system": "http://unitsofmeasure.org",
+    "code": "%"
+  },
+  "method": {
+    "text": "2D echocardiography, modified Simpson biplane"
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "resourceType": "CarePlan",
+  "id": "careplan-narrative-active",
+  "text": {
+    "status": "additional",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><h1>Diabetes &amp; Hypertension Care Plan</h1><p><b>Patient:</b> Casey Breadth-Tester — MRN BREADTH-0001</p><p><b>Plan owner:</b> Dr. Sample Renderer, Breadth Test Medical Center Endocrinology</p><h2>Problems Addressed</h2><ul><li>Type 2 diabetes mellitus without complication</li><li>Essential hypertension</li></ul><h2>Goals</h2><ol><li>Hemoglobin A1c below 7.0% by 2026-03-31. Most recent value 7.8% (2025-11-04). Patient verbalizes understanding of carbohydrate counting and agrees to log meals in the clinic portal at least 5 days per week.</li><li>Home blood pressure averaging below 130/80 mmHg. Patient was issued a validated home cuff on 2025-10-22 and instructed to measure twice daily, seated, after 5 minutes of rest, and to bring the log to every visit.</li><li>Walk 30 minutes, 5 days per week. Patient prefers morning walks with spouse Jordan; podiatry cleared footwear on 2025-09-15.</li></ol><h2>Interventions</h2><table border=\"1\"><tr><th>Intervention</th><th>Owner</th><th>Frequency</th></tr><tr><td>Metformin titration per protocol</td><td>Dr. Sample Renderer</td><td>Review q3 months</td></tr><tr><td>Diabetes self-management education</td><td>Pat Example, RN CDCES</td><td>4-session series, started 2025-10-29</td></tr><tr><td>Nutrition consult — carbohydrate-consistent diet, sodium &lt;2,300 mg/day</td><td>Riley Placeholder, RD</td><td>Initial + 2 follow-ups</td></tr><tr><td>Annual dilated eye exam — referral sent to Breadth Test Eye Associates</td><td>Care coordination</td><td>Due 2026-02-01</td></tr><tr><td>Depression screening (PHQ-9) at each quarterly visit; score 3 on 2025-11-04</td><td>Clinic staff</td><td>Quarterly</td></tr></table><h2>Patient Instructions</h2><p>Call the clinic for fasting glucose repeatedly above 250 mg/dL, symptoms of hypoglycemia not resolving with 15 g fast-acting carbohydrate, or home blood pressure above 180/110 mmHg. After-hours nurse line: 555-555-0199. This plan was reviewed with the patient, who states her goals in her own words: \"I want to be able to keep up with my grandkids and stay off insulin if I can.\"</p><p><i>Next review: 2026-02-03 with Dr. Sample Renderer.</i></p></div>"
+  },
+  "extension": [
+    {
+      "url": "https://open.epic.com/fhir/extensions/careplan-episode",
+      "valueString": "EPISODE;38492;AMB"
+    }
+  ],
+  "identifier": [
+    { "system": "https://breadth-test-medical.example.org/careplan", "value": "CP-2025-00417" },
+    { "system": "urn:oid:1.2.840.114350.1.13.999.2.7.2.737780", "value": "38492" }
+  ],
+  "status": "active",
+  "intent": "plan",
+  "category": [
+    {
+      "coding": [
+        { "system": "http://hl7.org/fhir/us/core/CodeSystem/careplan-category", "code": "assess-plan", "display": "Assessment and Plan of Treatment" }
+      ],
+      "text": "Assessment and Plan of Treatment"
+    },
+    {
+      "coding": [
+        { "system": "http://snomed.info/sct", "code": "736271009", "display": "Outpatient care plan" },
+        { "system": "urn:oid:1.2.840.114350.1.13.999.2.7.10.737780.20040", "code": "1", "display": "Longitudinal Plan of Care" }
+      ],
+      "text": "Longitudinal outpatient plan of care"
+    }
+  ],
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "period": { "start": "2025-10-22" },
+  "created": "2025-10-22T15:42:00-05:00",
+  "author": {
+    "reference": "Practitioner/practitioner-sample-renderer",
+    "display": "Dr. Sample Renderer"
+  },
+  "contributor": [
+    { "display": "Dr. Sample Renderer" },
+    { "display": "Pat Example, RN CDCES" }
+  ],
+  "addresses": [
+    { "display": "Type 2 diabetes mellitus without complication" },
+    { "display": "Essential hypertension" }
+  ]
+}

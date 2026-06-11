@@ -1,0 +1,29 @@
+{
+  "resourceType": "Observation",
+  "id": "observation-pediatric-bmi-age",
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        { "system": "http://terminology.hl7.org/CodeSystem/observation-category", "code": "vital-signs", "display": "Vital Signs" }
+      ]
+    }
+  ],
+  "code": {
+    "coding": [
+      { "system": "http://loinc.org", "code": "59576-9", "display": "Body mass index (BMI) [Percentile] Per age and sex" }
+    ],
+    "text": "BMI percentile (2-20 years)"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "effectiveDateTime": "2024-11-05T10:20:00-06:00",
+  "valueQuantity": {
+    "value": 65,
+    "unit": "%",
+    "system": "http://unitsofmeasure.org",
+    "code": "%"
+  }
+}

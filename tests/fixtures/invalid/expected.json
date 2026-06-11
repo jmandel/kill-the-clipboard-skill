@@ -1,0 +1,130 @@
+{
+  "_valid-baseline.json": {
+    "errors": []
+  },
+  "bundle-type.json": {
+    "errors": [
+      "bundle-type"
+    ]
+  },
+  "bundle-timestamp.json": {
+    "errors": [
+      "bundle-timestamp"
+    ]
+  },
+  "patient-count-two.json": {
+    "errors": [
+      "patient-count"
+    ]
+  },
+  "patient-count-zero.json": {
+    "errors": [
+      "patient-count"
+    ]
+  },
+  "entry-count.json": {
+    "errors": [
+      "entry-count"
+    ]
+  },
+  "fullurl-not-urn.json": {
+    "errors": [
+      "fullurl-not-urn"
+    ]
+  },
+  "fullurl-duplicate.json": {
+    "errors": [
+      "fullurl-duplicate"
+    ]
+  },
+  "reference-dangling-urn.json": {
+    "errors": [
+      "reference-dangling-urn"
+    ]
+  },
+  "reference-dangling-contained.json": {
+    "errors": [
+      "reference-dangling-contained"
+    ]
+  },
+  "attachment-url.json": {
+    "errors": [
+      "attachment-url"
+    ]
+  },
+  "attachment-no-data.json": {
+    "errors": [
+      "attachment-no-data"
+    ]
+  },
+  "docref-status.json": {
+    "errors": [
+      "docref-status"
+    ]
+  },
+  "docref-type.json": {
+    "errors": [
+      "docref-type"
+    ]
+  },
+  "docref-category.json": {
+    "errors": [
+      "docref-category"
+    ]
+  },
+  "docref-subject.json": {
+    "errors": [
+      "docref-subject"
+    ]
+  },
+  "docref-author.json": {
+    "errors": [
+      "docref-author"
+    ]
+  },
+  "docref-date.json": {
+    "errors": [
+      "docref-date"
+    ]
+  },
+  "docref-content-type.json": {
+    "errors": [
+      "docref-content-type"
+    ]
+  },
+  "docref-data-base64.json": {
+    "errors": [
+      "docref-data-base64"
+    ]
+  },
+  "warn-meta-profile.json": {
+    "errors": [],
+    "warnings": [
+      "meta-profile"
+    ]
+  },
+  "warn-patient-demographics.json": {
+    "errors": [],
+    "warnings": [
+      "patient-demographics"
+    ]
+  },
+  "warn-rendered-missing.json": {
+    "errors": [],
+    "warnings": [
+      "rendered-missing"
+    ]
+  },
+  "warn-docref-pataast.json": {
+    "errors": [],
+    "warnings": [
+      "docref-pataast"
+    ]
+  },
+  "warn-reference-external.json": {
+    "errors": [],
+    "warnings": [
+      "reference-external"
+    ]
+  }
+}

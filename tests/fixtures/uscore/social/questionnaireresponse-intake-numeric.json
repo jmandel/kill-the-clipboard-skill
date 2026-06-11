@@ -1,0 +1,132 @@
+{
+  "resourceType": "QuestionnaireResponse",
+  "id": "questionnaireresponse-intake-numeric",
+  "questionnaire": "http://example.org/fhir/Questionnaire/wellness-intake",
+  "_questionnaire": {
+    "extension": [
+      {
+        "url": "http://hl7.org/fhir/StructureDefinition/display",
+        "valueString": "Annual Wellness Intake"
+      },
+      {
+        "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-extension-questionnaire-uri",
+        "valueUri": "https://breadth-test-medical.example.org/forms/wellness-intake-v3"
+      }
+    ]
+  },
+  "status": "completed",
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "authored": "2025-10-02T09:30:00-05:00",
+  "author": {
+    "display": "Dr. Sample Renderer"
+  },
+  "item": [
+    {
+      "linkId": "last-flu-vaccine",
+      "text": "Date of your most recent influenza vaccination",
+      "answer": [
+        {
+          "valueDate": "2024-10-15"
+        }
+      ]
+    },
+    {
+      "linkId": "symptom-onset",
+      "text": "When did the fatigue you mentioned begin?",
+      "answer": [
+        {
+          "valueDateTime": "2025-09-28T06:45:00-05:00"
+        }
+      ]
+    },
+    {
+      "linkId": "alcohol-weekly",
+      "text": "On average, how many alcoholic drinks do you have per week?",
+      "answer": [
+        {
+          "valueDecimal": 2.5
+        }
+      ]
+    },
+    {
+      "linkId": "household-size",
+      "text": "How many people live in your household, including you?",
+      "answer": [
+        {
+          "valueInteger": 4
+        }
+      ]
+    },
+    {
+      "linkId": "self-reported-weight",
+      "text": "Current weight",
+      "answer": [
+        {
+          "valueQuantity": {
+            "value": 68.5,
+            "unit": "kg",
+            "system": "http://unitsofmeasure.org",
+            "code": "kg"
+          }
+        }
+      ]
+    },
+    {
+      "linkId": "exercise",
+      "text": "Do you exercise regularly?",
+      "answer": [
+        {
+          "valueBoolean": true,
+          "item": [
+            {
+              "linkId": "exercise/minutes-per-week",
+              "text": "About how many minutes per week?",
+              "answer": [
+                {
+                  "valueInteger": 150
+                }
+              ]
+            },
+            {
+              "linkId": "exercise/type",
+              "text": "What kind of exercise?",
+              "answer": [
+                {
+                  "valueString": "Cycling and yoga"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "smoking-record",
+      "text": "Most recent smoking status on file",
+      "answer": [
+        {
+          "valueReference": {
+            "reference": "Observation/observation-smokingstatus-current",
+            "display": "Tobacco smoking status (2025)"
+          }
+        }
+      ]
+    },
+    {
+      "linkId": "home-bp-log",
+      "text": "Upload your home blood pressure log",
+      "answer": [
+        {
+          "valueAttachment": {
+            "contentType": "text/plain",
+            "data": "SG9tZSBCUCBsb2cgKG1tSGcpCjIwMjUtMDktMjkgMDc6MTAgIDExOC83NgoyMDI1LTA5LTMwIDA3OjA1ICAxMjIvNzgKMjAyNS0xMC0wMSAwNzoxNSAgMTE2Lzc0Cg==",
+            "title": "Home BP log, late Sept 2025"
+          }
+        }
+      ]
+    }
+  ]
+}

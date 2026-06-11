@@ -1,0 +1,83 @@
+{
+  "resourceType": "MedicationRequest",
+  "id": "medicationrequest-completed-longsig",
+  "status": "completed",
+  "intent": "order",
+  "category": [
+    {
+      "text": "Outpatient compounded prescription"
+    }
+  ],
+  "reportedBoolean": true,
+  "medicationCodeableConcept": {
+    "text": "Magic Mouthwash (diphenhydramine / lidocaine viscous / aluminum-magnesium hydroxide) 1:1:1 compounded oral suspension"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "authoredOn": "2024-06-08",
+  "requester": {
+    "display": "Dr. Sample Renderer, MD"
+  },
+  "dosageInstruction": [
+    {
+      "sequence": 1,
+      "text": "Swish and spit 15 to 30 mL by mouth every 4 hours as needed for mouth pain: swish thoroughly around the entire mouth for 2 full minutes then spit out completely; do not eat or drink for 30 minutes afterward; call the clinic if throat numbness occurs.",
+      "asNeededCodeableConcept": {
+        "coding": [
+          {
+            "system": "http://snomed.info/sct",
+            "code": "20709006",
+            "display": "Pain in mouth (finding)"
+          }
+        ],
+        "text": "mouth pain"
+      },
+      "route": {
+        "coding": [
+          {
+            "system": "http://snomed.info/sct",
+            "code": "26643006",
+            "display": "Oral route (qualifier value)"
+          }
+        ],
+        "text": "Swish and spit"
+      },
+      "timing": {
+        "repeat": {
+          "frequency": 1,
+          "period": 4,
+          "periodUnit": "h"
+        }
+      },
+      "doseAndRate": [
+        {
+          "doseRange": {
+            "low": {
+              "value": 15,
+              "unit": "mL",
+              "system": "http://unitsofmeasure.org",
+              "code": "mL"
+            },
+            "high": {
+              "value": 30,
+              "unit": "mL",
+              "system": "http://unitsofmeasure.org",
+              "code": "mL"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "dispenseRequest": {
+    "numberOfRepeatsAllowed": 0,
+    "quantity": {
+      "value": 473,
+      "unit": "mL",
+      "system": "http://unitsofmeasure.org",
+      "code": "mL"
+    }
+  }
+}

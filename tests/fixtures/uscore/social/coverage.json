@@ -1,0 +1,177 @@
+{
+  "family": "social",
+  "uscoreVersion": "9.0.0",
+  "profiles": {
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-smokingstatus": {
+      "mustSupport": ["status", "category:SocialHistory", "code", "subject", "effective[x]", "performer", "value[x]"],
+      "covered": {
+        "status": ["observation-smokingstatus-current.json (final)", "observation-smokingstatus-packyears.json (entered-in-error)"],
+        "category:SocialHistory": ["observation-smokingstatus-current.json", "observation-smokingstatus-packyears.json"],
+        "code": ["observation-smokingstatus-current.json (72166-2, us-core-24 valueCodeableConcept)", "observation-smokingstatus-packyears.json (8664-5 pack-years, us-core-25 valueQuantity)"],
+        "subject": ["observation-smokingstatus-current.json"],
+        "effective[x]": ["observation-smokingstatus-current.json (effectiveDateTime)", "observation-smokingstatus-packyears.json (effectivePeriod)"],
+        "performer": ["observation-smokingstatus-current.json"],
+        "value[x]": ["observation-smokingstatus-current.json (CodeableConcept with SNOMED+LOINC LA translation)", "observation-smokingstatus-packyears.json (Quantity {PackYears})"]
+      },
+      "gaps": []
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-sexual-orientation": {
+      "mustSupport": ["status", "code", "subject", "effective[x]", "value[x]:valueCodeableConcept"],
+      "covered": {
+        "status": ["observation-sexual-orientation.json"],
+        "code": ["observation-sexual-orientation.json (fixed 76690-7)"],
+        "subject": ["observation-sexual-orientation.json"],
+        "effective[x]": ["observation-sexual-orientation.json (effectiveDateTime)"],
+        "value[x]:valueCodeableConcept": ["observation-sexual-orientation.json (code-only SNOMED coding, text carries display)"]
+      },
+      "gaps": []
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-occupation": {
+      "mustSupport": ["status", "category:socialhistory", "code", "subject", "effective[x]:effectivePeriod", "performer", "value[x]:valueCodeableConcept", "component:industry"],
+      "covered": {
+        "status": ["observation-occupation.json"],
+        "category:socialhistory": ["observation-occupation.json"],
+        "code": ["observation-occupation.json (fixed 11341-5)"],
+        "subject": ["observation-occupation.json"],
+        "effective[x]:effectivePeriod": ["observation-occupation.json (start only = current job)"],
+        "performer": ["observation-occupation.json (contained Practitioner with NPI)"],
+        "value[x]:valueCodeableConcept": ["observation-occupation.json (ODH ONETSOC detail)"],
+        "component:industry": ["observation-occupation.json (86188-0, ODH NAICS detail)"]
+      },
+      "gaps": []
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-pregnancystatus": {
+      "mustSupport": ["status", "category:SocialHistory", "code", "subject", "effective[x]:effectiveDateTime", "performer", "value[x]:valueCodeableConcept"],
+      "covered": {
+        "status": ["observation-pregnancystatus.json (amended)"],
+        "category:SocialHistory": ["observation-pregnancystatus.json"],
+        "code": ["observation-pregnancystatus.json (fixed 82810-3)"],
+        "subject": ["observation-pregnancystatus.json"],
+        "effective[x]:effectiveDateTime": ["observation-pregnancystatus.json"],
+        "performer": ["observation-pregnancystatus.json"],
+        "value[x]:valueCodeableConcept": ["observation-pregnancystatus.json (SNOMED 60001007 Not pregnant)"]
+      },
+      "gaps": []
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-pregnancyintent": {
+      "mustSupport": ["status", "category:SocialHistory", "code", "subject", "effective[x]:effectiveDateTime", "performer", "value[x]:valueCodeableConcept"],
+      "covered": {
+        "status": ["observation-pregnancyintent.json"],
+        "category:SocialHistory": ["observation-pregnancyintent.json"],
+        "code": ["observation-pregnancyintent.json (fixed 86645-9)"],
+        "subject": ["observation-pregnancyintent.json"],
+        "effective[x]:effectiveDateTime": ["observation-pregnancyintent.json (timezone-bearing dateTime)"],
+        "performer": ["observation-pregnancyintent.json"],
+        "value[x]:valueCodeableConcept": ["observation-pregnancyintent.json (SNOMED 454381000124105)"]
+      },
+      "gaps": []
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-screening-assessment": {
+      "mustSupport": ["status", "category:survey", "category:screening-assessment", "code", "subject", "effective[x]", "performer", "value[x]", "dataAbsentReason", "hasMember", "derivedFrom"],
+      "covered": {
+        "status": ["observation-sdoh-hvs-panel.json (final)"],
+        "category:survey": ["observation-sdoh-hvs-panel.json", "observation-sdoh-hvs-q1.json", "observation-sdoh-hvs-q2.json", "observation-sdoh-food-insecurity-risk.json"],
+        "category:screening-assessment": ["observation-sdoh-hvs-panel.json (us-core-category sdoh)", "observation-sdoh-hvs-q1.json", "observation-sdoh-hvs-q2.json", "observation-sdoh-food-insecurity-risk.json"],
+        "code": ["observation-sdoh-hvs-panel.json (88121-9 panel)", "observation-sdoh-hvs-q1.json (88122-7)", "observation-sdoh-hvs-q2.json (88123-5)", "observation-sdoh-food-insecurity-risk.json (88124-3)"],
+        "subject": ["observation-sdoh-hvs-panel.json"],
+        "effective[x]": ["observation-sdoh-hvs-panel.json (effectiveDateTime day precision)"],
+        "performer": ["observation-sdoh-hvs-q1.json (Practitioner display-only)", "observation-sdoh-food-insecurity-risk.json (Patient self-report)"],
+        "value[x]": ["observation-sdoh-hvs-q1.json (valueCodeableConcept LA answer)", "observation-sdoh-hvs-panel.json (panel with no value, per IG guidance)"],
+        "dataAbsentReason": ["observation-sdoh-hvs-q2.json (asked-declined, no value)"],
+        "hasMember": ["observation-sdoh-hvs-panel.json (-> two question Observations)"],
+        "derivedFrom": ["observation-sdoh-hvs-q1.json (-> QuestionnaireResponse)", "observation-sdoh-food-insecurity-risk.json (-> panel Observation; chain risk->panel->QR)"]
+      },
+      "gaps": ["hasMember -> QuestionnaireResponse target not exercised (hasMember points only at Observations; QR linkage shown via derivedFrom, which satisfies the SHALL-support-at-least-one rule)"]
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-simple-observation": {
+      "mustSupport": ["status", "category", "code", "subject", "effective[x]", "performer", "value[x]", "derivedFrom"],
+      "covered": {
+        "status": ["observation-simple-smartdata.json (final)", "observation-simple-functional-status.json (preliminary)"],
+        "category": ["observation-simple-smartdata.json (social-history + Epic smartdata)", "observation-simple-functional-status.json (us-core functional-status)", "observation-simple-disability-status.json (us-core disability-status + survey)"],
+        "code": ["observation-simple-smartdata.json (text-only CodeableConcept)", "observation-simple-functional-status.json (75276-6)", "observation-simple-disability-status.json (69856-3)"],
+        "subject": ["observation-simple-smartdata.json"],
+        "effective[x]": ["observation-simple-smartdata.json (instant-precision dateTime)", "observation-simple-disability-status.json (date-precision dateTime)"],
+        "performer": ["observation-simple-smartdata.json (Organization display-only)", "observation-simple-functional-status.json"],
+        "value[x]": ["observation-simple-smartdata.json (valueString)", "observation-simple-functional-status.json (valueCodeableConcept)", "observation-simple-disability-status.json (valueCodeableConcept LA33-6)"],
+        "derivedFrom": ["observation-simple-disability-status.json (reference by display only)"]
+      },
+      "gaps": []
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-care-experience-preference": {
+      "mustSupport": ["status", "category:us-core", "code", "subject", "effective[x]", "performer", "value[x]"],
+      "covered": {
+        "status": ["observation-care-experience-preference.json"],
+        "category:us-core": ["observation-care-experience-preference.json (care-experience-preference)"],
+        "code": ["observation-care-experience-preference.json (fixed 95541-9)"],
+        "subject": ["observation-care-experience-preference.json"],
+        "effective[x]": ["observation-care-experience-preference.json"],
+        "performer": ["observation-care-experience-preference.json (Patient = constant urn)"],
+        "value[x]": ["observation-care-experience-preference.json (valueString with unicode/diacritics/CJK)"]
+      },
+      "gaps": []
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-treatment-intervention-preference": {
+      "mustSupport": ["status", "category:us-core", "code", "subject", "effective[x]", "performer", "value[x]"],
+      "covered": {
+        "status": ["observation-treatment-intervention-preference.json"],
+        "category:us-core": ["observation-treatment-intervention-preference.json (treatment-intervention-preference)"],
+        "code": ["observation-treatment-intervention-preference.json (fixed 75773-2)"],
+        "subject": ["observation-treatment-intervention-preference.json"],
+        "effective[x]": ["observation-treatment-intervention-preference.json"],
+        "performer": ["observation-treatment-intervention-preference.json (Patient)"],
+        "value[x]": ["observation-treatment-intervention-preference.json (very long valueString, ~1500 chars)"]
+      },
+      "gaps": []
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-questionnaireresponse": {
+      "mustSupport": ["questionnaire", "questionnaire.extension:url", "status", "subject", "authored", "author", "item.linkId", "item.text", "item.answer", "item.answer.value[x]"],
+      "covered": {
+        "questionnaire": ["questionnaireresponse-hvs.json (canonical + display extension via _questionnaire)", "questionnaireresponse-intake-numeric.json"],
+        "questionnaire.extension:url": ["questionnaireresponse-hvs.json (us-core-extension-questionnaire-uri)", "questionnaireresponse-intake-numeric.json"],
+        "status": ["questionnaireresponse-hvs.json (completed)", "questionnaireresponse-intake-numeric.json (completed)"],
+        "subject": ["questionnaireresponse-hvs.json", "questionnaireresponse-intake-numeric.json"],
+        "authored": ["questionnaireresponse-hvs.json", "questionnaireresponse-intake-numeric.json"],
+        "author": ["questionnaireresponse-hvs.json (display-only)", "questionnaireresponse-intake-numeric.json (display-only)"],
+        "item.linkId": ["questionnaireresponse-hvs.json (incl. nested group items)", "questionnaireresponse-intake-numeric.json"],
+        "item.text": ["questionnaireresponse-hvs.json", "questionnaireresponse-intake-numeric.json"],
+        "item.answer": ["questionnaireresponse-hvs.json (also one item with text but NO answer)", "questionnaireresponse-intake-numeric.json"],
+        "item.answer.value[x]": ["questionnaireresponse-hvs.json (valueCoding, valueBoolean, valueString)", "questionnaireresponse-intake-numeric.json (valueDate, valueDateTime, valueDecimal, valueInteger, valueQuantity, valueBoolean, valueString, valueReference, valueAttachment inline data)"],
+        "item.answer.item (nested item under answer)": ["questionnaireresponse-intake-numeric.json (exercise -> minutes-per-week + type)"]
+      },
+      "gaps": ["answer types valueTime and valueUri not exercised (no realistic intake question; all types named in the 9.0.0 MS note on answer.value[x] breadth are now covered)"]
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-adi-documentation": {
+      "mustSupport": ["extension:supporting-info", "status", "category:us-core", "code", "subject", "issued", "performer", "value[x]"],
+      "covered": {
+        "extension:supporting-info": ["observation-adi-documentation.json (workflow-supportingInfo -> documents/documentreference-adi-living-will.json)"],
+        "status": ["observation-adi-documentation.json (final)"],
+        "category:us-core": ["observation-adi-documentation.json (us-core-category observation-adi-documentation)"],
+        "code": ["observation-adi-documentation.json (fixed LOINC 45473-6)"],
+        "subject": ["observation-adi-documentation.json"],
+        "issued": ["observation-adi-documentation.json"],
+        "performer": ["observation-adi-documentation.json (display-only)"],
+        "value[x]": ["observation-adi-documentation.json (valueCodeableConcept SNOMED 373066001 Yes)"]
+      },
+      "gaps": ["only the Yes answer instantiated (No/Unknown from the required yes-no-unknown answer set not repeated); single supporting-info extension (multiple ADI documents not exercised)"]
+    }
+  },
+  "variants": {
+    "value[x]": ["CodeableConcept", "string", "Quantity", "absent-with-dataAbsentReason", "absent-on-panel"],
+    "effective[x]": ["dateTime (day precision)", "dateTime (with time+tz)", "Period (open-ended)", "Period (closed)"],
+    "status": ["final", "entered-in-error", "amended", "preliminary", "completed (QR)"],
+    "QR answer value[x]": ["Coding", "boolean", "string", "date", "dateTime", "decimal", "integer", "Quantity", "Reference", "Attachment (inline data, never url)"],
+    "structure": ["hasMember panel", "derivedFrom chain (risk -> panel -> QuestionnaireResponse)", "component (occupation industry)", "contained resource (Practitioner)", "nested item under answer (questionnaireresponse-intake-numeric)", "workflow-supportingInfo extension -> cross-family ADI DocumentReference"],
+    "edgeCases": {
+      "code-only coding (no display)": "observation-sexual-orientation.json",
+      "text-only CodeableConcept": "observation-simple-smartdata.json (code)",
+      "multiple codings incl. translation": "observation-smokingstatus-current.json (SNOMED + LOINC LA)",
+      "very long string": "observation-treatment-intervention-preference.json",
+      "unicode": "observation-care-experience-preference.json",
+      "multiple identifiers": "observation-sdoh-hvs-panel.json",
+      "contained resource": "observation-occupation.json",
+      "reference by display only": "observation-simple-disability-status.json (derivedFrom), most performers",
+      "extension noise": "observation-smokingstatus-current.json (Epic urn extension)",
+      "epicQuirkCategories": ["sdoh", "survey", "smartdata", "functional-status", "disability-status", "display-rich Epic urn codings alongside standard codings"]
+    }
+  }
+}

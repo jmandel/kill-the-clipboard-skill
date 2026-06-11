@@ -1,0 +1,39 @@
+{
+  "resourceType": "Observation",
+  "id": "observation-urine-nitrite",
+  "meta": { "lastUpdated": "2025-09-02T13:02:45Z" },
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        { "system": "http://terminology.hl7.org/CodeSystem/observation-category", "code": "laboratory", "display": "Laboratory" }
+      ]
+    }
+  ],
+  "code": {
+    "coding": [
+      { "system": "http://loinc.org", "code": "5802-4", "display": "Nitrite [Presence] in Urine by Test strip" }
+    ],
+    "text": "Nitrite, Urine"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "effectiveDateTime": "2025-09-02T07:30:00-05:00",
+  "issued": "2025-09-02T13:00:00Z",
+  "performer": [
+    { "display": "Breadth Test Laboratory" }
+  ],
+  "valueBoolean": true,
+  "interpretation": [
+    {
+      "coding": [
+        { "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation", "code": "A", "display": "Abnormal" }
+      ]
+    }
+  ],
+  "specimen": {
+    "reference": "Specimen/specimen-urine-clean-catch"
+  }
+}

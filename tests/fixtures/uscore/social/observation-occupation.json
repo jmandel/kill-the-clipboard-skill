@@ -1,0 +1,92 @@
+{
+  "resourceType": "Observation",
+  "id": "observation-occupation",
+  "contained": [
+    {
+      "resourceType": "Practitioner",
+      "id": "contained-performer",
+      "identifier": [
+        {
+          "system": "http://hl7.org/fhir/sid/us-npi",
+          "value": "9999990001"
+        }
+      ],
+      "name": [
+        {
+          "family": "Renderer",
+          "given": ["Sample"],
+          "prefix": ["Dr."],
+          "text": "Dr. Sample Renderer"
+        }
+      ]
+    }
+  ],
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+          "code": "social-history",
+          "display": "Social History"
+        }
+      ]
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "11341-5",
+        "display": "History of Occupation"
+      }
+    ],
+    "text": "Occupation"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "effectivePeriod": {
+    "start": "2019-06-01"
+  },
+  "performer": [
+    {
+      "reference": "#contained-performer",
+      "display": "Dr. Sample Renderer"
+    }
+  ],
+  "valueCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/PHOccupationalDataForHealthODH",
+        "code": "31-1014.00.007136",
+        "display": "Certified Nursing Assistant (CNA) [Nursing Assistants]"
+      }
+    ],
+    "text": "Certified Nursing Assistant"
+  },
+  "component": [
+    {
+      "code": {
+        "coding": [
+          {
+            "system": "http://loinc.org",
+            "code": "86188-0",
+            "display": "History of Occupation industry"
+          }
+        ]
+      },
+      "valueCodeableConcept": {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/PHOccupationalDataForHealthODH",
+            "code": "621610.008495",
+            "display": "Home nursing services"
+          }
+        ],
+        "text": "Home health care services"
+      }
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "resourceType": "Medication",
+  "id": "medication-metformin-er",
+  "identifier": [
+    { "system": "https://breadth-test-medical.example.org/medication-id", "value": "MED-86097" }
+  ],
+  "code": {
+    "coding": [
+      { "system": "http://www.nlm.nih.gov/research/umls/rxnorm", "code": "860975", "display": "24 HR metformin hydrochloride 500 MG Extended Release Oral Tablet" },
+      { "system": "http://hl7.org/fhir/sid/ndc", "code": "00378-7155-05", "display": "METFORMIN ER 500MG TAB" },
+      { "system": "urn:oid:1.2.840.114350.1.13.999.2.7.2.698288", "code": "169201", "display": "metFORMIN HCl 24 hr ER (GLUCOPHAGE XR) 500 mg tablet" }
+    ],
+    "text": "metFORMIN HCl 24 hr ER (GLUCOPHAGE XR) 500 mg tablet"
+  },
+  "form": {
+    "coding": [
+      { "system": "http://snomed.info/sct", "code": "421026006", "display": "Oral tablet (qualifier value)" }
+    ],
+    "text": "tablet, extended release 24 hr"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "resourceType": "Organization",
+  "id": "organization-breadth-reference-lab",
+  "extension": [
+    {
+      "url": "https://open.epic.com/fhir/extensions/lab-routing-code",
+      "valueString": "RTE-LAB-77"
+    }
+  ],
+  "identifier": [
+    {
+      "system": "urn:oid:2.16.840.1.113883.4.7",
+      "value": "99D9999999",
+      "type": {
+        "text": "CLIA number"
+      }
+    },
+    {
+      "system": "http://hl7.org/fhir/sid/us-npi",
+      "value": "1444333227"
+    }
+  ],
+  "active": true,
+  "name": "Breadth Test Regional Reference Laboratory and Pathology Services of Greater Sample County, Specialty Send-Out and Esoteric Testing Division",
+  "telecom": [
+    { "system": "fax", "value": "555-555-0166", "use": "work" }
+  ],
+  "address": [
+    {
+      "line": ["9000 Assay Avenue"],
+      "city": "Sample City",
+      "state": "WA",
+      "postalCode": "98102",
+      "country": "US"
+    }
+  ]
+}

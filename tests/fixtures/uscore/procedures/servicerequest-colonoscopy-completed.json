@@ -1,0 +1,49 @@
+{
+  "resourceType": "ServiceRequest",
+  "id": "servicerequest-colonoscopy-completed",
+  "identifier": [
+    { "system": "https://breadth-test-medical.example.org/order-id", "value": "ORD-2024-31566" }
+  ],
+  "status": "completed",
+  "intent": "order",
+  "category": [
+    {
+      "coding": [
+        { "system": "http://snomed.info/sct", "code": "387713003", "display": "Surgical procedure" }
+      ]
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "45378",
+        "display": "Colonoscopy, flexible; diagnostic"
+      }
+    ],
+    "text": "Colonoscopy, diagnostic — screening order"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "encounter": {
+    "display": "Primary care office visit, 2024-08-22"
+  },
+  "occurrenceDateTime": "2024-09-17",
+  "authoredOn": "2024-08-22T14:05:00-05:00",
+  "requester": {
+    "display": "Dr. Sample Renderer, MD — Breadth Test Primary Care"
+  },
+  "reasonCode": [
+    {
+      "coding": [
+        { "system": "http://snomed.info/sct", "code": "171057006", "display": "Screening for malignant neoplasm of large intestine (procedure)" }
+      ],
+      "text": "Average-risk colorectal cancer screening"
+    }
+  ],
+  "note": [
+    { "text": "Split-dose bowel prep instructions provided." }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "resourceType": "PractitionerRole",
+  "id": "practitionerrole-cardiology",
+  "active": true,
+  "period": { "start": "2024-01-01" },
+  "practitioner": {
+    "reference": "Practitioner/practitioner-sample-renderer",
+    "display": "Dr. Sample Q. Renderer, MD"
+  },
+  "organization": {
+    "reference": "Organization/organization-breadth-test-medical",
+    "display": "Breadth Test Medical Center"
+  },
+  "code": [
+    {
+      "coding": [
+        { "system": "http://snomed.info/sct", "code": "17561000", "display": "Cardiologist" },
+        { "system": "http://nucc.org/provider-taxonomy", "code": "207RC0000X", "display": "Internal Medicine Physician - Cardiovascular Disease" }
+      ],
+      "text": "Cardiologist"
+    }
+  ],
+  "specialty": [
+    {
+      "coding": [
+        { "system": "http://nucc.org/provider-taxonomy", "code": "207RC0000X", "display": "Internal Medicine Physician - Cardiovascular Disease" }
+      ],
+      "text": "Cardiovascular Disease"
+    }
+  ],
+  "location": [
+    {
+      "reference": "Location/location-breadth-clinic",
+      "display": "Breadth Test Clinic"
+    }
+  ],
+  "telecom": [
+    { "system": "phone", "value": "555-555-0150", "use": "work" },
+    { "system": "email", "value": "cardiology@breadth-test-medical.example.org", "use": "work" }
+  ]
+}

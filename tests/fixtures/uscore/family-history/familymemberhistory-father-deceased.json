@@ -1,0 +1,86 @@
+{
+  "resourceType": "FamilyMemberHistory",
+  "id": "familymemberhistory-father-deceased",
+  "status": "completed",
+  "patient": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "date": "2025-04-10",
+  "name": "Frank Breadth-Tester",
+  "relationship": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+        "code": "FTH",
+        "display": "father"
+      }
+    ],
+    "text": "Father"
+  },
+  "sex": {
+    "coding": [
+      {
+        "system": "http://hl7.org/fhir/administrative-gender",
+        "code": "male",
+        "display": "Male"
+      }
+    ]
+  },
+  "deceasedAge": {
+    "value": 71,
+    "unit": "years",
+    "system": "http://unitsofmeasure.org",
+    "code": "a"
+  },
+  "condition": [
+    {
+      "code": {
+        "coding": [
+          {
+            "system": "http://snomed.info/sct",
+            "code": "22298006",
+            "display": "Myocardial infarction (disorder)"
+          }
+        ],
+        "text": "Heart attack"
+      },
+      "contributedToDeath": true,
+      "onsetRange": {
+        "low": {
+          "value": 60,
+          "unit": "years",
+          "system": "http://unitsofmeasure.org",
+          "code": "a"
+        },
+        "high": {
+          "value": 65,
+          "unit": "years",
+          "system": "http://unitsofmeasure.org",
+          "code": "a"
+        }
+      },
+      "note": [
+        {
+          "text": "First infarct sometime in his early 60s; fatal second event."
+        }
+      ]
+    },
+    {
+      "code": {
+        "coding": [
+          {
+            "system": "http://snomed.info/sct",
+            "code": "44054006",
+            "display": "Diabetes mellitus type 2 (disorder)"
+          }
+        ],
+        "text": "Type 2 diabetes"
+      },
+      "onsetPeriod": {
+        "start": "2005",
+        "end": "2019"
+      }
+    }
+  ]
+}

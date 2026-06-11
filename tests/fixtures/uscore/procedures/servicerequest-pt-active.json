@@ -1,0 +1,58 @@
+{
+  "resourceType": "ServiceRequest",
+  "id": "servicerequest-pt-active",
+  "status": "active",
+  "intent": "order",
+  "category": [
+    {
+      "coding": [
+        { "system": "http://snomed.info/sct", "code": "386053000", "display": "Evaluation procedure" }
+      ],
+      "text": "Rehabilitation therapy"
+    }
+  ],
+  "code": {
+    "coding": [
+      { "system": "http://snomed.info/sct", "code": "91251008", "display": "Physical therapy procedure (regime/therapy)" },
+      { "system": "http://www.ama-assn.org/go/cpt", "code": "97110", "display": "Therapeutic exercises to develop strength and endurance, range of motion and flexibility, each 15 minutes" }
+    ],
+    "text": "Physical therapy — lumbar stabilization program"
+  },
+  "orderDetail": [
+    { "text": "Therapeutic exercise with core stabilization focus; progress to home exercise program" },
+    {
+      "coding": [
+        { "system": "http://www.ama-assn.org/go/cpt", "code": "97140", "display": "Manual therapy techniques, 1 or more regions, each 15 minutes" }
+      ],
+      "text": "Include manual therapy as tolerated"
+    }
+  ],
+  "quantityQuantity": {
+    "value": 12,
+    "unit": "sessions"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "occurrenceTiming": {
+    "repeat": {
+      "boundsPeriod": { "start": "2025-11-10", "end": "2026-01-05" },
+      "frequency": 2,
+      "period": 1,
+      "periodUnit": "wk"
+    },
+    "code": { "text": "Twice weekly for 8 weeks" }
+  },
+  "authoredOn": "2025-11-03T10:20:00-06:00",
+  "requester": {
+    "display": "Dr. Example Orthopedist, MD"
+  },
+  "performer": [
+    { "display": "Breadth Test Rehabilitation Services" }
+  ],
+  "reasonReference": [
+    { "display": "Chronic low back pain without radiculopathy (Condition, display-only reference)" }
+  ],
+  "patientInstruction": "Wear comfortable clothing; bring prior imaging reports to first visit."
+}

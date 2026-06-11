@@ -1,0 +1,37 @@
+{
+  "resourceType": "DocumentReference",
+  "id": "documentreference-superseded-minimal",
+  "status": "superseded",
+  "type": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "34117-2"
+      }
+    ]
+  },
+  "category": [
+    {
+      "text": "History & physical"
+    }
+  ],
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001"
+  },
+  "relatesTo": [
+    {
+      "code": "replaces",
+      "target": {
+        "display": "Corrected History and Physical note of 2025-08-02"
+      }
+    }
+  ],
+  "content": [
+    {
+      "attachment": {
+        "contentType": "text/plain",
+        "data": "VGhpcyBub3RlIHdhcyBzdXBlcnNlZGVkIGJ5IGEgY29ycmVjdGVkIHZlcnNpb24gb24gMjAyNS0wOC0wMi4="
+      }
+    }
+  ]
+}

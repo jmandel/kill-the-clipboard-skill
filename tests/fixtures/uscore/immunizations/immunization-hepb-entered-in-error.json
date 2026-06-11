@@ -1,0 +1,17 @@
+{
+  "resourceType": "Immunization",
+  "id": "immunization-hepb-entered-in-error",
+  "status": "entered-in-error",
+  "vaccineCode": {
+    "text": "hepatitis B vaccine, adult formulation (free-text entry, no code captured)"
+  },
+  "patient": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "occurrenceDateTime": "2025-01-08",
+  "primarySource": true,
+  "note": [
+    { "text": "Entered on wrong patient chart; voided 2025-01-09 by registrar." }
+  ]
+}

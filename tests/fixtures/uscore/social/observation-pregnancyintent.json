@@ -1,0 +1,46 @@
+{
+  "resourceType": "Observation",
+  "id": "observation-pregnancyintent",
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+          "code": "social-history",
+          "display": "Social History"
+        }
+      ]
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "86645-9",
+        "display": "Pregnancy intention in the next year - Reported"
+      }
+    ],
+    "text": "Pregnancy intention in the next year"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "effectiveDateTime": "2025-09-18T10:22:00-07:00",
+  "performer": [
+    {
+      "display": "Dr. Sample Renderer"
+    }
+  ],
+  "valueCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "454381000124105",
+        "display": "Not sure of desire to become pregnant (finding)"
+      }
+    ],
+    "text": "Not sure"
+  }
+}

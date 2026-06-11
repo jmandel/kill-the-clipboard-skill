@@ -1,0 +1,34 @@
+{
+  "resourceType": "Device",
+  "id": "device-insulin-pump-active",
+  "udiCarrier": [
+    {
+      "deviceIdentifier": "B1XCRT001234567",
+      "issuer": "http://hl7.org/fhir/NamingSystem/hibcc-di",
+      "jurisdiction": "http://hl7.org/fhir/NamingSystem/fda-udi",
+      "carrierHRF": "+B1XCRT0012345671G2406%$$3270630/S24Q6001IP/16D20240605C1",
+      "entryType": "manual"
+    }
+  ],
+  "status": "active",
+  "manufacturer": "Bösch Diabetes Technik GmbH (Synthetic)",
+  "expirationDate": "2027-06-30",
+  "serialNumber": "IP-2406-001",
+  "deviceName": [
+    { "name": "GlucoFlow Implantable Insulin Pump", "type": "user-friendly-name" },
+    { "name": "GF-IIP-7", "type": "model-name" }
+  ],
+  "version": [
+    { "value": "Firmware 3.2.1" }
+  ],
+  "type": {
+    "coding": [
+      { "system": "http://snomed.info/sct", "code": "69805005", "display": "Insulin pump, device" }
+    ],
+    "text": "Implantable insulin pump"
+  },
+  "patient": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  }
+}

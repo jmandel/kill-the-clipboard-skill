@@ -1,0 +1,77 @@
+{
+  "resourceType": "DocumentReference",
+  "id": "documentreference-progress-note",
+  "identifier": [
+    {
+      "system": "https://breadth-test-medical.example.org/document-id",
+      "value": "DOC-2025-031401"
+    }
+  ],
+  "status": "current",
+  "docStatus": "final",
+  "type": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "11506-3",
+        "display": "Progress note"
+      }
+    ],
+    "text": "Progress note"
+  },
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://hl7.org/fhir/us/core/CodeSystem/us-core-documentreference-category",
+          "code": "clinical-note",
+          "display": "Clinical Note"
+        }
+      ],
+      "text": "Clinical Note"
+    }
+  ],
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "date": "2025-03-14T16:45:00Z",
+  "author": [
+    {
+      "reference": "Practitioner/practitioner-sample-renderer",
+      "display": "Dr. Sample Renderer"
+    }
+  ],
+  "custodian": {
+    "reference": "Organization/organization-breadth-test-medical",
+    "display": "Breadth Test Medical Center"
+  },
+  "description": "Hospital medicine progress note, day 3 of inpatient stay for community-acquired pneumonia.",
+  "content": [
+    {
+      "attachment": {
+        "contentType": "text/plain",
+        "data": "UFJPR1JFU1MgTk9URSAtIDIwMjUtMDMtMTQKUGF0aWVudDogQ2FzZXkgQnJlYWR0aC1UZXN0ZXIgKE1STiBCUkVBRFRILTAwMDEpCkF1dGhvcjogRHIuIFNhbXBsZSBSZW5kZXJlciwgSG9zcGl0YWwgTWVkaWNpbmUKClN1YmplY3RpdmU6IFBhdGllbnQgcmVwb3J0cyBpbXByb3ZlZCBicmVhdGhpbmcgb3Zlcm5pZ2h0LiBObyBjaGVzdCBwYWluLiBUb2xlcmF0aW5nIGRpZXQuCk9iamVjdGl2ZTogVCAzNi44IEMsIEhSIDc4LCBCUCAxMjIvNzYsIFNwTzIgOTYlIG9uIHJvb20gYWlyLiBMdW5ncyB3aXRoIHNjYXR0ZXJlZCBjcmFja2xlcwphdCByaWdodCBiYXNlLCBpbXByb3ZlZCBmcm9tIGFkbWlzc2lvbi4gTm8gbG93ZXIgZXh0cmVtaXR5IGVkZW1hLgpBc3Nlc3NtZW50L1BsYW46IENvbW11bml0eS1hY3F1aXJlZCBwbmV1bW9uaWEsIGltcHJvdmluZyBvbiBjZWZ0cmlheG9uZSBkYXkgMy4KMS4gVHJhbnNpdGlvbiB0byBvcmFsIGFtb3hpY2lsbGluLWNsYXZ1bGFuYXRlIHRvZGF5LgoyLiBBbWJ1bGF0ZSB3aXRoIHBoeXNpY2FsIHRoZXJhcHkuCjMuIEFudGljaXBhdGUgZGlzY2hhcmdlIHRvbW9ycm93IGlmIGFmZWJyaWxlIGZvciAyNCBob3Vycy4K",
+        "title": "Progress note 2025-03-14",
+        "creation": "2025-03-14T16:40:00Z"
+      },
+      "format": {
+        "system": "http://ihe.net/fhir/ihe.formatcode.fhir/CodeSystem/formatcode",
+        "code": "urn:ihe:iti:xds:2017:mimeTypeSufficient",
+        "display": "mimeType Sufficient"
+      }
+    }
+  ],
+  "context": {
+    "encounter": [
+      {
+        "reference": "Encounter/encounter-imp-hospitalization",
+        "display": "Inpatient hospitalization, Breadth Test Medical Center"
+      }
+    ],
+    "period": {
+      "start": "2025-03-12T08:15:00Z",
+      "end": "2025-03-15T11:00:00Z"
+    }
+  }
+}

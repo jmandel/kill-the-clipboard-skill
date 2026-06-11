@@ -1,0 +1,24 @@
+{
+  "name": "kill-the-clipboard",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "bun test",
+    "test:render": "RUN_RENDER=1 bun test skill/kill-the-clipboard/scripts/lib/fhir-render skill/kill-the-clipboard/scripts/tests/md-to-pdf.test.ts",
+    "test:all": "RUN_RENDER=1 RUN_VOLUME=1 bun test",
+    "test:par": "RUN_RENDER=1 bash scripts/test-parallel.sh",
+    "server": "bun run server/src/index.ts"
+  },
+  "dependencies": {
+    "@react-pdf/renderer": "4.5.1",
+    "qrcode": "^1.5.4",
+    "react": "19.2.7",
+    "react-dom": "19.2.7"
+  },
+  "devDependencies": {
+    "@types/qrcode": "^1.5.5",
+    "@types/react": "19.2.7",
+    "bun-types": "^1.3.14",
+    "jose": "^4.15.9"
+  }
+}

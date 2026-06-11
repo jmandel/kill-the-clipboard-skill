@@ -1,0 +1,69 @@
+{
+  "resourceType": "QuestionnaireResponse",
+  "id": "questionnaireresponse-hvs",
+  "questionnaire": "http://example.org/fhir/Questionnaire/hunger-vital-sign",
+  "_questionnaire": {
+    "extension": [
+      {
+        "url": "http://hl7.org/fhir/StructureDefinition/display",
+        "valueString": "Hunger Vital Sign (HVS)"
+      },
+      {
+        "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-extension-questionnaire-uri",
+        "valueUri": "https://breadth-test-medical.example.org/forms/hunger-vital-sign-v2"
+      }
+    ]
+  },
+  "status": "completed",
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "authored": "2025-08-20T14:05:00-05:00",
+  "author": {
+    "display": "Sam Intake-Coordinator, RN"
+  },
+  "item": [
+    {
+      "linkId": "hvs-group",
+      "text": "Hunger Vital Sign",
+      "item": [
+        {
+          "linkId": "hvs-group/88122-7",
+          "text": "Within the past 12 months we worried whether our food would run out before we got money to buy more.",
+          "answer": [
+            {
+              "valueCoding": {
+                "system": "http://loinc.org",
+                "code": "LA28397-0",
+                "display": "Often true"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "hvs-group/88123-5",
+          "text": "Within the past 12 months the food we bought just didn't last and we didn't have money to get more."
+        }
+      ]
+    },
+    {
+      "linkId": "resource-help",
+      "text": "Would you like help connecting with food resources?",
+      "answer": [
+        {
+          "valueBoolean": true
+        }
+      ]
+    },
+    {
+      "linkId": "comments",
+      "text": "Additional comments",
+      "answer": [
+        {
+          "valueString": "Declined to answer the second question; asked about the food pantry on 5th Street."
+        }
+      ]
+    }
+  ]
+}

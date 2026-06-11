@@ -1,0 +1,108 @@
+{
+  "family": "encounters",
+  "uscoreVersion": "9.0.0",
+  "profiles": {
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-encounter": {
+      "mustSupport": [
+        "meta.lastUpdated",
+        "extension:interpreterRequired (us-core-interpreter-needed)",
+        "identifier",
+        "identifier.system",
+        "identifier.value",
+        "status",
+        "class",
+        "type",
+        "subject",
+        "participant",
+        "participant.type",
+        "participant.period",
+        "participant.individual",
+        "period",
+        "reasonCode",
+        "reasonReference",
+        "hospitalization.dischargeDisposition",
+        "location",
+        "location.location",
+        "serviceProvider"
+      ],
+      "covered": {
+        "meta.lastUpdated": ["encounter-imp-hospitalization.json"],
+        "extension:interpreterRequired (us-core-interpreter-needed)": ["encounter-in-progress-no-end.json"],
+        "identifier": ["encounter-amb-office.json", "encounter-imp-hospitalization.json", "encounter-epic-quirk-telehealth.json"],
+        "identifier.system": ["encounter-amb-office.json", "encounter-imp-hospitalization.json"],
+        "identifier.value": ["encounter-amb-office.json", "encounter-imp-hospitalization.json"],
+        "status": ["encounter-amb-office.json", "encounter-emer-discharge.json", "encounter-imp-hospitalization.json", "encounter-in-progress-no-end.json", "encounter-cancelled-minimal.json"],
+        "class": ["encounter-amb-office.json", "encounter-emer-discharge.json", "encounter-imp-hospitalization.json", "encounter-epic-quirk-telehealth.json", "encounter-cancelled-minimal.json"],
+        "type": ["encounter-amb-office.json", "encounter-emer-discharge.json", "encounter-imp-hospitalization.json", "encounter-cancelled-minimal.json", "encounter-epic-quirk-telehealth.json"],
+        "subject": ["encounter-amb-office.json", "encounter-emer-discharge.json", "encounter-imp-hospitalization.json", "encounter-in-progress-no-end.json", "encounter-cancelled-minimal.json", "encounter-epic-quirk-telehealth.json"],
+        "participant": ["encounter-amb-office.json", "encounter-emer-discharge.json", "encounter-imp-hospitalization.json", "encounter-epic-quirk-telehealth.json"],
+        "participant.type": ["encounter-amb-office.json", "encounter-emer-discharge.json", "encounter-imp-hospitalization.json"],
+        "participant.period": ["encounter-amb-office.json", "encounter-imp-hospitalization.json", "encounter-in-progress-no-end.json"],
+        "participant.individual": ["encounter-amb-office.json", "encounter-emer-discharge.json", "encounter-epic-quirk-telehealth.json"],
+        "period": ["encounter-amb-office.json", "encounter-emer-discharge.json", "encounter-imp-hospitalization.json", "encounter-in-progress-no-end.json", "encounter-cancelled-minimal.json"],
+        "reasonCode": ["encounter-amb-office.json", "encounter-emer-discharge.json", "encounter-imp-hospitalization.json", "encounter-epic-quirk-telehealth.json"],
+        "reasonReference": ["encounter-emer-discharge.json"],
+        "hospitalization.dischargeDisposition": ["encounter-emer-discharge.json", "encounter-imp-hospitalization.json"],
+        "location": ["encounter-amb-office.json", "encounter-emer-discharge.json", "encounter-imp-hospitalization.json", "encounter-epic-quirk-telehealth.json"],
+        "location.location": ["encounter-amb-office.json", "encounter-emer-discharge.json", "encounter-imp-hospitalization.json", "encounter-epic-quirk-telehealth.json"],
+        "serviceProvider": ["encounter-amb-office.json", "encounter-emer-discharge.json", "encounter-imp-hospitalization.json", "encounter-epic-quirk-telehealth.json"]
+      },
+      "gaps": [
+        "reasonReference is a display-only reference (no Condition fixture in this family; conditions family owns Condition instances)",
+        "participant.individual / serviceProvider Practitioner and Organization targets are reference+display or display-only; Practitioner/Organization fixtures live in other families"
+      ]
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-location": {
+      "mustSupport": [
+        "identifier",
+        "status",
+        "name",
+        "type",
+        "type.coding",
+        "type.coding.system",
+        "type.coding.code",
+        "telecom",
+        "address",
+        "address.line",
+        "address.city",
+        "address.state",
+        "address.postalCode",
+        "managingOrganization"
+      ],
+      "covered": {
+        "identifier": ["location-breadth-clinic.json", "location-breadth-hospital.json"],
+        "status": ["location-breadth-clinic.json", "location-breadth-hospital.json"],
+        "name": ["location-breadth-clinic.json", "location-breadth-hospital.json"],
+        "type": ["location-breadth-clinic.json", "location-breadth-hospital.json"],
+        "type.coding": ["location-breadth-clinic.json", "location-breadth-hospital.json"],
+        "type.coding.system": ["location-breadth-clinic.json", "location-breadth-hospital.json"],
+        "type.coding.code": ["location-breadth-clinic.json", "location-breadth-hospital.json"],
+        "telecom": ["location-breadth-clinic.json", "location-breadth-hospital.json"],
+        "address": ["location-breadth-clinic.json", "location-breadth-hospital.json"],
+        "address.line": ["location-breadth-clinic.json", "location-breadth-hospital.json"],
+        "address.city": ["location-breadth-clinic.json", "location-breadth-hospital.json"],
+        "address.state": ["location-breadth-clinic.json", "location-breadth-hospital.json"],
+        "address.postalCode": ["location-breadth-clinic.json", "location-breadth-hospital.json"],
+        "managingOrganization": ["location-breadth-clinic.json", "location-breadth-hospital.json"]
+      },
+      "gaps": [
+        "Location.status only exercises 'active' (suspended/inactive omitted to keep the set minimal; renderer treats status as opaque code)"
+      ]
+    }
+  },
+  "variants": {
+    "Encounter.class": ["AMB", "EMER", "IMP", "VR", "AMB code-only (no display)"],
+    "Encounter.status": ["finished", "in-progress", "cancelled"],
+    "Encounter.type": ["CPT 99213", "CPT 99284", "CPT 99223 + SNOMED translation", "CPT 99222", "CPT 99395 code-only", "Epic proprietary urn:oid coding + CPT"],
+    "Encounter.period": ["start+end dateTime", "start-only (in progress)", "date-precision start-only"],
+    "Encounter.reasonCode": ["SNOMED coding+text", "text-only", "coding without text", "Epic proprietary + SNOMED translation"],
+    "Encounter.location.location": ["reference+display to family Location", "display-only reference"],
+    "Encounter.serviceProvider": ["reference+display", "display-only", "very long display string"],
+    "Encounter.identifier": ["single", "multiple incl. urn:oid system + VN type", "Epic-style use:usual"],
+    "Encounter.participant": ["typed with period and reference", "display-only individual", "multiple participants", "individual without type (Epic quirk)"],
+    "Location.address": ["2-line with use", "1-line with zip+4"],
+    "Location.type": ["v3-RoleCode OF", "v3-RoleCode HOSP + SNOMED translation", "repeating type (ER)"],
+    "unicode": ["encounter-epic-quirk-telehealth.json participant display (Sánchez-Müller, 家庭医学)", "location-breadth-hospital.json alias (French diacritics)"],
+    "extension-noise": ["encounter-in-progress-no-end.json unknown proprietary extension"]
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "resourceType": "Observation",
+  "id": "observation-bmi",
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        { "system": "http://terminology.hl7.org/CodeSystem/observation-category", "code": "vital-signs", "display": "Vital Signs" }
+      ]
+    }
+  ],
+  "code": {
+    "coding": [
+      { "system": "http://loinc.org", "code": "39156-5", "display": "Body mass index (BMI) [Ratio]" }
+    ],
+    "text": "BMI"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "effectiveDateTime": "2024-09-17T14:05:00-05:00",
+  "valueQuantity": {
+    "value": 22.4,
+    "unit": "kg/m2",
+    "system": "http://unitsofmeasure.org",
+    "code": "kg/m2"
+  },
+  "interpretation": [
+    { "text": "Within normal limits per institutional adult BMI cutoffs" }
+  ],
+  "derivedFrom": [
+    { "reference": "Observation/observation-height", "display": "Body height 175.3 cm" },
+    { "reference": "Observation/observation-weight", "display": "Body weight 152 lb" }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "resourceType": "FamilyMemberHistory",
+  "id": "familymemberhistory-mother-completed",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-familymemberhistory-recorder",
+      "valueReference": {
+        "reference": "Practitioner/practitioner-sample-renderer",
+        "display": "Dr. Sample Renderer"
+      }
+    }
+  ],
+  "status": "completed",
+  "patient": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "date": "2025-04-10",
+  "name": "Margaret Breadth-Tester",
+  "relationship": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+        "code": "MTH",
+        "display": "mother"
+      }
+    ],
+    "text": "Mother"
+  },
+  "sex": {
+    "coding": [
+      {
+        "system": "http://hl7.org/fhir/administrative-gender",
+        "code": "female",
+        "display": "Female"
+      }
+    ]
+  },
+  "bornDate": "1955-06-14",
+  "deceasedBoolean": false,
+  "condition": [
+    {
+      "code": {
+        "coding": [
+          {
+            "system": "http://snomed.info/sct",
+            "code": "254837009",
+            "display": "Malignant neoplasm of breast (disorder)"
+          },
+          {
+            "system": "http://hl7.org/fhir/sid/icd-10-cm",
+            "code": "C50.911",
+            "display": "Malignant neoplasm of unspecified site of right female breast"
+          }
+        ],
+        "text": "Breast cancer"
+      },
+      "onsetAge": {
+        "value": 52,
+        "unit": "years",
+        "system": "http://unitsofmeasure.org",
+        "code": "a"
+      },
+      "note": [
+        {
+          "text": "Treated with lumpectomy and radiation; in remission since 2010."
+        }
+      ]
+    },
+    {
+      "code": {
+        "coding": [
+          {
+            "system": "http://snomed.info/sct",
+            "code": "38341003",
+            "display": "Hypertensive disorder, systemic arterial (disorder)"
+          }
+        ],
+        "text": "High blood pressure"
+      },
+      "onsetString": "mid-40s"
+    }
+  ],
+  "note": [
+    {
+      "text": "History obtained directly from the family member during a joint visit."
+    }
+  ]
+}

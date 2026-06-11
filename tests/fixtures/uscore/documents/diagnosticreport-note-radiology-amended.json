@@ -1,0 +1,92 @@
+{
+  "resourceType": "DiagnosticReport",
+  "id": "diagnosticreport-note-radiology-amended",
+  "identifier": [
+    {
+      "system": "https://breadth-test-medical.example.org/report-id",
+      "value": "RPT-2025-0312-XR"
+    },
+    {
+      "system": "urn:oid:1.2.840.114350.1.13.999.2.7.2.798268",
+      "value": "IMG-44120077",
+      "type": {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+            "code": "ACSN",
+            "display": "Accession ID"
+          }
+        ]
+      }
+    }
+  ],
+  "status": "amended",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "LP29684-5",
+          "display": "Radiology"
+        },
+        {
+          "system": "urn:oid:1.2.840.114350.1.13.999.2.7.10.798268.30",
+          "code": "Imaging",
+          "display": "Imaging"
+        }
+      ],
+      "text": "Imaging"
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "36643-5",
+        "display": "XR Chest 2 Views"
+      }
+    ],
+    "text": "XR CHEST 2 VW"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "encounter": {
+    "display": "Inpatient stay, Breadth Test Medical Center, March 2025"
+  },
+  "effectivePeriod": {
+    "start": "2025-03-12T09:05:00Z",
+    "end": "2025-03-12T09:12:00Z"
+  },
+  "issued": "2025-03-13T07:40:00Z",
+  "performer": [
+    {
+      "display": "Breadth Test Imaging Associates"
+    }
+  ],
+  "resultsInterpreter": [
+    {
+      "display": "Dr. Fictitious Radiologist, MD"
+    }
+  ],
+  "result": [
+    {
+      "display": "Right lower lobe consolidation consistent with pneumonia"
+    }
+  ],
+  "presentedForm": [
+    {
+      "contentType": "application/pdf",
+      "data": "JVBERi0xLjQKMSAwIG9iaiA8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4gZW5kb2JqCjIgMCBvYmogPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4gZW5kb2JqCjMgMCBvYmogPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvTWVkaWFCb3ggWzAgMCA2MTIgNzkyXSAvQ29udGVudHMgNCAwIFIgPj4gZW5kb2JqCjQgMCBvYmogPDwgL0xlbmd0aCA2NiA+PiBzdHJlYW0KQlQgL0YxIDEyIFRmIDcyIDcyMCBUZCAoWFIgQ2hlc3QgMiBWaWV3cyAtIEFtZW5kZWQgUmVwb3J0KSBUaiBFVAplbmRzdHJlYW0gZW5kb2JqCnRyYWlsZXIgPDwgL1Jvb3QgMSAwIFIgL1NpemUgNSA+PgolJUVPRgo=",
+      "title": "XR Chest 2 Views — Amended Report (PDF)",
+      "creation": "2025-03-13T07:35:00Z",
+      "size": 356
+    },
+    {
+      "contentType": "text/plain",
+      "data": "QU1FTkRFRCAyMDI1LTAzLTEzOiBSaWdodCBsb3dlciBsb2JlIGNvbnNvbGlkYXRpb24gY29uc2lzdGVudCB3aXRoIHBuZXVtb25pYS4gTm8gZWZmdXNpb24u",
+      "title": "Amended impression (plain text)"
+    }
+  ]
+}

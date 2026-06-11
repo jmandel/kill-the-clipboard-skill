@@ -1,0 +1,89 @@
+{
+  "resourceType": "CareTeam",
+  "id": "careteam-active-multirole",
+  "contained": [
+    {
+      "resourceType": "Practitioner",
+      "id": "contained-cdces",
+      "name": [{ "family": "Example", "given": ["Pat"], "suffix": ["RN", "CDCES"], "text": "Pat Example, RN CDCES" }],
+      "telecom": [{ "system": "phone", "value": "555-555-0173", "use": "work" }]
+    }
+  ],
+  "status": "active",
+  "name": "Diabetes Longitudinal Care Team",
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "period": { "start": "2025-10-22" },
+  "participant": [
+    {
+      "role": [
+        {
+          "coding": [
+            { "system": "http://snomed.info/sct", "code": "62247001", "display": "Family medicine specialist" },
+            { "system": "http://nucc.org/provider-taxonomy", "code": "207Q00000X", "display": "Family Medicine Physician" }
+          ],
+          "text": "Primary Care Provider"
+        }
+      ],
+      "member": {
+        "reference": "Practitioner/practitioner-sample-renderer",
+        "display": "Dr. Sample Renderer"
+      },
+      "period": { "start": "2025-10-22" }
+    },
+    {
+      "role": [
+        {
+          "coding": [
+            { "system": "http://nucc.org/provider-taxonomy", "code": "163W00000X", "display": "Registered Nurse" }
+          ],
+          "text": "Certified Diabetes Care and Education Specialist"
+        }
+      ],
+      "member": {
+        "reference": "#contained-cdces",
+        "display": "Pat Example, RN CDCES"
+      }
+    },
+    {
+      "role": [
+        { "text": "Caregiver / emergency contact" }
+      ],
+      "member": {
+        "reference": "RelatedPerson/relatedperson-jordan-spouse",
+        "display": "Jordan Breadth-Tester (spouse)"
+      }
+    },
+    {
+      "role": [
+        {
+          "coding": [
+            { "system": "http://snomed.info/sct", "code": "116154003", "display": "Patient" }
+          ]
+        }
+      ],
+      "member": {
+        "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+        "display": "Casey Breadth-Tester"
+      }
+    },
+    {
+      "role": [
+        {
+          "coding": [
+            { "system": "http://nucc.org/provider-taxonomy", "code": "261QP2300X", "display": "Primary Care Clinic/Center" }
+          ]
+        }
+      ],
+      "member": {
+        "display": "Breadth Test Medical Center — Endocrinology Clinic"
+      },
+      "onBehalfOf": { "display": "Breadth Test Medical Center" }
+    }
+  ],
+  "managingOrganization": [
+    { "display": "Breadth Test Medical Center" }
+  ]
+}

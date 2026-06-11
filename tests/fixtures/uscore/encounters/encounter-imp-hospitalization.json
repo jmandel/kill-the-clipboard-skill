@@ -1,0 +1,145 @@
+{
+  "resourceType": "Encounter",
+  "id": "encounter-imp-hospitalization",
+  "meta": {
+    "lastUpdated": "2025-06-20T14:02:11Z"
+  },
+  "identifier": [
+    {
+      "system": "https://breadth-test-medical.example.org/encounter-id",
+      "value": "ENC-2025-007731"
+    },
+    {
+      "system": "urn:oid:1.2.840.114350.1.13.999.2.7.3.698084.8",
+      "value": "HAR-55012393",
+      "type": {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+            "code": "VN",
+            "display": "Visit number"
+          }
+        ]
+      }
+    }
+  ],
+  "status": "finished",
+  "class": {
+    "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+    "code": "IMP",
+    "display": "inpatient encounter"
+  },
+  "type": [
+    {
+      "coding": [
+        {
+          "system": "http://www.ama-assn.org/go/cpt",
+          "code": "99223",
+          "display": "Initial hospital inpatient or observation care, per day, high level of medical decision making"
+        },
+        {
+          "system": "http://snomed.info/sct",
+          "code": "32485007",
+          "display": "Hospital admission (procedure)"
+        }
+      ],
+      "text": "Inpatient admission"
+    }
+  ],
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "participant": [
+    {
+      "type": [
+        {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/v3-ParticipationType",
+              "code": "ATND",
+              "display": "attender"
+            }
+          ]
+        }
+      ],
+      "period": {
+        "start": "2025-06-14T11:05:00-05:00",
+        "end": "2025-06-19T10:00:00-05:00"
+      },
+      "individual": {
+        "reference": "Practitioner/practitioner-sample-hospitalist",
+        "display": "Dr. Inpatient Sample, MD (Hospital Medicine)"
+      }
+    },
+    {
+      "type": [
+        {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/v3-ParticipationType",
+              "code": "CON",
+              "display": "consultant"
+            }
+          ]
+        }
+      ],
+      "individual": {
+        "display": "Dr. Consult Renderer, MD (Infectious Disease)"
+      }
+    }
+  ],
+  "period": {
+    "start": "2025-06-14T11:05:00-05:00",
+    "end": "2025-06-19T10:30:00-05:00"
+  },
+  "reasonCode": [
+    {
+      "coding": [
+        {
+          "system": "http://snomed.info/sct",
+          "code": "233604007",
+          "display": "Pneumonia (disorder)"
+        }
+      ],
+      "text": "Community-acquired pneumonia"
+    },
+    {
+      "coding": [
+        {
+          "system": "http://snomed.info/sct",
+          "code": "91302008",
+          "display": "Sepsis (disorder)"
+        }
+      ]
+    }
+  ],
+  "hospitalization": {
+    "dischargeDisposition": {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/discharge-disposition",
+          "code": "snf",
+          "display": "Skilled nursing facility"
+        }
+      ],
+      "text": "Discharged/transferred to a skilled nursing facility (SNF) with Medicare certification in anticipation of skilled care"
+    }
+  },
+  "location": [
+    {
+      "location": {
+        "reference": "Location/location-breadth-hospital",
+        "display": "Breadth Test General Hospital"
+      },
+      "period": {
+        "start": "2025-06-14T11:05:00-05:00",
+        "end": "2025-06-19T10:30:00-05:00"
+      }
+    }
+  ],
+  "serviceProvider": {
+    "reference": "Organization/organization-breadth-test-medical",
+    "display": "Breadth Test Medical Center"
+  }
+}

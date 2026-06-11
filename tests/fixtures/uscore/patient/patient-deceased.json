@@ -1,0 +1,60 @@
+{
+  "resourceType": "Patient",
+  "id": "patient-deceased",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race",
+      "extension": [
+        { "url": "ombCategory", "valueCoding": { "system": "urn:oid:2.16.840.1.113883.6.238", "code": "2054-5", "display": "Black or African American" } },
+        { "url": "text", "valueString": "Black or African American" }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity",
+      "extension": [
+        { "url": "ombCategory", "valueCoding": { "system": "urn:oid:2.16.840.1.113883.6.238", "code": "2135-2", "display": "Hispanic or Latino" } },
+        { "url": "detailed", "valueCoding": { "system": "urn:oid:2.16.840.1.113883.6.238", "code": "2148-5", "display": "Mexican" } },
+        { "url": "text", "valueString": "Hispanic or Latino - Mexican" }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-individual-sex",
+      "valueCoding": { "system": "http://snomed.info/sct", "code": "248153007", "display": "Male (finding)" }
+    },
+    {
+      "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-interpreter-needed",
+      "valueCoding": { "system": "http://snomed.info/sct", "code": "373067005", "display": "No (qualifier value)" }
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/patient-religion",
+      "valueCodeableConcept": { "coding": [{ "system": "http://terminology.hl7.org/CodeSystem/v3-ReligiousAffiliation", "code": "1041", "display": "Roman Catholic Church" }] }
+    }
+  ],
+  "identifier": [
+    { "system": "https://breadth-test-medical.example.org/mrn", "value": "BREADTH-0046", "type": { "coding": [{ "system": "http://terminology.hl7.org/CodeSystem/v2-0203", "code": "MR", "display": "Medical Record Number" }] } }
+  ],
+  "active": false,
+  "name": [
+    { "use": "official", "family": "Renderer-Decedent", "given": ["Hector", "Manuel"], "suffix": ["Sr."], "text": "Hector Manuel Renderer-Decedent Sr." }
+  ],
+  "telecom": [
+    { "system": "phone", "value": "555-555-0103", "use": "home" }
+  ],
+  "gender": "male",
+  "birthDate": "1942-03-17",
+  "deceasedDateTime": "2025-11-02T14:30:00-06:00",
+  "address": [
+    {
+      "use": "home",
+      "line": ["1600 Extraordinarily Long Assisted Living And Skilled Nursing Rehabilitation Facility Campus Access Road, Building 7, North Wing, Memory Care Unit", "Room 214-B"],
+      "city": "Sample City",
+      "state": "WA",
+      "postalCode": "98103",
+      "country": "US"
+    }
+  ],
+  "communication": [
+    { "language": { "text": "Spanish" }, "preferred": true }
+  ],
+  "managingOrganization": { "display": "Breadth Test Medical Center" }
+}

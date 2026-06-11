@@ -1,0 +1,65 @@
+{
+  "resourceType": "Observation",
+  "id": "observation-potassium-high",
+  "meta": { "lastUpdated": "2025-03-10T11:05:33Z" },
+  "extension": [
+    {
+      "url": "https://open.epic.com/fhir/extensions/observation-instant",
+      "valueDateTime": "2025-03-10T10:58:00Z"
+    }
+  ],
+  "status": "preliminary",
+  "category": [
+    {
+      "coding": [
+        { "system": "http://terminology.hl7.org/CodeSystem/observation-category", "code": "laboratory", "display": "Laboratory" }
+      ]
+    },
+    {
+      "coding": [
+        { "code": "Lab" }
+      ],
+      "text": "Lab"
+    }
+  ],
+  "code": {
+    "coding": [
+      { "system": "http://loinc.org", "code": "2823-3", "display": "Potassium [Moles/volume] in Serum or Plasma" },
+      { "system": "https://breadth-test-medical.example.org/lab-codes", "code": "POT" }
+    ],
+    "text": "Potassium Level"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "effectiveDateTime": "2025-03-10T08:20:00-05:00",
+  "issued": "2025-03-10T11:05:00Z",
+  "performer": [
+    { "display": "Breadth Test Laboratory" },
+    { "display": "Dr. Sample Renderer, MD" }
+  ],
+  "valueQuantity": {
+    "value": 5.9,
+    "unit": "mmol/L",
+    "system": "http://unitsofmeasure.org",
+    "code": "mmol/L"
+  },
+  "interpretation": [
+    {
+      "coding": [
+        { "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation", "code": "H", "display": "High" }
+      ],
+      "text": "High"
+    }
+  ],
+  "specimen": {
+    "reference": "Specimen/specimen-blood-venous"
+  },
+  "referenceRange": [
+    {
+      "low": { "value": 3.5, "unit": "mmol/L", "system": "http://unitsofmeasure.org", "code": "mmol/L" },
+      "high": { "value": 5.1, "unit": "mmol/L", "system": "http://unitsofmeasure.org", "code": "mmol/L" }
+    }
+  ]
+}

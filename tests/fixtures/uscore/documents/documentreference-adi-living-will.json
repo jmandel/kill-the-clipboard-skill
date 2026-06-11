@@ -1,0 +1,76 @@
+{
+  "resourceType": "DocumentReference",
+  "id": "documentreference-adi-living-will",
+  "identifier": [
+    {
+      "system": "https://breadth-test-medical.example.org/document-id",
+      "value": "ADI-2025-000087"
+    }
+  ],
+  "status": "current",
+  "docStatus": "final",
+  "type": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "75320-2",
+        "display": "Advance directive"
+      },
+      {
+        "system": "http://loinc.org",
+        "code": "86533-7",
+        "display": "Patient Living will"
+      }
+    ],
+    "text": "Living will"
+  },
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "42348-3",
+          "display": "Advance healthcare directives"
+        }
+      ],
+      "text": "Advance healthcare directives"
+    }
+  ],
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "date": "2025-09-04T16:20:00Z",
+  "author": [
+    {
+      "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+      "display": "Casey Breadth-Tester (patient-authored)"
+    }
+  ],
+  "custodian": {
+    "reference": "Organization/organization-breadth-test-medical",
+    "display": "Breadth Test Medical Center"
+  },
+  "description": "Living will executed by the patient on 2025-09-01, witnessed and uploaded to the chart by health information management.",
+  "content": [
+    {
+      "attachment": {
+        "contentType": "application/pdf",
+        "data": "JVBERi0xLjQKMSAwIG9iaiA8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4gZW5kb2JqCjIgMCBvYmogPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4gZW5kb2JqCjMgMCBvYmogPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvTWVkaWFCb3ggWzAgMCA2MTIgNzkyXSAvQ29udGVudHMgNCAwIFIgPj4gZW5kb2JqCjQgMCBvYmogPDwgL0xlbmd0aCA2NiA+PiBzdHJlYW0KQlQgL0YxIDEyIFRmIDcyIDcyMCBUZCAoTGl2aW5nIFdpbGwgLSBDYXNleSBCcmVhZHRoLVRlc3RlcikgVGogRVQKZW5kc3RyZWFtIGVuZG9iagp0cmFpbGVyIDw8IC9Sb290IDEgMCBSIC9TaXplIDUgPj4KJSVFT0YK",
+        "title": "Living Will (PDF)",
+        "creation": "2025-09-01",
+        "size": 357
+      },
+      "format": {
+        "system": "http://ihe.net/fhir/ihe.formatcode.fhir/CodeSystem/formatcode",
+        "code": "urn:ihe:iti:xds:2017:mimeTypeSufficient",
+        "display": "mimeType Sufficient"
+      }
+    }
+  ],
+  "context": {
+    "period": {
+      "start": "2025-09-01"
+    }
+  }
+}

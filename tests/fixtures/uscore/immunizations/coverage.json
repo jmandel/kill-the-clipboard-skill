@@ -1,0 +1,86 @@
+{
+  "family": "immunizations",
+  "uscoreVersion": "9.0.0",
+  "profiles": {
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-immunization": {
+      "mustSupport": [
+        "status",
+        "statusReason",
+        "vaccineCode",
+        "patient",
+        "encounter",
+        "occurrence[x]",
+        "primarySource",
+        "location",
+        "lotNumber",
+        "performer",
+        "performer.actor"
+      ],
+      "covered": {
+        "status": [
+          "immunization-flu-completed.json",
+          "immunization-covid-completed.json",
+          "immunization-tdap-historical.json",
+          "immunization-flu-not-done.json",
+          "immunization-hepb-entered-in-error.json"
+        ],
+        "statusReason": ["immunization-flu-not-done.json"],
+        "vaccineCode": [
+          "immunization-flu-completed.json",
+          "immunization-covid-completed.json",
+          "immunization-tdap-historical.json",
+          "immunization-flu-not-done.json",
+          "immunization-hepb-entered-in-error.json"
+        ],
+        "patient": [
+          "immunization-flu-completed.json",
+          "immunization-covid-completed.json",
+          "immunization-tdap-historical.json",
+          "immunization-flu-not-done.json",
+          "immunization-hepb-entered-in-error.json"
+        ],
+        "encounter": ["immunization-flu-completed.json"],
+        "occurrence[x]": [
+          "immunization-flu-completed.json",
+          "immunization-covid-completed.json",
+          "immunization-tdap-historical.json",
+          "immunization-flu-not-done.json",
+          "immunization-hepb-entered-in-error.json"
+        ],
+        "primarySource": [
+          "immunization-flu-completed.json",
+          "immunization-covid-completed.json",
+          "immunization-tdap-historical.json",
+          "immunization-flu-not-done.json",
+          "immunization-hepb-entered-in-error.json"
+        ],
+        "location": ["immunization-flu-completed.json"],
+        "lotNumber": ["immunization-flu-completed.json", "immunization-covid-completed.json"],
+        "performer": ["immunization-flu-completed.json", "immunization-covid-completed.json"],
+        "performer.actor": ["immunization-flu-completed.json", "immunization-covid-completed.json"]
+      },
+      "gaps": []
+    }
+  },
+  "variants": {
+    "status": ["completed", "not-done", "entered-in-error"],
+    "occurrence[x]": ["dateTime (with timezone offset)", "dateTime (date-only)", "string"],
+    "vaccineCode": [
+      "CVX with display + text",
+      "CVX + NDC translation coding (us-core-5 SHOULD)",
+      "code-only CVX coding (no display)",
+      "text-only CodeableConcept"
+    ],
+    "primarySource": ["true", "false with reportOrigin"],
+    "performer.actor": ["contained Practitioner", "display-only Reference (Organization, Practitioner)"],
+    "edgeCases": [
+      "contained resource (Practitioner in immunization-flu-completed)",
+      "reference-by-display-only (encounter, location, performer actor)",
+      "multiple identifiers (immunization-tdap-historical)",
+      "very long string (lotNumber in immunization-covid-completed)",
+      "unicode in note (immunization-covid-completed)",
+      "Epic-style extension noise (immunization-flu-completed)",
+      "non-MS extras a renderer must tolerate: site, route, doseQuantity, expirationDate, performer.function, note"
+    ]
+  }
+}

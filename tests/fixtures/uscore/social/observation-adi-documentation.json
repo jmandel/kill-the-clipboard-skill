@@ -1,0 +1,57 @@
+{
+  "resourceType": "Observation",
+  "id": "observation-adi-documentation",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/workflow-supportingInfo",
+      "valueReference": {
+        "reference": "DocumentReference/documentreference-adi-living-will",
+        "display": "Living will (advance directive, PDF)"
+      }
+    }
+  ],
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://hl7.org/fhir/us/core/CodeSystem/us-core-category",
+          "code": "observation-adi-documentation",
+          "display": "Observation ADI Documentation"
+        }
+      ],
+      "text": "Advance directive documentation"
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "45473-6",
+        "display": "Advance healthcare directive completed"
+      }
+    ],
+    "text": "Advance healthcare directive completed"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "effectiveDateTime": "2025-09-04T16:25:00Z",
+  "issued": "2025-09-04T16:30:00Z",
+  "performer": [
+    {
+      "display": "Dr. Sample Renderer"
+    }
+  ],
+  "valueCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "373066001",
+        "display": "Yes (qualifier value)"
+      }
+    ],
+    "text": "Yes"
+  }
+}

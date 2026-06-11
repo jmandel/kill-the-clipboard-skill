@@ -1,0 +1,45 @@
+{
+  "resourceType": "Observation",
+  "id": "observation-temperature",
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        { "system": "http://terminology.hl7.org/CodeSystem/observation-category", "code": "vital-signs", "display": "Vital Signs" },
+        { "system": "urn:oid:1.2.840.114350.1.13.0.1.7.10.798268.30", "code": "Vitals", "display": "Vitals" }
+      ]
+    }
+  ],
+  "code": {
+    "coding": [
+      { "system": "http://loinc.org", "code": "8310-5", "display": "Body temperature" },
+      { "system": "http://snomed.info/sct", "code": "386725007", "display": "Body temperature" }
+    ],
+    "text": "Temperature (oral)"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "effectiveDateTime": "2025-03-11T09:31:00-05:00",
+  "valueQuantity": {
+    "value": 38.1,
+    "unit": "C",
+    "system": "http://unitsofmeasure.org",
+    "code": "Cel"
+  },
+  "interpretation": [
+    {
+      "coding": [
+        { "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation", "code": "H", "display": "High" }
+      ],
+      "text": "Above reference range"
+    }
+  ],
+  "method": {
+    "text": "oral thermometer, electronic"
+  },
+  "note": [
+    { "text": "Paciente reporta que se siente afiebrada desde anoche — 体温計で測定 (38.1 °C)." }
+  ]
+}

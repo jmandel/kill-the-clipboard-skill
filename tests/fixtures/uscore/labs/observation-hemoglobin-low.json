@@ -1,0 +1,57 @@
+{
+  "resourceType": "Observation",
+  "id": "observation-hemoglobin-low",
+  "meta": { "lastUpdated": "2025-03-10T14:22:00Z" },
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        { "system": "http://terminology.hl7.org/CodeSystem/observation-category", "code": "laboratory", "display": "Laboratory" }
+      ],
+      "text": "Laboratory"
+    }
+  ],
+  "code": {
+    "coding": [
+      { "system": "http://loinc.org", "code": "718-7", "display": "Hemoglobin [Mass/volume] in Blood" }
+    ],
+    "text": "Hemoglobin"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "encounter": {
+    "display": "Office visit at Breadth Test Medical Center, 2025-03-10"
+  },
+  "effectiveDateTime": "2025-03-10T08:20:00-05:00",
+  "issued": "2025-03-10T14:20:00Z",
+  "performer": [
+    { "display": "Breadth Test Laboratory" }
+  ],
+  "valueQuantity": {
+    "value": 10.8,
+    "unit": "g/dL",
+    "system": "http://unitsofmeasure.org",
+    "code": "g/dL"
+  },
+  "interpretation": [
+    {
+      "coding": [
+        { "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation", "code": "L", "display": "Low" }
+      ],
+      "text": "Low"
+    }
+  ],
+  "specimen": {
+    "reference": "Specimen/specimen-blood-venous",
+    "display": "Venous blood specimen"
+  },
+  "referenceRange": [
+    {
+      "low": { "value": 12.0, "unit": "g/dL", "system": "http://unitsofmeasure.org", "code": "g/dL" },
+      "high": { "value": 15.5, "unit": "g/dL", "system": "http://unitsofmeasure.org", "code": "g/dL" },
+      "text": "12.0 - 15.5 g/dL"
+    }
+  ]
+}

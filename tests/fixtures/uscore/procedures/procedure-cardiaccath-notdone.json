@@ -1,0 +1,30 @@
+{
+  "resourceType": "Procedure",
+  "id": "procedure-cardiaccath-notdone",
+  "status": "not-done",
+  "statusReason": {
+    "coding": [
+      { "system": "http://snomed.info/sct", "code": "183944003", "display": "Procedure refused (situation)" }
+    ],
+    "text": "Patient declined after risk/benefit discussion"
+  },
+  "code": {
+    "text": "Left heart catheterization (text-only code, no coding)"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "reasonCode": [
+    {
+      "coding": [
+        { "system": "http://snomed.info/sct", "code": "29857009", "display": "Chest pain (finding)" },
+        { "system": "http://hl7.org/fhir/sid/icd-10-cm", "code": "R07.9", "display": "Chest pain, unspecified" }
+      ],
+      "text": "Atypical chest pain, intermediate pretest probability"
+    }
+  ],
+  "asserter": {
+    "display": "Dr. Sample Renderer, MD"
+  }
+}

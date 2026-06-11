@@ -1,0 +1,71 @@
+{
+  "resourceType": "Condition",
+  "id": "condition-food-insecurity-health-concern",
+  "meta": {
+    "lastUpdated": "2026-01-15T11:05:30Z"
+  },
+  "clinicalStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+        "code": "active",
+        "display": "Active"
+      }
+    ]
+  },
+  "verificationStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+        "code": "unconfirmed",
+        "display": "Unconfirmed"
+      }
+    ],
+    "text": "Unconfirmed — patient-reported on SDOH screening"
+  },
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+          "code": "health-concern",
+          "display": "Health Concern"
+        }
+      ],
+      "text": "Health Concern"
+    },
+    {
+      "coding": [
+        {
+          "system": "http://hl7.org/fhir/us/core/CodeSystem/us-core-category",
+          "code": "sdoh",
+          "display": "SDOH"
+        },
+        {
+          "system": "urn:oid:1.2.840.114350.1.13.0.1.7.10.654321.999",
+          "code": "sdoh",
+          "display": "Social Determinants Of Health"
+        }
+      ],
+      "text": "SDOH"
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "733423003",
+        "display": "Food insecurity (finding)"
+      }
+    ],
+    "text": "Food insecurity — 食品不安全 (identified via Hunger Vital Sign screening)"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "recordedDate": "2026-01-15",
+  "asserter": {
+    "display": "Casey Breadth-Tester (self-reported)"
+  }
+}

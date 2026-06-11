@@ -1,0 +1,46 @@
+{
+  "resourceType": "Practitioner",
+  "id": "practitioner-sample-hospitalist",
+  "extension": [
+    {
+      "url": "https://open.epic.com/fhir/extensions/provider-display-rank",
+      "valueInteger": 2
+    }
+  ],
+  "identifier": [
+    {
+      "system": "http://hl7.org/fhir/sid/us-npi",
+      "value": "1999888773"
+    },
+    {
+      "system": "urn:oid:1.2.840.114350.1.13.999.2.7.2.836982",
+      "value": "eTOf4r2-SAMPLE-EPIC-ID-x3"
+    }
+  ],
+  "name": [
+    {
+      "use": "official",
+      "family": "Sample-Hospitalist",
+      "given": ["José", "María"],
+      "prefix": ["Dr."],
+      "text": "Dr. José María Sample-Hospitalist, DO"
+    },
+    {
+      "use": "usual",
+      "given": ["Pepe"]
+    }
+  ],
+  "telecom": [
+    { "system": "phone", "value": "555-555-0177", "use": "work" }
+  ],
+  "qualification": [
+    {
+      "code": {
+        "coding": [
+          { "system": "http://terminology.hl7.org/CodeSystem/v2-0360", "code": "DO", "display": "Doctor of Osteopathy" }
+        ]
+      },
+      "issuer": { "display": "Sample State Osteopathic Board" }
+    }
+  ]
+}

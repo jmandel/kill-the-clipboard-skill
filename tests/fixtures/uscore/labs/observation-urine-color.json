@@ -1,0 +1,37 @@
+{
+  "resourceType": "Observation",
+  "id": "observation-urine-color",
+  "meta": { "lastUpdated": "2025-09-02T13:02:45Z" },
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        { "system": "http://terminology.hl7.org/CodeSystem/observation-category", "code": "laboratory", "display": "Laboratory" }
+      ]
+    }
+  ],
+  "code": {
+    "coding": [
+      { "system": "http://loinc.org", "code": "5778-6", "display": "Color of Urine" }
+    ],
+    "text": "Urine Color"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "effectiveDateTime": "2025-09-02T07:30:00-05:00",
+  "issued": "2025-09-02T13:00:00Z",
+  "performer": [
+    { "display": "Breadth Test Laboratory" }
+  ],
+  "valueString": "Dark amber",
+  "specimen": {
+    "reference": "Specimen/specimen-urine-clean-catch"
+  },
+  "note": [
+    {
+      "text": "Specimen visually inspected prior to dipstick testing. Color graded against the laboratory's standard urine color chart under fluorescent lighting per SOP UA-COLOR-07 rev 4; note that ambient lighting differences between collection sites (Sample City main campus vs. the 4242 Coverage Court satellite draw station) have historically produced one-step grading discrepancies, so dark amber results are routinely confirmed by a second technologist before release. Confirmed by S. Técnico-Müller, MLS(ASCP); patient instructions were provided in English and 中文. Specific gravity correlation pending — see urinalysis dipstick panel for full results. Volume received: 30 µL aliquot from a 50 mL collection container."
+    }
+  ]
+}

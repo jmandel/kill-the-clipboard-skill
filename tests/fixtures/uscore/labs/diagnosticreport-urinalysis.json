@@ -1,0 +1,42 @@
+{
+  "resourceType": "DiagnosticReport",
+  "id": "diagnosticreport-urinalysis",
+  "meta": { "lastUpdated": "2025-09-03T09:16:00Z" },
+  "status": "preliminary",
+  "category": [
+    {
+      "coding": [
+        { "system": "http://terminology.hl7.org/CodeSystem/v2-0074", "code": "LAB", "display": "Laboratory" }
+      ]
+    }
+  ],
+  "code": {
+    "coding": [
+      { "system": "http://loinc.org", "code": "24356-8", "display": "Urinalysis complete panel - Urine" }
+    ],
+    "text": "Urinalysis, Complete"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "effectivePeriod": {
+    "start": "2025-09-02T07:30:00-05:00",
+    "end": "2025-09-02T12:45:00-05:00"
+  },
+  "issued": "2025-09-02T13:05:00Z",
+  "performer": [
+    { "display": "Breadth Test Laboratory" }
+  ],
+  "resultsInterpreter": [
+    { "display": "Dr. Sample Renderer, MD" }
+  ],
+  "specimen": [
+    { "reference": "Specimen/specimen-urine-clean-catch", "display": "Urine, clean catch" }
+  ],
+  "result": [
+    { "reference": "Observation/observation-urine-color", "display": "Urine Color: Dark amber" },
+    { "reference": "Observation/observation-urine-dipstick", "display": "Urinalysis, Dipstick" },
+    { "reference": "Observation/observation-urine-nitrite", "display": "Nitrite: Positive" }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "resourceType": "Observation",
+  "id": "observation-vitals-panel",
+  "identifier": [
+    {
+      "system": "urn:oid:1.2.840.114350.1.13.0.1.7.2.798268",
+      "value": "e7XQvZk1m2breadthPANEL.vitals1",
+      "use": "usual"
+    },
+    {
+      "system": "https://breadth-test-medical.example.org/flowsheet-instance",
+      "value": "FS-2025-0311-0930"
+    }
+  ],
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        { "system": "http://terminology.hl7.org/CodeSystem/observation-category", "code": "vital-signs", "display": "Vital Signs" }
+      ],
+      "text": "Vital Signs"
+    }
+  ],
+  "code": {
+    "coding": [
+      { "system": "http://loinc.org", "code": "85353-1", "display": "Vital signs, weight, height, head circumference, oxygen saturation and BMI panel" }
+    ],
+    "text": "Vital signs panel"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "effectiveDateTime": "2025-03-11T09:30:00-05:00",
+  "performer": [
+    { "display": "Breadth Test Medical Center rooming staff" }
+  ],
+  "hasMember": [
+    { "reference": "Observation/observation-bp", "display": "Blood pressure 132/84 mm[Hg]" },
+    { "reference": "Observation/observation-heart-rate", "display": "Heart rate 72 /min" },
+    { "reference": "Observation/observation-respiratory-rate", "display": "Respiratory rate 16 /min" },
+    { "reference": "Observation/observation-temperature", "display": "Body temperature 38.1 Cel" },
+    { "display": "Oxygen saturation 97% on room air (resulted in legacy system; no resource available)" }
+  ]
+}

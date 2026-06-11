@@ -1,0 +1,242 @@
+{
+  "family": "documents",
+  "uscoreVersion": "9.0.0",
+  "profiles": {
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-documentreference": {
+      "mustSupport": [
+        "identifier",
+        "status",
+        "type",
+        "category",
+        "category:uscore",
+        "subject",
+        "date",
+        "author",
+        "content",
+        "content.attachment",
+        "content.attachment.contentType",
+        "content.attachment.data",
+        "content.attachment.url",
+        "content.format",
+        "context.encounter",
+        "context.period"
+      ],
+      "covered": {
+        "identifier": [
+          "documentreference-progress-note.json",
+          "documentreference-discharge-summary-pdf.json",
+          "documentreference-consult-note.json"
+        ],
+        "status": [
+          "documentreference-progress-note.json",
+          "documentreference-superseded-minimal.json"
+        ],
+        "type": [
+          "documentreference-progress-note.json",
+          "documentreference-discharge-summary-pdf.json",
+          "documentreference-consult-note.json",
+          "documentreference-superseded-minimal.json"
+        ],
+        "category": [
+          "documentreference-progress-note.json",
+          "documentreference-discharge-summary-pdf.json",
+          "documentreference-superseded-minimal.json"
+        ],
+        "category:uscore": [
+          "documentreference-progress-note.json",
+          "documentreference-discharge-summary-pdf.json",
+          "documentreference-consult-note.json"
+        ],
+        "subject": [
+          "documentreference-progress-note.json",
+          "documentreference-superseded-minimal.json"
+        ],
+        "date": [
+          "documentreference-progress-note.json",
+          "documentreference-discharge-summary-pdf.json"
+        ],
+        "author": [
+          "documentreference-progress-note.json",
+          "documentreference-discharge-summary-pdf.json",
+          "documentreference-consult-note.json"
+        ],
+        "content": [
+          "documentreference-progress-note.json",
+          "documentreference-discharge-summary-pdf.json",
+          "documentreference-consult-note.json",
+          "documentreference-superseded-minimal.json"
+        ],
+        "content.attachment": [
+          "documentreference-progress-note.json",
+          "documentreference-discharge-summary-pdf.json"
+        ],
+        "content.attachment.contentType": [
+          "documentreference-progress-note.json",
+          "documentreference-discharge-summary-pdf.json"
+        ],
+        "content.attachment.data": [
+          "documentreference-progress-note.json",
+          "documentreference-discharge-summary-pdf.json",
+          "documentreference-consult-note.json",
+          "documentreference-superseded-minimal.json"
+        ],
+        "content.format": [
+          "documentreference-progress-note.json",
+          "documentreference-discharge-summary-pdf.json"
+        ],
+        "context.encounter": [
+          "documentreference-progress-note.json",
+          "documentreference-discharge-summary-pdf.json",
+          "documentreference-consult-note.json"
+        ],
+        "context.period": [
+          "documentreference-progress-note.json",
+          "documentreference-discharge-summary-pdf.json",
+          "documentreference-consult-note.json"
+        ]
+      },
+      "gaps": [
+        "content.attachment.url — deliberately omitted everywhere per KTC rule (inline data only); us-core-6 satisfied via attachment.data in every instance"
+      ]
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-adi-documentreference": {
+      "mustSupport": [
+        "identifier",
+        "status",
+        "type",
+        "category",
+        "category:adi",
+        "subject",
+        "date",
+        "author",
+        "content",
+        "content.attachment",
+        "content.attachment.contentType",
+        "content.attachment.data",
+        "content.attachment.url",
+        "content.format"
+      ],
+      "covered": {
+        "identifier": ["documentreference-adi-living-will.json"],
+        "status": ["documentreference-adi-living-will.json"],
+        "type": ["documentreference-adi-living-will.json (LOINC 75320-2 + 86533-7, ADHD-grouper VS)"],
+        "category": ["documentreference-adi-living-will.json"],
+        "category:adi": ["documentreference-adi-living-will.json (LOINC 42348-3 Advance healthcare directives)"],
+        "subject": ["documentreference-adi-living-will.json"],
+        "date": ["documentreference-adi-living-will.json"],
+        "author": ["documentreference-adi-living-will.json (patient-authored, constant urn)"],
+        "content": ["documentreference-adi-living-will.json"],
+        "content.attachment": ["documentreference-adi-living-will.json"],
+        "content.attachment.contentType": ["documentreference-adi-living-will.json (application/pdf)"],
+        "content.attachment.data": ["documentreference-adi-living-will.json (inline base64 PDF stub)"],
+        "content.format": ["documentreference-adi-living-will.json"]
+      },
+      "gaps": [
+        "content.attachment.url — deliberately omitted per KTC rule (inline data only); us-core-6 satisfied via attachment.data",
+        "single instance only — DNR/POLST type variants from the ADHD-grouper value set not instantiated (living-will exercises the shared ADI rendering path; cross-referenced by social/observation-adi-documentation.json)"
+      ]
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-note": {
+      "mustSupport": [
+        "status",
+        "category",
+        "category:us-core",
+        "code",
+        "subject",
+        "encounter",
+        "effective[x]",
+        "effectiveDateTime",
+        "issued",
+        "performer",
+        "resultsInterpreter",
+        "result",
+        "presentedForm"
+      ],
+      "covered": {
+        "status": [
+          "diagnosticreport-note-cardiology.json",
+          "diagnosticreport-note-radiology-amended.json"
+        ],
+        "category": [
+          "diagnosticreport-note-cardiology.json",
+          "diagnosticreport-note-radiology-amended.json"
+        ],
+        "category:us-core": [
+          "diagnosticreport-note-cardiology.json",
+          "diagnosticreport-note-radiology-amended.json"
+        ],
+        "code": [
+          "diagnosticreport-note-cardiology.json",
+          "diagnosticreport-note-radiology-amended.json"
+        ],
+        "subject": [
+          "diagnosticreport-note-cardiology.json",
+          "diagnosticreport-note-radiology-amended.json"
+        ],
+        "encounter": [
+          "diagnosticreport-note-cardiology.json",
+          "diagnosticreport-note-radiology-amended.json"
+        ],
+        "effective[x]": [
+          "diagnosticreport-note-cardiology.json",
+          "diagnosticreport-note-radiology-amended.json"
+        ],
+        "effectiveDateTime": [
+          "diagnosticreport-note-cardiology.json"
+        ],
+        "issued": [
+          "diagnosticreport-note-cardiology.json",
+          "diagnosticreport-note-radiology-amended.json"
+        ],
+        "performer": [
+          "diagnosticreport-note-cardiology.json",
+          "diagnosticreport-note-radiology-amended.json"
+        ],
+        "resultsInterpreter": [
+          "diagnosticreport-note-cardiology.json",
+          "diagnosticreport-note-radiology-amended.json"
+        ],
+        "result": [
+          "diagnosticreport-note-radiology-amended.json"
+        ],
+        "presentedForm": [
+          "diagnosticreport-note-cardiology.json",
+          "diagnosticreport-note-radiology-amended.json"
+        ]
+      },
+      "gaps": []
+    }
+  },
+  "variants": {
+    "DocumentReference.type (LOINC note type)": [
+      "11506-3 Progress note",
+      "18842-5 Discharge summary",
+      "11488-4 Consult note",
+      "34117-2 History and physical note (code-only, no display)",
+      "75320-2 Advance directive + 86533-7 Patient Living will (ADI profile)"
+    ],
+    "DocumentReference.category": [
+      "clinical-note (us-core slice)",
+      "42348-3 Advance healthcare directives (adi slice)"
+    ],
+    "attachment.contentType": ["text/plain", "application/pdf"],
+    "attachment delivery": ["inline base64 data only (never url, KTC rule)"],
+    "DocumentReference.status": ["current", "superseded"],
+    "docStatus": ["final", "preliminary", "absent"],
+    "DiagnosticReport.status": ["final", "amended"],
+    "DiagnosticReport.effective[x]": ["dateTime", "Period"],
+    "DiagnosticReport.category (note exchange)": ["LP29708-2 Cardiology", "LP29684-5 Radiology"],
+    "presentedForm": ["single text/plain", "multiple (pdf + text)"],
+    "edge cases": [
+      "code-only coding (documentreference-superseded-minimal type)",
+      "text-only CodeableConcept (documentreference-superseded-minimal category)",
+      "multiple codings incl. Epic local translation (consult-note type, discharge-summary category, radiology category)",
+      "very long string (discharge-summary description)",
+      "unicode in attachment data/title (consult-note: présyncope, ≤, °C, β, —)",
+      "multiple identifiers incl. Epic urn:oid (discharge-summary-pdf, radiology-amended)",
+      "reference-by-display-only (consult-note author, radiology encounter/performer/result, minimal relatesTo.target)",
+      "extension noise tolerated (discharge-summary-pdf root extension)",
+      "minimal instance with no date/author/identifier (documentreference-superseded-minimal)"
+    ]
+  }
+}

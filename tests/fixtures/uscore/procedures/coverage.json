@@ -1,0 +1,217 @@
+{
+  "family": "procedures",
+  "uscoreVersion": "9.0.0",
+  "profiles": {
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-procedure": {
+      "mustSupport": [
+        "status",
+        "code",
+        "subject",
+        "performed[x]",
+        "encounter"
+      ],
+      "additionalUscdi": [
+        "basedOn",
+        "performer",
+        "performer.actor",
+        "reasonCode",
+        "reasonReference"
+      ],
+      "covered": {
+        "status": [
+          "procedure-colonoscopy-completed.json",
+          "procedure-appendectomy-period.json",
+          "procedure-dialysis-inprogress.json",
+          "procedure-cardiaccath-notdone.json",
+          "procedure-tonsillectomy-childhood-age.json",
+          "procedure-cholecystectomy-string.json"
+        ],
+        "code": [
+          "procedure-colonoscopy-completed.json",
+          "procedure-appendectomy-period.json",
+          "procedure-dialysis-inprogress.json",
+          "procedure-cardiaccath-notdone.json",
+          "procedure-tonsillectomy-childhood-age.json",
+          "procedure-cholecystectomy-string.json"
+        ],
+        "subject": [
+          "procedure-colonoscopy-completed.json",
+          "procedure-appendectomy-period.json",
+          "procedure-dialysis-inprogress.json",
+          "procedure-cardiaccath-notdone.json",
+          "procedure-tonsillectomy-childhood-age.json",
+          "procedure-cholecystectomy-string.json"
+        ],
+        "performed[x]": [
+          "procedure-colonoscopy-completed.json",
+          "procedure-appendectomy-period.json",
+          "procedure-dialysis-inprogress.json",
+          "procedure-tonsillectomy-childhood-age.json",
+          "procedure-cholecystectomy-string.json"
+        ],
+        "encounter": [
+          "procedure-colonoscopy-completed.json"
+        ],
+        "basedOn": [
+          "procedure-colonoscopy-completed.json"
+        ],
+        "performer": [
+          "procedure-colonoscopy-completed.json",
+          "procedure-appendectomy-period.json"
+        ],
+        "performer.actor": [
+          "procedure-colonoscopy-completed.json",
+          "procedure-appendectomy-period.json"
+        ],
+        "performer.onBehalfOf": [
+          "procedure-colonoscopy-completed.json",
+          "procedure-appendectomy-period.json"
+        ],
+        "reasonCode": [
+          "procedure-colonoscopy-completed.json",
+          "procedure-cardiaccath-notdone.json",
+          "procedure-cholecystectomy-string.json"
+        ],
+        "reasonReference": [
+          "procedure-appendectomy-period.json"
+        ]
+      },
+      "gaps": [
+        "performedRange not instantiated (no realistic source shape: US exports express imprecision as performedString or performedAge; performedDateTime/Period/String/Age cover four of the five performed[x] arms)",
+        "focalDevice not instantiated (SHOULD-level guidance only; implantable-device linkage belongs to the devices family)",
+        "encounter is display-only reference, not a resolvable US Core Encounter (encounter family owns Encounter instances)"
+      ]
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-servicerequest": {
+      "mustSupport": [
+        "status",
+        "intent",
+        "category",
+        "code",
+        "subject",
+        "encounter",
+        "occurrence[x]",
+        "authoredOn",
+        "requester",
+        "reasonCode",
+        "reasonReference"
+      ],
+      "covered": {
+        "status": [
+          "servicerequest-colonoscopy-completed.json",
+          "servicerequest-pt-active.json",
+          "servicerequest-mri-revoked.json"
+        ],
+        "intent": [
+          "servicerequest-colonoscopy-completed.json",
+          "servicerequest-pt-active.json",
+          "servicerequest-mri-revoked.json"
+        ],
+        "category": [
+          "servicerequest-colonoscopy-completed.json",
+          "servicerequest-pt-active.json",
+          "servicerequest-mri-revoked.json"
+        ],
+        "code": [
+          "servicerequest-colonoscopy-completed.json",
+          "servicerequest-pt-active.json",
+          "servicerequest-mri-revoked.json"
+        ],
+        "subject": [
+          "servicerequest-colonoscopy-completed.json",
+          "servicerequest-pt-active.json",
+          "servicerequest-mri-revoked.json"
+        ],
+        "encounter": [
+          "servicerequest-colonoscopy-completed.json"
+        ],
+        "occurrence[x]": [
+          "servicerequest-colonoscopy-completed.json",
+          "servicerequest-pt-active.json",
+          "servicerequest-mri-revoked.json"
+        ],
+        "authoredOn": [
+          "servicerequest-colonoscopy-completed.json",
+          "servicerequest-pt-active.json",
+          "servicerequest-mri-revoked.json"
+        ],
+        "requester": [
+          "servicerequest-colonoscopy-completed.json",
+          "servicerequest-pt-active.json",
+          "servicerequest-mri-revoked.json"
+        ],
+        "reasonCode": [
+          "servicerequest-colonoscopy-completed.json",
+          "servicerequest-mri-revoked.json"
+        ],
+        "reasonReference": [
+          "servicerequest-pt-active.json"
+        ]
+      },
+      "gaps": [
+        "encounter/requester/performer/reasonReference are display-only references rather than resolvable resources (Practitioner/Encounter/Condition fixtures live in their own families)"
+      ]
+    }
+  },
+  "variants": {
+    "Procedure.status": [
+      "completed",
+      "in-progress",
+      "not-done"
+    ],
+    "Procedure.performed[x]": [
+      "performedDateTime",
+      "performedPeriod (start+end)",
+      "performedPeriod (start only, in-progress)",
+      "performedAge (childhood, UCUM a)",
+      "performedString (free-text imprecise date)",
+      "absent (not-done)"
+    ],
+    "Procedure.code coding systems": [
+      "CPT + SNOMED dual coding",
+      "SNOMED only",
+      "code-only coding without display",
+      "text-only CodeableConcept"
+    ],
+    "Procedure.performer": [
+      "actor + function + onBehalfOf",
+      "actor only",
+      "multiple performers"
+    ],
+    "ServiceRequest.status": [
+      "completed",
+      "active",
+      "revoked"
+    ],
+    "ServiceRequest.intent": [
+      "order",
+      "original-order"
+    ],
+    "ServiceRequest.occurrence[x]": [
+      "occurrenceDateTime",
+      "occurrenceTiming (boundsPeriod + frequency)",
+      "occurrencePeriod"
+    ],
+    "ServiceRequest.orderDetail": [
+      "text-only",
+      "CPT-coded"
+    ],
+    "reason": [
+      "reasonCode coded",
+      "reasonCode text-only",
+      "reasonCode with ICD-10-CM translation",
+      "reasonReference display-only"
+    ],
+    "edgeCases": [
+      "very long note text (colonoscopy)",
+      "unicode in note (dialysis)",
+      "unknown extension noise (dialysis)",
+      "Epic-style local identifier oid + local category coding (colonoscopy identifier, MRI category)",
+      "reference-by-display-only (encounters, conditions, practitioners)",
+      "statusReason on not-done procedure",
+      "intra-family basedOn link Procedure -> ServiceRequest",
+      "patient-reported history: asserter = constant patient, recorder = practitioner (cholecystectomy, tonsillectomy)",
+      "unicode em-dash in performedString (cholecystectomy)"
+    ]
+  }
+}

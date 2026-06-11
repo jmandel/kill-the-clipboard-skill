@@ -1,0 +1,133 @@
+{
+  "family": "supporting",
+  "uscoreVersion": "9.0.0",
+  "profiles": {
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitioner": {
+      "mustSupport": [
+        "identifier",
+        "identifier:NPI",
+        "identifier:NCSBNID",
+        "name",
+        "name.family",
+        "telecom (system, value)",
+        "address (line, city, state, postalCode, country)"
+      ],
+      "covered": {
+        "identifier": ["practitioner-sample-renderer.json", "practitioner-sample-hospitalist.json", "practitioner-nurse-minimal.json"],
+        "identifier:NPI": ["practitioner-sample-renderer.json", "practitioner-sample-hospitalist.json"],
+        "identifier:NCSBNID": ["practitioner-nurse-minimal.json"],
+        "name": ["practitioner-sample-renderer.json", "practitioner-sample-hospitalist.json", "practitioner-nurse-minimal.json"],
+        "name.family": ["practitioner-sample-renderer.json", "practitioner-sample-hospitalist.json", "practitioner-nurse-minimal.json"],
+        "telecom (system, value)": ["practitioner-sample-renderer.json", "practitioner-sample-hospitalist.json"],
+        "address (line, city, state, postalCode, country)": ["practitioner-sample-renderer.json"]
+      },
+      "gaps": []
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitionerrole": {
+      "mustSupport": [
+        "practitioner",
+        "organization",
+        "code",
+        "specialty",
+        "location",
+        "telecom.system",
+        "telecom.value",
+        "endpoint"
+      ],
+      "covered": {
+        "practitioner": ["practitionerrole-cardiology.json"],
+        "organization": ["practitionerrole-cardiology.json", "practitionerrole-pharmacist-endpoint.json"],
+        "code": ["practitionerrole-cardiology.json", "practitionerrole-pharmacist-endpoint.json"],
+        "specialty": ["practitionerrole-cardiology.json", "practitionerrole-pharmacist-endpoint.json"],
+        "location": ["practitionerrole-cardiology.json", "practitionerrole-pharmacist-endpoint.json"],
+        "telecom.system": ["practitionerrole-cardiology.json"],
+        "telecom.value": ["practitionerrole-cardiology.json"],
+        "endpoint": ["practitionerrole-pharmacist-endpoint.json"]
+      },
+      "gaps": [
+        "Endpoint/endpoint-breadth-direct is intentionally unresolvable (no Endpoint fixture in the corpus); renderer must fall back to the reference display"
+      ]
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-organization": {
+      "mustSupport": [
+        "identifier",
+        "identifier:NPI",
+        "identifier:CLIA",
+        "identifier:NAIC",
+        "identifier.system",
+        "identifier.value",
+        "active",
+        "name",
+        "telecom (system, value)",
+        "address (line, city, state, postalCode, country)"
+      ],
+      "covered": {
+        "identifier": ["organization-breadth-test-medical.json", "organization-breadth-reference-lab.json", "organization-breadth-health-plan.json"],
+        "identifier:NPI": ["organization-breadth-test-medical.json", "organization-breadth-reference-lab.json"],
+        "identifier:CLIA": ["organization-breadth-reference-lab.json"],
+        "identifier:NAIC": ["organization-breadth-health-plan.json"],
+        "identifier.system": ["organization-breadth-test-medical.json", "organization-breadth-reference-lab.json", "organization-breadth-health-plan.json"],
+        "identifier.value": ["organization-breadth-test-medical.json", "organization-breadth-reference-lab.json", "organization-breadth-health-plan.json"],
+        "active": ["organization-breadth-test-medical.json", "organization-breadth-reference-lab.json", "organization-breadth-health-plan.json"],
+        "name": ["organization-breadth-test-medical.json", "organization-breadth-reference-lab.json", "organization-breadth-health-plan.json"],
+        "telecom (system, value)": ["organization-breadth-test-medical.json", "organization-breadth-reference-lab.json", "organization-breadth-health-plan.json"],
+        "address (line, city, state, postalCode, country)": ["organization-breadth-test-medical.json", "organization-breadth-reference-lab.json"]
+      },
+      "gaps": []
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-relatedperson": {
+      "mustSupport": [
+        "active",
+        "patient",
+        "relationship",
+        "name",
+        "telecom",
+        "address"
+      ],
+      "covered": {
+        "active": ["relatedperson-spouse.json", "relatedperson-guardian-noname.json"],
+        "patient": ["relatedperson-spouse.json", "relatedperson-guardian-noname.json"],
+        "relationship": ["relatedperson-spouse.json", "relatedperson-guardian-noname.json"],
+        "name": ["relatedperson-spouse.json"],
+        "telecom": ["relatedperson-spouse.json", "relatedperson-guardian-noname.json"],
+        "address": ["relatedperson-spouse.json"]
+      },
+      "gaps": []
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-provenance": {
+      "mustSupport": [
+        "target",
+        "recorded",
+        "agent",
+        "agent:ProvenanceAuthor (type=author, who, onBehalfOf)",
+        "agent:ProvenanceTransmitter (type=transmitter, who, onBehalfOf)"
+      ],
+      "covered": {
+        "target": ["provenance-author-transmitter.json", "provenance-patient-author-quirk.json"],
+        "recorded": ["provenance-author-transmitter.json", "provenance-patient-author-quirk.json"],
+        "agent": ["provenance-author-transmitter.json", "provenance-patient-author-quirk.json"],
+        "agent:ProvenanceAuthor (type=author, who, onBehalfOf)": ["provenance-author-transmitter.json", "provenance-patient-author-quirk.json"],
+        "agent:ProvenanceTransmitter (type=transmitter, who, onBehalfOf)": ["provenance-author-transmitter.json", "provenance-patient-author-quirk.json"]
+      },
+      "gaps": [
+        "transmitter agent onBehalfOf never populated (who is an Organization or display-only HIE in both instances; onBehalfOf is only required when who is a Practitioner or Device)"
+      ]
+    }
+  },
+  "variants": {
+    "Practitioner.identifier": ["NPI (Luhn-valid)", "NCSBNID (8-digit)", "facility staff-id with type", "Epic urn:oid internal id"],
+    "Practitioner shape": ["full (prefix/suffix/multiple telecoms/full address/qualification with issuer+period)", "unicode name + multiple names + proprietary extension", "minimal (family-only name, code-only RN qualification, no telecom/address)"],
+    "PractitionerRole.pd-1": ["telecom", "endpoint"],
+    "PractitionerRole.code": ["multi-coding SNOMED+NUCC with text", "text-only"],
+    "PractitionerRole.specialty": ["NUCC coding with display+text", "NUCC code-only (no display)"],
+    "PractitionerRole.location": ["resolvable reference (Location/location-breadth-clinic)", "display-only reference"],
+    "Organization.identifier": ["NPI", "CLIA (urn:oid:2.16.840.1.113883.4.7) with text-only type", "NAIC (urn:oid:2.16.840.1.113883.6.300)"],
+    "Organization shape": ["active hospital with full address", "lab with very long name + proprietary extension", "inactive payer (active=false, partial address: no line/country)"],
+    "RelatedPerson.us-core-14": ["name + relationship (spouse)", "relationship-only, no name (guardian)"],
+    "RelatedPerson.relationship": ["multiple relationships SPS+ECON with text", "code-only GUARD (no display)"],
+    "RelatedPerson.active": ["true", "false (former guardian with bounded period)"],
+    "Provenance.agent.who": ["Practitioner reference + onBehalfOf Organization", "Organization reference", "Patient (constant urn)", "display-only (HIE)"],
+    "Provenance.target": ["constant patient urn", "relative references into problems/allergies/medications/immunizations families"],
+    "Provenance.recorded": ["UTC Z instant", "millisecond + offset instant"]
+  }
+}

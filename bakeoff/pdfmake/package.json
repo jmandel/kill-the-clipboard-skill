@@ -1,0 +1,15 @@
+{
+  "name": "bakeoff-pdfmake",
+  "module": "doc.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "pdfmake": "^0.3.10"
+  }
+}

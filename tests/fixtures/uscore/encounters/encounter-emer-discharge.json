@@ -1,0 +1,87 @@
+{
+  "resourceType": "Encounter",
+  "id": "encounter-emer-discharge",
+  "identifier": [
+    {
+      "system": "https://breadth-test-medical.example.org/encounter-id",
+      "value": "ENC-2025-004412"
+    }
+  ],
+  "status": "finished",
+  "class": {
+    "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+    "code": "EMER",
+    "display": "emergency"
+  },
+  "type": [
+    {
+      "coding": [
+        {
+          "system": "http://www.ama-assn.org/go/cpt",
+          "code": "99284",
+          "display": "Emergency department visit for the evaluation and management of a patient, which requires a medically appropriate history and/or examination and moderate level of medical decision making"
+        }
+      ],
+      "text": "Emergency department visit"
+    }
+  ],
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "participant": [
+    {
+      "type": [
+        {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/v3-ParticipationType",
+              "code": "ATND",
+              "display": "attender"
+            }
+          ]
+        }
+      ],
+      "individual": {
+        "display": "Dr. Edge Casey, DO (Emergency Medicine)"
+      }
+    }
+  ],
+  "period": {
+    "start": "2025-03-08T22:41:00-08:00",
+    "end": "2025-03-09T03:15:00-08:00"
+  },
+  "reasonCode": [
+    {
+      "text": "Chest pain, rule out ACS"
+    }
+  ],
+  "reasonReference": [
+    {
+      "display": "Chest pain (resolved)"
+    }
+  ],
+  "hospitalization": {
+    "dischargeDisposition": {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/discharge-disposition",
+          "code": "home",
+          "display": "Home"
+        }
+      ],
+      "text": "Discharged to home"
+    }
+  },
+  "location": [
+    {
+      "location": {
+        "reference": "Location/location-breadth-hospital",
+        "display": "Breadth Test General Hospital - Emergency Department"
+      }
+    }
+  ],
+  "serviceProvider": {
+    "display": "Breadth Test Medical Center"
+  }
+}

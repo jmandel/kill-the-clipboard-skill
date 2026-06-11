@@ -1,0 +1,70 @@
+{
+  "resourceType": "DocumentReference",
+  "id": "documentreference-consult-note",
+  "identifier": [
+    {
+      "system": "https://breadth-test-medical.example.org/document-id",
+      "value": "DOC-2024-110588"
+    }
+  ],
+  "status": "current",
+  "docStatus": "preliminary",
+  "type": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "11488-4",
+        "display": "Consult note"
+      },
+      {
+        "system": "urn:oid:1.2.840.114350.1.13.999.2.7.4.737880.5010",
+        "code": "100021",
+        "display": "Cardiology Consult Note"
+      }
+    ],
+    "text": "Cardiology consultation"
+  },
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://hl7.org/fhir/us/core/CodeSystem/us-core-documentreference-category",
+          "code": "clinical-note",
+          "display": "Clinical Note"
+        }
+      ]
+    }
+  ],
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "date": "2024-11-05T18:02:00Z",
+  "author": [
+    {
+      "display": "Dr. Sample Renderer, MD — Breadth Test Cardiology Associates"
+    }
+  ],
+  "content": [
+    {
+      "attachment": {
+        "contentType": "text/plain",
+        "data": "Q09OU1VMVEFUSU9OIE5PVEUg4oCUIENhcmRpb2xvZ3kg4oCUIDIwMjQtMTEtMDUKUGF0aWVudDogQ2FzZXkgQnJlYWR0aC1UZXN0ZXIgfCBSZWZlcnJpbmc6IERyLiBQcmV0ZW5kIEF0dGVuZGluZwpSZWFzb24gZm9yIGNvbnN1bHQ6IHBhbHBpdGF0aW9ucyBhbmQgYW4gZXBpc29kZSBvZiBwcsOpc3luY29wZSBhdCBoZXIgY2Fmw6kgam9iLgoKSGlzdG9yeTogSW50ZXJtaXR0ZW50IHBhbHBpdGF0aW9ucyDDlyAzIG1vbnRocywgc3VkZGVuIG9uc2V0L29mZnNldCwgbGFzdGluZyDiiaQ1IG1pbnV0ZXMuClRlbXBlcmF0dXJlIGF0IGVwaXNvZGUgMzcuMSDCsEMuIE5vIGZhbWlseSBoaXN0b3J5IG9mIHN1ZGRlbiBjYXJkaWFjIGRlYXRoLgpFQ0c6IHNpbnVzIHJoeXRobSwgUFIgMTU4IG1zLCBRVGMgNDIxIG1zLiDDiWNob2NhcmRpb2dyYW1tZSAob3V0c2lkZSwgcmV2aWV3ZWQpOiBub3JtYWwgRUYuCkltcHJlc3Npb246IHByb2JhYmxlIEFWTlJULiBQbGFuOiAxNC1kYXkgYW1idWxhdG9yeSBtb25pdG9yOyBkaXNjdXNzIGFibGF0aW9uIHZzLiDOsi1ibG9ja2VyLgrigJQgRHIuIFNhbXBsZSBSZW5kZXJlciwgTUQsIEJyZWFkdGggVGVzdCBDYXJkaW9sb2d5IEFzc29jaWF0ZXMK",
+        "title": "Cardiology consult — palpitations / présyncope (≤5 min episodes)",
+        "language": "en-US"
+      }
+    }
+  ],
+  "context": {
+    "encounter": [
+      {
+        "reference": "Encounter/encounter-amb-office",
+        "display": "Office visit, Breadth Test Cardiology Associates"
+      }
+    ],
+    "period": {
+      "start": "2024-11-05T17:00:00Z",
+      "end": "2024-11-05T17:45:00Z"
+    }
+  }
+}

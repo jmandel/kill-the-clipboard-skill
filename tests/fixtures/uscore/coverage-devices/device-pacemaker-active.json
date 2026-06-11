@@ -1,0 +1,35 @@
+{
+  "resourceType": "Device",
+  "id": "device-pacemaker-active",
+  "udiCarrier": [
+    {
+      "deviceIdentifier": "00643169007222",
+      "issuer": "http://hl7.org/fhir/NamingSystem/gs1-di",
+      "jurisdiction": "http://hl7.org/fhir/NamingSystem/fda-udi",
+      "carrierHRF": "(01)00643169007222(11)240115(17)320115(10)LOT-PMK-2024A(21)PMK-SN-000123",
+      "entryType": "barcode"
+    }
+  ],
+  "status": "active",
+  "distinctIdentifier": "00643169007222-PMK-SN-000123",
+  "manufacturer": "Breadth Test Cardiac Devices, Inc.",
+  "manufactureDate": "2024-01-15",
+  "expirationDate": "2032-01-15",
+  "lotNumber": "LOT-PMK-2024A",
+  "serialNumber": "PMK-SN-000123",
+  "deviceName": [
+    { "name": "EnduraPace BT-100 Dual-Chamber Pacemaker", "type": "user-friendly-name" }
+  ],
+  "modelNumber": "BT-100",
+  "type": {
+    "coding": [
+      { "system": "http://snomed.info/sct", "code": "14106009", "display": "Cardiac pacemaker, device" },
+      { "system": "urn:oid:1.2.840.114350.1.13.0.1.7.2.737780", "code": "PACEMAKER", "display": "PACEMAKER, CARDIAC DUAL CHAMBER [EnduraPace BT-100] - IMPLANTED 2024" }
+    ],
+    "text": "Cardiac pacemaker"
+  },
+  "patient": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  }
+}

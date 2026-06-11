@@ -1,0 +1,63 @@
+{
+  "resourceType": "Goal",
+  "id": "goal-a1c-active",
+  "lifecycleStatus": "active",
+  "achievementStatus": {
+    "coding": [
+      { "system": "http://terminology.hl7.org/CodeSystem/goal-achievement", "code": "in-progress", "display": "In Progress" }
+    ],
+    "text": "In Progress"
+  },
+  "category": [
+    {
+      "coding": [
+        { "system": "http://terminology.hl7.org/CodeSystem/goal-category", "code": "physiologic", "display": "Physiologic" }
+      ]
+    }
+  ],
+  "priority": {
+    "coding": [
+      { "system": "http://terminology.hl7.org/CodeSystem/goal-priority", "code": "high-priority", "display": "High Priority" }
+    ]
+  },
+  "description": {
+    "coding": [
+      { "system": "http://loinc.org", "code": "4548-4", "display": "Hemoglobin A1c/Hemoglobin.total in Blood" }
+    ],
+    "text": "Hemoglobin A1c below 7.0%"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "startDate": "2025-10-22",
+  "target": [
+    {
+      "measure": {
+        "coding": [
+          { "system": "http://loinc.org", "code": "4548-4", "display": "Hemoglobin A1c/Hemoglobin.total in Blood" }
+        ]
+      },
+      "detailRange": {
+        "low": { "value": 5.0, "unit": "%", "system": "http://unitsofmeasure.org", "code": "%" },
+        "high": { "value": 7.0, "unit": "%", "system": "http://unitsofmeasure.org", "code": "%" }
+      },
+      "dueDate": "2026-03-31"
+    }
+  ],
+  "statusDate": "2025-11-04",
+  "expressedBy": {
+    "reference": "Practitioner/practitioner-sample-renderer",
+    "display": "Dr. Sample Renderer"
+  },
+  "addresses": [
+    { "display": "Type 2 diabetes mellitus without complication" }
+  ],
+  "note": [
+    {
+      "authorString": "Dr. Sample Renderer",
+      "time": "2025-11-04T16:20:00-06:00",
+      "text": "A1c 7.8% today, down from 8.4%. Continue metformin 1000 mg BID; recheck in 3 months."
+    }
+  ]
+}

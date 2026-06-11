@@ -1,0 +1,57 @@
+{
+  "resourceType": "Observation",
+  "id": "observation-pulse-oximetry",
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        { "system": "http://terminology.hl7.org/CodeSystem/observation-category", "code": "vital-signs", "display": "Vital Signs" }
+      ]
+    }
+  ],
+  "code": {
+    "coding": [
+      { "system": "http://loinc.org", "code": "2708-6", "display": "Oxygen saturation in Arterial blood" },
+      { "system": "http://loinc.org", "code": "59408-5", "display": "Oxygen saturation in Arterial blood by Pulse oximetry" }
+    ],
+    "text": "SpO2 on supplemental oxygen"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "effectiveDateTime": "2026-01-22T03:45:00-06:00",
+  "performer": [
+    { "display": "Night shift RN, Breadth Test Medical Center 4 West" }
+  ],
+  "valueQuantity": {
+    "value": 93,
+    "unit": "%",
+    "system": "http://unitsofmeasure.org",
+    "code": "%"
+  },
+  "component": [
+    {
+      "code": {
+        "coding": [
+          { "system": "http://loinc.org", "code": "3151-8", "display": "Inhaled oxygen flow rate" }
+        ],
+        "text": "Inhaled oxygen flow rate"
+      },
+      "valueQuantity": { "value": 2, "unit": "liters/min", "system": "http://unitsofmeasure.org", "code": "L/min" }
+    },
+    {
+      "code": {
+        "coding": [
+          { "system": "http://loinc.org", "code": "3150-0", "display": "Inhaled oxygen concentration" }
+        ],
+        "text": "Inhaled oxygen concentration"
+      },
+      "dataAbsentReason": {
+        "coding": [
+          { "system": "http://terminology.hl7.org/CodeSystem/data-absent-reason", "code": "not-performed", "display": "Not Performed" }
+        ]
+      }
+    }
+  ]
+}

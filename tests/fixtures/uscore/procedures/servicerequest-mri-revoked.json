@@ -1,0 +1,47 @@
+{
+  "resourceType": "ServiceRequest",
+  "id": "servicerequest-mri-revoked",
+  "status": "revoked",
+  "intent": "original-order",
+  "priority": "routine",
+  "category": [
+    {
+      "coding": [
+        { "system": "http://snomed.info/sct", "code": "363679005", "display": "Imaging" }
+      ]
+    },
+    {
+      "coding": [
+        { "system": "urn:oid:1.2.840.114350.1.13.999.2.7.10.798268.30", "code": "Imaging", "display": "Imaging" }
+      ],
+      "text": "Imaging (Epic-style local category quirk)"
+    }
+  ],
+  "code": {
+    "coding": [
+      { "system": "http://loinc.org", "code": "24590-2", "display": "MR Brain WO contrast" },
+      { "system": "http://www.ama-assn.org/go/cpt", "code": "70551", "display": "Magnetic resonance (eg, proton) imaging, brain (including brain stem); without contrast material" }
+    ],
+    "text": "MRI brain without contrast"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "occurrencePeriod": {
+    "start": "2025-06-01",
+    "end": "2025-06-30"
+  },
+  "authoredOn": "2025-05-18",
+  "requester": {
+    "display": "Dr. Sample Renderer, MD"
+  },
+  "reasonCode": [
+    {
+      "text": "New-onset headaches, evaluate for structural cause (text-only reason)"
+    }
+  ],
+  "note": [
+    { "text": "Order revoked 2025-05-29: symptoms resolved after medication adjustment; imaging no longer indicated." }
+  ]
+}

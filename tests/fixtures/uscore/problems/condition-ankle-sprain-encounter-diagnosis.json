@@ -1,0 +1,67 @@
+{
+  "resourceType": "Condition",
+  "id": "condition-ankle-sprain-encounter-diagnosis",
+  "meta": {
+    "lastUpdated": "2025-03-14T22:40:11Z"
+  },
+  "clinicalStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+        "code": "resolved",
+        "display": "Resolved"
+      }
+    ]
+  },
+  "verificationStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+        "code": "confirmed",
+        "display": "Confirmed"
+      }
+    ]
+  },
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+          "code": "encounter-diagnosis",
+          "display": "Encounter Diagnosis"
+        }
+      ],
+      "text": "Encounter Diagnosis"
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "44465007",
+        "display": "Sprain of ankle (disorder)"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "code": "S93.401A",
+        "display": "Sprain of unspecified ligament of right ankle, initial encounter"
+      }
+    ],
+    "text": "Right ankle sprain"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "encounter": {
+    "reference": "Encounter/encounter-breadth-ed-visit",
+    "display": "Emergency visit — Breadth Test Medical Center, 2025-03-14"
+  },
+  "onsetDateTime": "2025-03-14T18:30:00-05:00",
+  "abatementDateTime": "2025-04-28",
+  "recordedDate": "2025-03-14T20:05:00-05:00",
+  "recorder": {
+    "reference": "Practitioner/practitioner-sample-renderer",
+    "display": "Dr. Sample Renderer"
+  }
+}

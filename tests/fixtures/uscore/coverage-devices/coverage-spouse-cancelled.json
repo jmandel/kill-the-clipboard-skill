@@ -1,0 +1,36 @@
+{
+  "resourceType": "Coverage",
+  "id": "coverage-spouse-cancelled",
+  "status": "cancelled",
+  "type": {
+    "text": "Commercial health insurance through spouse's employer"
+  },
+  "subscriber": {
+    "display": "Jordan Breadth-Tester"
+  },
+  "subscriberId": "SP-2210-01",
+  "beneficiary": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "dependent": "02",
+  "relationship": {
+    "coding": [
+      { "system": "http://terminology.hl7.org/CodeSystem/subscriber-relationship", "code": "spouse" }
+    ]
+  },
+  "period": { "start": "2024-01-01", "end": "2024-09-30" },
+  "payor": [
+    { "display": "Sample Mutual Insurance Company (Synthetic)" }
+  ],
+  "class": [
+    {
+      "type": {
+        "coding": [
+          { "system": "http://terminology.hl7.org/CodeSystem/coverage-class", "code": "plan", "display": "Plan" }
+        ]
+      },
+      "value": "SMI-HDHP-2024"
+    }
+  ]
+}

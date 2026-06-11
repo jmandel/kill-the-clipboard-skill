@@ -1,0 +1,38 @@
+{
+  "resourceType": "Observation",
+  "id": "observation-care-experience-preference",
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://hl7.org/fhir/us/core/CodeSystem/us-core-category",
+          "code": "care-experience-preference",
+          "display": "Care Experience Preference"
+        }
+      ]
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "95541-9",
+        "display": "Care experience preference"
+      }
+    ],
+    "text": "Care experience preference"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "effectiveDateTime": "2025-06-11",
+  "performer": [
+    {
+      "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+      "display": "Casey Breadth-Tester"
+    }
+  ],
+  "valueString": "Prefers early-morning appointments and communication by email. Prefiere recibir las instrucciones médicas también en español. Family members may join visits — 家属可以陪同就诊 (family welcome). Likes the room kept at ≥ 22 °C and quiet music (Satie, «Gymnopédie № 1»)."
+}

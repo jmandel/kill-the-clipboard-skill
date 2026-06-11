@@ -1,0 +1,58 @@
+{
+  "resourceType": "Observation",
+  "id": "observation-avg-bp",
+  "status": "amended",
+  "category": [
+    {
+      "coding": [
+        { "system": "http://terminology.hl7.org/CodeSystem/observation-category", "code": "vital-signs", "display": "Vital Signs" }
+      ]
+    }
+  ],
+  "code": {
+    "coding": [
+      { "system": "http://loinc.org", "code": "96607-7", "display": "Blood pressure panel mean systolic and mean diastolic" }
+    ],
+    "text": "Average Blood Pressure (home readings)"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "effectivePeriod": {
+    "start": "2025-04-01",
+    "end": "2025-04-14"
+  },
+  "performer": [
+    {
+      "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+      "display": "Casey Breadth-Tester (self-measured, home cuff)"
+    }
+  ],
+  "note": [
+    { "text": "Average of 12 home cuff readings over two weeks. Diastolic average not computed; device exported systolic series only." }
+  ],
+  "component": [
+    {
+      "code": {
+        "coding": [
+          { "system": "http://loinc.org", "code": "96608-5", "display": "Systolic blood pressure mean" }
+        ]
+      },
+      "valueQuantity": { "value": 127.5, "unit": "mm[Hg]", "system": "http://unitsofmeasure.org", "code": "mm[Hg]" }
+    },
+    {
+      "code": {
+        "coding": [
+          { "system": "http://loinc.org", "code": "96609-3", "display": "Diastolic blood pressure mean" }
+        ]
+      },
+      "dataAbsentReason": {
+        "coding": [
+          { "system": "http://terminology.hl7.org/CodeSystem/data-absent-reason", "code": "error", "display": "Error" }
+        ],
+        "text": "Device export error"
+      }
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "resourceType": "FamilyMemberHistory",
+  "id": "familymemberhistory-grandmother-unicode",
+  "status": "completed",
+  "patient": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "date": "2025-04-10",
+  "name": "王秀英",
+  "relationship": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+        "code": "MGRMTH",
+        "display": "maternal grandmother"
+      }
+    ],
+    "text": "Maternal grandmother (外婆)"
+  },
+  "sex": {
+    "coding": [
+      {
+        "system": "http://hl7.org/fhir/administrative-gender",
+        "code": "female",
+        "display": "Female"
+      }
+    ]
+  },
+  "bornString": "Rural Fujian province, exact date unknown",
+  "deceasedDate": "2018-11-02",
+  "condition": [
+    {
+      "code": {
+        "coding": [
+          {
+            "system": "http://snomed.info/sct",
+            "code": "230690007"
+          }
+        ],
+        "text": "Stroke (中风)"
+      },
+      "contributedToDeath": true,
+      "onsetAge": {
+        "value": 79,
+        "unit": "years",
+        "system": "http://unitsofmeasure.org",
+        "code": "a"
+      }
+    }
+  ],
+  "note": [
+    {
+      "text": "Reported by the patient's mother; record name kept in the original script — 王秀英."
+    }
+  ]
+}

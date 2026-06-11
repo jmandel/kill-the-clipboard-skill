@@ -1,0 +1,46 @@
+{
+  "resourceType": "Observation",
+  "id": "observation-pregnancystatus",
+  "status": "amended",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+          "code": "social-history",
+          "display": "Social History"
+        }
+      ]
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "82810-3",
+        "display": "Pregnancy status"
+      }
+    ],
+    "text": "Pregnancy status"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "effectiveDateTime": "2025-09-18",
+  "performer": [
+    {
+      "display": "Dr. Sample Renderer"
+    }
+  ],
+  "valueCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "60001007",
+        "display": "Not pregnant (finding)"
+      }
+    ],
+    "text": "Not pregnant"
+  }
+}

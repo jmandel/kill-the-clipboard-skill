@@ -1,0 +1,76 @@
+{
+  "resourceType": "Condition",
+  "id": "condition-hypertension-active",
+  "meta": {
+    "lastUpdated": "2025-11-03T14:22:05Z"
+  },
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/condition-assertedDate",
+      "valueDateTime": "2024-05-14"
+    }
+  ],
+  "clinicalStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+        "code": "active",
+        "display": "Active"
+      }
+    ],
+    "text": "Active"
+  },
+  "verificationStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+        "code": "confirmed",
+        "display": "Confirmed"
+      }
+    ]
+  },
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+          "code": "problem-list-item",
+          "display": "Problem List Item"
+        }
+      ],
+      "text": "Problem List Item"
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "59621000",
+        "display": "Essential hypertension (disorder)"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "code": "I10",
+        "display": "Essential (primary) hypertension"
+      }
+    ],
+    "text": "Essential hypertension"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "onsetDateTime": "2024-05-02",
+  "recordedDate": "2024-05-14T09:30:00Z",
+  "recorder": {
+    "display": "Dr. Sample Renderer"
+  },
+  "asserter": {
+    "display": "Dr. Sample Renderer"
+  },
+  "note": [
+    {
+      "text": "Confirmed on repeat ambulatory readings. Started lifestyle modification; pharmacotherapy initiated 2024-06."
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "resourceType": "Procedure",
+  "id": "procedure-appendectomy-period",
+  "status": "completed",
+  "code": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "174041007",
+        "display": "Laparoscopic emergency appendectomy (procedure)"
+      }
+    ],
+    "text": "Laparoscopic appendectomy"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "performedPeriod": {
+    "start": "2025-03-02T22:10:00-06:00",
+    "end": "2025-03-02T23:25:00-06:00"
+  },
+  "performer": [
+    {
+      "actor": { "display": "Dr. Example Surgeon, MD" },
+      "onBehalfOf": { "display": "Breadth Test Medical Center" }
+    },
+    {
+      "function": { "text": "Anesthesiologist" },
+      "actor": { "display": "Dr. Test Anesthesia, DO" }
+    }
+  ],
+  "reasonReference": [
+    {
+      "display": "Acute appendicitis with localized peritonitis (Condition, display-only reference)"
+    }
+  ],
+  "complication": [
+    {
+      "coding": [
+        { "system": "http://snomed.info/sct", "code": "271737000", "display": "Anemia (disorder)" }
+      ],
+      "text": "Mild postoperative anemia, no transfusion required"
+    }
+  ],
+  "followUp": [
+    { "text": "Surgical clinic wound check in 2 weeks" }
+  ]
+}

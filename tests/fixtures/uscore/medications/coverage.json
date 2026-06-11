@@ -1,0 +1,189 @@
+{
+  "family": "medications",
+  "uscoreVersion": "9.0.0",
+  "profiles": {
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-medicationrequest": {
+      "mustSupport": [
+        "status",
+        "intent",
+        "category",
+        "reported[x]",
+        "medication[x]",
+        "subject",
+        "encounter",
+        "authoredOn",
+        "requester",
+        "dosageInstruction",
+        "dosageInstruction.text",
+        "dosageInstruction.timing",
+        "dosageInstruction.route",
+        "dosageInstruction.doseAndRate",
+        "dosageInstruction.doseAndRate.dose[x]",
+        "dispenseRequest.numberOfRepeatsAllowed",
+        "dispenseRequest.quantity"
+      ],
+      "covered": {
+        "status": [
+          "medicationrequest-active-coded.json (active)",
+          "medicationrequest-stopped-contained.json (stopped)",
+          "medicationrequest-onhold-plan-external.json (on-hold)",
+          "medicationrequest-completed-longsig.json (completed)"
+        ],
+        "intent": [
+          "medicationrequest-active-coded.json (order)",
+          "medicationrequest-onhold-plan-external.json (plan)"
+        ],
+        "category": [
+          "medicationrequest-active-coded.json (outpatient)",
+          "medicationrequest-stopped-contained.json (community, coding-only no text)",
+          "medicationrequest-onhold-plan-external.json (inpatient + Epic local translation)",
+          "medicationrequest-completed-longsig.json (text-only)"
+        ],
+        "reported[x]": [
+          "medicationrequest-active-coded.json (reportedBoolean false)",
+          "medicationrequest-completed-longsig.json (reportedBoolean true)",
+          "medicationrequest-stopped-contained.json (reportedReference to constant patient)"
+        ],
+        "medication[x]": [
+          "medicationrequest-active-coded.json (medicationCodeableConcept, RxNorm)",
+          "medicationrequest-completed-longsig.json (medicationCodeableConcept, text-only)",
+          "medicationrequest-stopped-contained.json (medicationReference to contained Medication)",
+          "medicationrequest-onhold-plan-external.json (medicationReference to medication-metformin-er.json)"
+        ],
+        "subject": ["all four MedicationRequest fixtures (constant patient urn)"],
+        "encounter": [
+          "medicationrequest-active-coded.json (display-only reference)",
+          "medicationrequest-onhold-plan-external.json (display-only reference)"
+        ],
+        "authoredOn": [
+          "medicationrequest-active-coded.json (dateTime with tz)",
+          "medicationrequest-completed-longsig.json (date precision only)"
+        ],
+        "requester": [
+          "medicationrequest-active-coded.json (display-only)",
+          "medicationrequest-stopped-contained.json (Epic-style unresolvable Practitioner/e... id + display)"
+        ],
+        "dosageInstruction": ["all four MedicationRequest fixtures"],
+        "dosageInstruction.text": [
+          "medicationrequest-active-coded.json",
+          "medicationrequest-stopped-contained.json (free-text-only sig, no structured elements)",
+          "medicationrequest-completed-longsig.json (exactly 250-char sig)"
+        ],
+        "dosageInstruction.timing": [
+          "medicationrequest-active-coded.json (repeat + boundsPeriod + text code)",
+          "medicationrequest-onhold-plan-external.json (repeat.when + GTSAbbreviation BID)",
+          "medicationrequest-completed-longsig.json (q4h repeat)"
+        ],
+        "dosageInstruction.route": [
+          "medicationrequest-active-coded.json (SNOMED + text)",
+          "medicationrequest-onhold-plan-external.json (code-only coding, no display)",
+          "medicationrequest-completed-longsig.json"
+        ],
+        "dosageInstruction.doseAndRate": [
+          "medicationrequest-active-coded.json",
+          "medicationrequest-onhold-plan-external.json",
+          "medicationrequest-completed-longsig.json"
+        ],
+        "dosageInstruction.doseAndRate.dose[x]": [
+          "medicationrequest-active-coded.json (doseQuantity, {tbl})",
+          "medicationrequest-onhold-plan-external.json (doseQuantity, mg)",
+          "medicationrequest-completed-longsig.json (doseRange)"
+        ],
+        "dispenseRequest.numberOfRepeatsAllowed": [
+          "medicationrequest-active-coded.json (3)",
+          "medicationrequest-completed-longsig.json (0)"
+        ],
+        "dispenseRequest.quantity": [
+          "medicationrequest-active-coded.json",
+          "medicationrequest-completed-longsig.json"
+        ]
+      },
+      "gaps": []
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-medication": {
+      "mustSupport": ["code"],
+      "covered": {
+        "code": [
+          "medication-metformin-er.json (RxNorm + NDC + Epic local coding + text)",
+          "medicationrequest-stopped-contained.json (contained Medication: RxNorm + NDC)"
+        ]
+      },
+      "gaps": []
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-medicationdispense": {
+      "mustSupport": [
+        "status",
+        "medication[x]",
+        "subject",
+        "context",
+        "performer",
+        "performer.actor",
+        "authorizingPrescription",
+        "type",
+        "quantity",
+        "whenHandedOver",
+        "dosageInstruction",
+        "dosageInstruction.text",
+        "dosageInstruction.timing",
+        "dosageInstruction.route",
+        "dosageInstruction.doseAndRate",
+        "dosageInstruction.doseAndRate.dose[x]"
+      ],
+      "covered": {
+        "status": [
+          "medicationdispense-completed.json (completed)",
+          "medicationdispense-inprogress-external.json (in-progress)"
+        ],
+        "medication[x]": [
+          "medicationdispense-completed.json (medicationCodeableConcept, RxNorm)",
+          "medicationdispense-inprogress-external.json (medicationReference to medication-metformin-er.json)"
+        ],
+        "subject": ["both MedicationDispense fixtures (constant patient urn)"],
+        "context": ["medicationdispense-completed.json (display-only reference)"],
+        "performer": ["both MedicationDispense fixtures"],
+        "performer.actor": [
+          "medicationdispense-completed.json (Organization display-only)",
+          "medicationdispense-inprogress-external.json (Epic-style unresolvable Practitioner/e... id + display)"
+        ],
+        "authorizingPrescription": [
+          "medicationdispense-completed.json (relative reference to medicationrequest-active-coded.json)",
+          "medicationdispense-inprogress-external.json (display-only)"
+        ],
+        "type": [
+          "medicationdispense-completed.json (FF with display + text)",
+          "medicationdispense-inprogress-external.json (RF code-only coding, no display)"
+        ],
+        "quantity": ["both MedicationDispense fixtures"],
+        "whenHandedOver": ["medicationdispense-completed.json"],
+        "dosageInstruction": ["both MedicationDispense fixtures"],
+        "dosageInstruction.text": [
+          "medicationdispense-completed.json",
+          "medicationdispense-inprogress-external.json (free-text-only Spanish sig, unicode)"
+        ],
+        "dosageInstruction.timing": ["medicationdispense-completed.json"],
+        "dosageInstruction.route": ["medicationdispense-completed.json"],
+        "dosageInstruction.doseAndRate": ["medicationdispense-completed.json"],
+        "dosageInstruction.doseAndRate.dose[x]": ["medicationdispense-completed.json (doseQuantity)"]
+      },
+      "gaps": [
+        "whenHandedOver intentionally absent on medicationdispense-inprogress-external.json (status in-progress; covered by the completed fixture)"
+      ]
+    }
+  },
+  "variants": {
+    "MedicationRequest.medication[x]": [
+      "medicationCodeableConcept (RxNorm)",
+      "medicationCodeableConcept (text-only)",
+      "medicationReference (contained #)",
+      "medicationReference (external fixture)"
+    ],
+    "MedicationRequest.status": ["active", "stopped", "on-hold", "completed"],
+    "MedicationRequest.intent": ["order", "plan"],
+    "MedicationRequest.reported[x]": ["reportedBoolean true", "reportedBoolean false", "reportedReference"],
+    "dosageInstruction": ["full structured (timing/route/doseAndRate)", "free-text-only sig", "250-char sig", "Spanish unicode sig"],
+    "dose[x]": ["doseQuantity", "doseRange"],
+    "MedicationDispense.medication[x]": ["medicationCodeableConcept", "medicationReference (external)"],
+    "MedicationDispense.status": ["completed", "in-progress"],
+    "non-MS extras exercised": ["daysSupply", "whenPrepared", "statusReason", "reasonCode", "note", "asNeededBoolean", "asNeededCodeableConcept", "patientInstruction", "dispenseRequest.validityPeriod/expectedSupplyDuration/performer"]
+  }
+}

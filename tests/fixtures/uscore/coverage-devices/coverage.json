@@ -1,0 +1,88 @@
+{
+  "family": "coverage-devices",
+  "uscoreVersion": "9.0.0",
+  "profiles": {
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-coverage": {
+      "mustSupport": [
+        "identifier:memberid",
+        "status",
+        "type",
+        "subscriberId",
+        "beneficiary",
+        "relationship",
+        "period",
+        "payor",
+        "class:group",
+        "class:group.value",
+        "class:plan",
+        "class:plan.value",
+        "class:plan.name"
+      ],
+      "covered": {
+        "identifier:memberid": ["coverage-employer-ppo.json", "coverage-medicare-contained-payor.json"],
+        "status": ["coverage-employer-ppo.json (active)", "coverage-spouse-cancelled.json (cancelled)", "coverage-medicare-contained-payor.json (active)"],
+        "type": ["coverage-employer-ppo.json (SOP 512 coding)", "coverage-spouse-cancelled.json (text-only)", "coverage-medicare-contained-payor.json (SOP 1 MEDICARE)"],
+        "subscriberId": ["coverage-employer-ppo.json", "coverage-spouse-cancelled.json"],
+        "beneficiary": ["coverage-employer-ppo.json", "coverage-spouse-cancelled.json", "coverage-medicare-contained-payor.json"],
+        "relationship": ["coverage-employer-ppo.json (self)", "coverage-spouse-cancelled.json (spouse, code-only coding)", "coverage-medicare-contained-payor.json (self)"],
+        "period": ["coverage-employer-ppo.json (start+end)", "coverage-spouse-cancelled.json (start+end)", "coverage-medicare-contained-payor.json (start only)"],
+        "payor": ["coverage-employer-ppo.json (Organization by display only)", "coverage-spouse-cancelled.json (display only)", "coverage-medicare-contained-payor.json (contained Organization #cms-payor)"],
+        "class:group": ["coverage-employer-ppo.json"],
+        "class:group.value": ["coverage-employer-ppo.json"],
+        "class:plan": ["coverage-employer-ppo.json", "coverage-spouse-cancelled.json"],
+        "class:plan.value": ["coverage-employer-ppo.json", "coverage-spouse-cancelled.json"],
+        "class:plan.name": ["coverage-employer-ppo.json (plan with name; coverage-spouse-cancelled plan deliberately name-less)"]
+      },
+      "gaps": []
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-implantable-device": {
+      "mustSupport": [
+        "udiCarrier",
+        "udiCarrier.deviceIdentifier",
+        "udiCarrier.carrierHRF",
+        "distinctIdentifier",
+        "manufactureDate",
+        "expirationDate",
+        "lotNumber",
+        "serialNumber",
+        "type",
+        "patient"
+      ],
+      "covered": {
+        "udiCarrier": ["device-pacemaker-active.json", "device-hip-prosthesis-inactive.json", "device-insulin-pump-active.json"],
+        "udiCarrier.deviceIdentifier": ["device-pacemaker-active.json", "device-hip-prosthesis-inactive.json", "device-insulin-pump-active.json"],
+        "udiCarrier.carrierHRF": ["device-pacemaker-active.json (GS1 HRF)", "device-insulin-pump-active.json (HIBCC HRF); device-hip-prosthesis-inactive deliberately omits it (legacy-import variant)"],
+        "distinctIdentifier": ["device-pacemaker-active.json"],
+        "manufactureDate": ["device-pacemaker-active.json", "device-hip-prosthesis-inactive.json"],
+        "expirationDate": ["device-pacemaker-active.json", "device-insulin-pump-active.json"],
+        "lotNumber": ["device-pacemaker-active.json", "device-hip-prosthesis-inactive.json"],
+        "serialNumber": ["device-pacemaker-active.json", "device-insulin-pump-active.json"],
+        "type": ["device-pacemaker-active.json (SNOMED + Epic local translation)", "device-hip-prosthesis-inactive.json (SNOMED with display + code-only second coding)", "device-insulin-pump-active.json (single SNOMED)"],
+        "patient": ["device-pacemaker-active.json", "device-hip-prosthesis-inactive.json", "device-insulin-pump-active.json"]
+      },
+      "gaps": []
+    }
+  },
+  "variants": {
+    "Coverage.status": ["active", "cancelled"],
+    "Coverage.relationship": ["self", "spouse"],
+    "Coverage.type": ["SOP coding (512 PPO, 1 MEDICARE)", "text-only CodeableConcept"],
+    "Coverage.payor": ["display-only reference", "contained Organization"],
+    "Coverage.period": ["start+end", "start-only (ongoing)"],
+    "Coverage.identifier": ["memberid slice (v2-0203 MB)", "MBI on us-mbi system", "multiple identifiers incl. Epic-style urn:oid filler id"],
+    "Device.status": ["active", "inactive"],
+    "Device.udiCarrier": ["GS1 full carrier (DI+HRF+issuer+jurisdiction+entryType=barcode)", "HIBCC full carrier (entryType=manual)", "deviceIdentifier-only legacy import"],
+    "Device.type": ["multi-coding with Epic display-rich local translation", "code-only coding (no display)", "coding+text"],
+    "edge-cases": [
+      "text-only CodeableConcept (coverage-spouse-cancelled.type)",
+      "code-only coding without display (coverage-spouse-cancelled.relationship; device-hip-prosthesis-inactive.type second coding)",
+      "contained resource (coverage-medicare-contained-payor)",
+      "reference-by-display-only (payors; Coverage.subscriber Jordan Breadth-Tester)",
+      "extension noise to tolerate (coverage-medicare-contained-payor, device-hip-prosthesis-inactive)",
+      "very long string (device-hip-prosthesis-inactive.note; HRF carrier strings)",
+      "unicode (device-insulin-pump-active.manufacturer Bösch)",
+      "multiple identifiers (coverage-employer-ppo)",
+      "Epic-inspired display-rich local coding (device-pacemaker-active.type urn:oid:1.2.840.114350...)"
+    ]
+  }
+}

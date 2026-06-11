@@ -1,0 +1,146 @@
+#!/usr/bin/env bun
+// Dev harness: serves the handoff page with a MOCK in-memory /api/manage so the page is
+// manually testable without the real server. Seeds one link per status (live, expired,
+// exhausted, paused, destroyed) and prints test URLs.
+//
+// Printing these links is fine ONLY because they are throwaway secrets for in-memory mock
+// data that dies with this process — never do this with real links (CLAUDE.md).
+//
+// Usage: bun run app/src/dev.ts [--port 4801]
+
+import indexHtml from '../index.html';
+import { b64url } from '../../lib/encoding.ts';
+import { deriveAuth, deriveKey, generateMasterSecret } from '../../lib/hkdf.ts';
+import { buildOwnerLink, buildShlink, buildViewerLink } from '../../lib/shlink.ts';
+import type { AccessEntry, ManagePatch, ManageState } from '../../lib/types.ts';
+
+const port = Number(process.argv[process.argv.indexOf('--port') + 1] || 4801);
+const nowSec = () => Math.floor(Date.now() / 1000);
+const iso = (s: number) => new Date(s * 1000).toISOString();
+
+const store = new Map<string, ManageState>();
+
+function computeLive(s: ManageState): boolean {
+  return (
+    s.active &&
+    nowSec() < s.exp &&
+    (s.maxUses === null || s.uses < s.maxUses) &&
+    s.purgedAt === null
+  );
+}
+
+function sampleLog(n: number): AccessEntry[] {
+  const outcomes: AccessEntry['outcome'][] = ['ok', 'ok', 'inactive'];
+  return Array.from({ length: n }, (_, i) => ({
+    ts: iso(nowSec() - (i + 1) * 3700),
+    recipient: i % 2 === 0 ? 'Dr. Rivera — General Hospital' : 'Front desk check-in kiosk',
+    action: 'direct',
+    outcome: outcomes[i % outcomes.length]!,
+  }));
+}
+
+interface Seed {
+  name: string;
+  tweak: (s: ManageState) => void;
+}
+
+const seeds: Seed[] = [
+  { name: 'live', tweak: () => {} },
+  { name: 'expired', tweak: (s) => { s.exp = nowSec() - 3600; } },
+  { name: 'exhausted', tweak: (s) => { s.uses = s.maxUses ?? 5; } },
+  { name: 'paused', tweak: (s) => { s.active = false; } },
+  { name: 'destroyed', tweak: (s) => { s.active = false; s.purgedAt = iso(nowSec() - 60); s.files = []; } },
+];
+
+const base = `http://localhost:${port}`;
+const lines: string[] = [];
+
+for (const seed of seeds) {
+  const m = generateMasterSecret();
+  const auth = await deriveAuth(m);
+  const key = await deriveKey(m);
+  const id = b64url(crypto.getRandomValues(new Uint8Array(32)));
+  const state: ManageState = {
+    id,
+    url: `${base}/shl/${id}`,
+    flag: 'U',
+    label: `Casey Tester — mock ${seed.name} link`,
+    exp: nowSec() + 24 * 3600,
+    maxUses: 5,
+    uses: 2,
+    active: true,
+    live: true,
+    purgedAt: null,
+    passcodeAttemptsRemaining: null,
+    createdAt: iso(nowSec() - 7200),
+    files: [{ fileId: 'f1', contentType: 'application/jose', size: 48211, lastUpdated: iso(nowSec() - 7200) }],
+    accessLog: sampleLog(seed.name === 'destroyed' ? 4 : 2),
+  };
+  seed.tweak(state);
+  state.live = computeLive(state);
+  store.set(auth, state);
+
+  lines.push(`  ${seed.name.padEnd(10)} owner:  ${buildOwnerLink(base, m)}`);
+  if (seed.name === 'live') {
+    const shlink = buildShlink({ url: state.url, key, exp: state.exp, flag: state.flag, label: state.label ?? undefined });
+    lines.push(`  ${''.padEnd(10)} viewer: ${buildViewerLink(base, shlink)}`);
+  }
+}
+
+const CORS = {
+  'access-control-allow-origin': '*',
+  'access-control-allow-methods': 'GET, PATCH, DELETE, OPTIONS',
+  'access-control-allow-headers': 'content-type',
+};
+
+function json(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { 'content-type': 'application/json', ...CORS },
+  });
+}
+
+function withState(auth: string, fn: (s: ManageState) => Response): Response {
+  const s = store.get(auth);
+  if (!s) return json({ error: 'no such link' }, 404);
+  return fn(s);
+}
+
+Bun.serve({
+  port,
+  routes: {
+    '/': () => Response.redirect('/s', 302),
+    '/s': indexHtml,
+    '/api/manage/:auth': {
+      OPTIONS: () => new Response(null, { status: 204, headers: CORS }),
+      GET: (req) =>
+        withState(req.params.auth, (s) => {
+          s.live = computeLive(s);
+          return json(s);
+        }),
+      PATCH: async (req) => {
+        const s = store.get(req.params.auth);
+        if (!s) return json({ error: 'no such link' }, 404);
+        if (s.purgedAt !== null) return json({ error: 'link destroyed' }, 410);
+        const patch = (await req.json()) as ManagePatch;
+        if (patch.exp !== undefined) s.exp = patch.exp;
+        if (patch.maxUses !== undefined) s.maxUses = patch.maxUses;
+        if (patch.active !== undefined) s.active = patch.active;
+        if (patch.label !== undefined) s.label = patch.label;
+        s.live = computeLive(s);
+        return json(s);
+      },
+      DELETE: (req) =>
+        withState(req.params.auth, (s) => {
+          s.active = false;
+          s.purgedAt = iso(nowSec());
+          s.files = [];
+          s.live = false;
+          return json(s);
+        }),
+    },
+  },
+  development: true,
+});
+
+console.log(`mock handoff dev server on ${base}\n\nTest URLs (mock-only secrets):\n${lines.join('\n')}\n`);

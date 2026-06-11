@@ -1,0 +1,55 @@
+{
+  "resourceType": "Patient",
+  "id": "patient-unicode-name",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race",
+      "extension": [
+        { "url": "ombCategory", "valueCoding": { "system": "urn:oid:2.16.840.1.113883.6.238", "code": "2028-9", "display": "Asian" } },
+        { "url": "detailed", "valueCoding": { "system": "urn:oid:2.16.840.1.113883.6.238", "code": "2034-7", "display": "Chinese" } },
+        { "url": "text", "valueString": "Chinese" }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity",
+      "extension": [
+        { "url": "ombCategory", "valueCoding": { "system": "urn:oid:2.16.840.1.113883.6.238", "code": "2186-5", "display": "Not Hispanic or Latino" } },
+        { "url": "text", "valueString": "Not Hispanic or Latino" }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-interpreter-needed",
+      "valueCoding": { "system": "http://snomed.info/sct", "code": "373066001", "display": "Yes (qualifier value)" }
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/individual-genderIdentity",
+      "extension": [
+        {
+          "url": "value",
+          "valueCodeableConcept": {
+            "coding": [{ "system": "http://snomed.info/sct", "code": "446141000124107", "display": "Identifies as female gender (finding)" }]
+          }
+        }
+      ]
+    }
+  ],
+  "identifier": [
+    { "system": "https://breadth-test-medical.example.org/mrn", "value": "BREADTH-0045" }
+  ],
+  "name": [
+    { "use": "official", "family": "王", "given": ["秀英"], "text": "王秀英" },
+    { "use": "usual", "family": "Wang", "given": ["Xiuying"], "text": "Xiuying Wang" }
+  ],
+  "telecom": [
+    { "system": "phone", "value": "555-555-0166", "use": "mobile" }
+  ],
+  "gender": "female",
+  "birthDate": "1955-08-14",
+  "address": [
+    { "use": "home", "line": ["812 国际 Lane", "Apt 3"], "city": "Sample City", "state": "WA", "postalCode": "98102", "country": "US" }
+  ],
+  "communication": [
+    { "language": { "coding": [{ "system": "urn:ietf:bcp:47", "code": "zh-CN" }], "text": "Chinese (Mandarin)" }, "preferred": true },
+    { "language": { "coding": [{ "system": "urn:ietf:bcp:47", "code": "en-US", "display": "English (United States)" }] }, "preferred": false }
+  ]
+}

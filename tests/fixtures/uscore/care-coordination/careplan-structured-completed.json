@@ -1,0 +1,66 @@
+{
+  "resourceType": "CarePlan",
+  "id": "careplan-structured-completed",
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>Completed post-pneumonia recovery care plan (2024-03-04 to 2024-06-28): pulmonary rehabilitation exercise regime and repeat chest imaging.</p></div>"
+  },
+  "status": "completed",
+  "intent": "order",
+  "category": [
+    {
+      "text": "Post-acute recovery plan"
+    }
+  ],
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "period": { "start": "2024-03-04", "end": "2024-06-28" },
+  "created": "2024-03-04T09:10:00Z",
+  "author": { "display": "Breadth Test Medical Center Pulmonology" },
+  "goal": [
+    { "reference": "Goal/goal-walking-completed", "display": "Walk 30 minutes daily without dyspnea" }
+  ],
+  "activity": [
+    {
+      "detail": {
+        "kind": "ServiceRequest",
+        "code": {
+          "coding": [
+            { "system": "http://snomed.info/sct", "code": "229065009", "display": "Exercise therapy" }
+          ],
+          "text": "Pulmonary rehabilitation exercise regime"
+        },
+        "status": "completed",
+        "scheduledTiming": {
+          "repeat": { "frequency": 3, "period": 1, "periodUnit": "wk" }
+        },
+        "performer": [
+          { "display": "Breadth Test Rehab Services" }
+        ],
+        "description": "Supervised pulmonary rehab three times weekly for 12 weeks; completed 34 of 36 sessions."
+      }
+    },
+    {
+      "detail": {
+        "code": {
+          "coding": [
+            { "system": "http://loinc.org", "code": "36643-5", "display": "XR Chest 2 Views" },
+            { "system": "http://www.ama-assn.org/go/cpt", "code": "71046", "display": "X-ray exam chest 2 views" }
+          ],
+          "text": "Repeat 2-view chest x-ray to confirm resolution"
+        },
+        "status": "completed",
+        "scheduledPeriod": { "start": "2024-05-01", "end": "2024-05-31" },
+        "location": { "display": "Breadth Test Medical Center Imaging" }
+      }
+    },
+    {
+      "reference": { "display": "Smoking cessation counseling referral (external order, not resolvable)" },
+      "progress": [
+        { "text": "Patient declined referral on 2024-04-12; will revisit at annual exam.", "time": "2024-04-12T14:05:00-05:00" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "family": "patient",
+  "uscoreVersion": "9.0.0",
+  "profiles": {
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient": {
+      "mustSupport": [
+        "identifier",
+        "identifier.system",
+        "identifier.value",
+        "name",
+        "name.family",
+        "name.given",
+        "birthDate",
+        "address",
+        "address.line",
+        "address.city",
+        "address.state",
+        "address.postalCode"
+      ],
+      "additionalUSCDI": [
+        "name.use",
+        "name.suffix",
+        "name.period",
+        "telecom",
+        "telecom.system",
+        "telecom.value",
+        "telecom.use",
+        "deceased[x]",
+        "address.use",
+        "address.period",
+        "communication.language",
+        "extension:us-core-race",
+        "extension:us-core-ethnicity",
+        "extension:us-core-tribal-affiliation",
+        "extension:us-core-individual-sex",
+        "extension:us-core-interpreter-needed"
+      ],
+      "covered": {
+        "identifier": ["patient-constant.json", "patient-multiple-names.json", "patient-unicode-name.json", "patient-deceased.json", "patient-minimal-absent.json"],
+        "identifier.system": ["patient-constant.json", "patient-multiple-names.json", "patient-minimal-absent.json"],
+        "identifier.value": ["patient-constant.json", "patient-multiple-names.json", "patient-minimal-absent.json"],
+        "name": ["patient-constant.json", "patient-multiple-names.json", "patient-unicode-name.json", "patient-deceased.json", "patient-minimal-absent.json"],
+        "name.family": ["patient-constant.json", "patient-multiple-names.json", "patient-unicode-name.json", "patient-deceased.json"],
+        "name.given": ["patient-constant.json", "patient-multiple-names.json", "patient-unicode-name.json", "patient-deceased.json"],
+        "name.use": ["patient-multiple-names.json", "patient-unicode-name.json", "patient-deceased.json", "patient-minimal-absent.json"],
+        "name.suffix": ["patient-multiple-names.json", "patient-deceased.json"],
+        "name.period": ["patient-multiple-names.json"],
+        "birthDate": ["patient-constant.json", "patient-multiple-names.json", "patient-unicode-name.json", "patient-deceased.json"],
+        "deceased[x]": ["patient-deceased.json", "patient-minimal-absent.json"],
+        "telecom": ["patient-constant.json", "patient-multiple-names.json", "patient-unicode-name.json", "patient-deceased.json"],
+        "telecom.system": ["patient-constant.json", "patient-multiple-names.json"],
+        "telecom.value": ["patient-constant.json", "patient-multiple-names.json"],
+        "telecom.use": ["patient-constant.json", "patient-multiple-names.json", "patient-unicode-name.json", "patient-deceased.json"],
+        "address": ["patient-constant.json", "patient-multiple-names.json", "patient-unicode-name.json", "patient-deceased.json"],
+        "address.line": ["patient-constant.json", "patient-multiple-names.json", "patient-unicode-name.json", "patient-deceased.json"],
+        "address.city": ["patient-constant.json", "patient-multiple-names.json", "patient-unicode-name.json", "patient-deceased.json"],
+        "address.state": ["patient-constant.json", "patient-multiple-names.json", "patient-unicode-name.json", "patient-deceased.json"],
+        "address.postalCode": ["patient-constant.json", "patient-multiple-names.json", "patient-unicode-name.json", "patient-deceased.json"],
+        "address.use": ["patient-constant.json", "patient-multiple-names.json", "patient-unicode-name.json", "patient-deceased.json"],
+        "address.period": ["patient-multiple-names.json"],
+        "communication.language": ["patient-constant.json", "patient-multiple-names.json", "patient-unicode-name.json", "patient-deceased.json"],
+        "extension:us-core-race": ["patient-constant.json", "patient-multiple-names.json", "patient-unicode-name.json", "patient-deceased.json"],
+        "extension:us-core-ethnicity": ["patient-constant.json", "patient-multiple-names.json", "patient-unicode-name.json", "patient-deceased.json"],
+        "extension:us-core-tribal-affiliation": ["patient-multiple-names.json"],
+        "extension:us-core-individual-sex": ["patient-multiple-names.json", "patient-deceased.json"],
+        "extension:us-core-interpreter-needed": ["patient-unicode-name.json", "patient-deceased.json"]
+      },
+      "gaps": [
+        "Patient.gender is populated everywhere but is NOT must-support in US Core 9.0.0 (replaced by us-core-individual-sex); patient-constant keeps the deprecated us-core-birthsex extension as legacy-data noise.",
+        "No instance uses an address-level data-absent-reason; absence of address is covered by patient-minimal-absent.json (element simply missing).",
+        "genderIdentity is not profiled in US Core 9.0.0; the standard FHIR individual-genderIdentity extension is included in patient-unicode-name.json only as tolerated extension noise.",
+        "sex-parameter-for-clinical-use is not profiled on US Core Patient (it is an Observation/context concept in 9.0.0), so it is not represented."
+      ]
+    }
+  },
+  "variants": {
+    "name.use": ["official", "usual", "maiden", "old", "temp"],
+    "deceased[x]": ["deceasedDateTime", "deceasedBoolean"],
+    "birthDate": ["present", "data-absent-reason via _birthDate"],
+    "name absence": ["us-core-6 satisfied via data-absent-reason extension, no family/given (patient-minimal-absent.json)"],
+    "identifier": ["single MRN", "multiple (MRN + SSN + Epic OID internal ID)", "type text-only CodeableConcept"],
+    "communication.language": ["coding+text preferred", "code-only coding (zh-CN, no display)", "text-only CodeableConcept (Spanish)", "multiple repetitions with preferred true/false"],
+    "unicode": ["CJK family/given/text 王秀英", "CJK character in address line"],
+    "long strings": ["155-char address line (patient-deceased.json)"],
+    "reference-by-display-only": ["managingOrganization (patient-deceased.json)"],
+    "extension noise": ["individual-genderIdentity", "patient-religion", "deprecated us-core-birthsex"]
+  }
+}

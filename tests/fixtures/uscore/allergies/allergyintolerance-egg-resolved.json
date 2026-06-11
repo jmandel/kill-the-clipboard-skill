@@ -1,0 +1,67 @@
+{
+  "resourceType": "AllergyIntolerance",
+  "id": "allergyintolerance-egg-resolved",
+  "clinicalStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical",
+        "code": "resolved",
+        "display": "Resolved"
+      }
+    ],
+    "text": "Resolved"
+  },
+  "verificationStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-verification",
+        "code": "confirmed",
+        "display": "Confirmed"
+      }
+    ]
+  },
+  "type": "allergy",
+  "category": ["food"],
+  "code": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "91930004",
+        "display": "Allergy to eggs (finding)"
+      }
+    ],
+    "text": "Egg allergy (childhood, outgrown)"
+  },
+  "patient": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "onsetString": "childhood",
+  "recordedDate": "2025-01-10T08:45:00-06:00",
+  "recorder": {
+    "display": "Dr. Sample Renderer"
+  },
+  "reaction": [
+    {
+      "manifestation": [
+        {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "24079001",
+              "display": "Atopic dermatitis (disorder)"
+            }
+          ],
+          "text": "Eczema flare"
+        }
+      ],
+      "description": "Historical childhood eczema flares with baked egg; outgrown by adolescence.",
+      "severity": "moderate"
+    }
+  ],
+  "note": [
+    {
+      "text": "Tolerated supervised baked-egg challenge in 2024; now eats egg regularly without symptoms. Documented as resolved."
+    }
+  ]
+}

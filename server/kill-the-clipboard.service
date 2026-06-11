@@ -1,0 +1,38 @@
+# systemd unit for the kill-the-clipboard SHL server.
+# Install:
+#   sudo useradd --system --home /var/lib/kill-the-clipboard --shell /usr/sbin/nologin ktc
+#   sudo mkdir -p /var/lib/kill-the-clipboard && sudo chown ktc: /var/lib/kill-the-clipboard
+#   sudo cp server/kill-the-clipboard.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now kill-the-clipboard
+
+[Unit]
+Description=kill-the-clipboard SMART Health Link server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ktc
+Group=ktc
+WorkingDirectory=/opt/kill-the-clipboard
+Environment=CONFIG_PATH=/opt/kill-the-clipboard/server/config.json
+Environment=DB_PATH=/var/lib/kill-the-clipboard/data.sqlite
+ExecStart=/usr/local/bin/bun run server/src/index.ts
+Restart=on-failure
+RestartSec=2
+
+# Hardening: the process needs the repo read-only and the state dir read-write, nothing else.
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/kill-the-clipboard
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=false
+
+[Install]
+WantedBy=multi-user.target

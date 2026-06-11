@@ -1,0 +1,39 @@
+{
+  "resourceType": "Observation",
+  "id": "observation-weight",
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        { "system": "http://terminology.hl7.org/CodeSystem/observation-category", "code": "vital-signs", "display": "Vital Signs" }
+      ]
+    }
+  ],
+  "code": {
+    "coding": [
+      { "system": "http://loinc.org", "code": "29463-7", "display": "Body weight" }
+    ],
+    "text": "Weight"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "effectiveDateTime": "2024-09-17T14:05:00-05:00",
+  "performer": [
+    { "display": "Dr. Sample Renderer" }
+  ],
+  "valueQuantity": {
+    "value": 152,
+    "unit": "lb",
+    "system": "http://unitsofmeasure.org",
+    "code": "[lb_av]"
+  },
+  "note": [
+    {
+      "authorString": "Breadth Test Medical Center rooming staff",
+      "time": "2024-09-17T14:06:00-05:00",
+      "text": "Weight obtained on standing scale #2 in street clothes without shoes; patient declined gown. Scale #1 was out for calibration per biomedical engineering ticket BTMC-2024-008841, so the measurement was taken on the backup unit which historically reads approximately 0.2 lb heavy according to the most recent quarterly calibration report. Patient reports intentional weight loss of about 6 lb since the spring visit attributable to a structured walking program (45 minutes daily, 5 days per week) and reduced portion sizes; she was counseled to continue current diet and exercise habits and to return for a recheck at the next annual preventive visit. This deliberately long narrative exists to exercise renderer wrapping, truncation, and pagination behavior for multi-sentence note text."
+    }
+  ]
+}

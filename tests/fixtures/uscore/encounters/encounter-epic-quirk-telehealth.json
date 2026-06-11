@@ -1,0 +1,78 @@
+{
+  "resourceType": "Encounter",
+  "id": "encounter-epic-quirk-telehealth",
+  "identifier": [
+    {
+      "use": "usual",
+      "system": "urn:oid:1.2.840.114350.1.13.999.2.7.3.698084.8",
+      "value": "100445566"
+    }
+  ],
+  "status": "finished",
+  "class": {
+    "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+    "code": "VR",
+    "display": "virtual"
+  },
+  "type": [
+    {
+      "coding": [
+        {
+          "system": "urn:oid:1.2.840.114350.1.13.999.2.7.10.698084.30",
+          "code": "101",
+          "display": "Telemedicine"
+        },
+        {
+          "system": "http://www.ama-assn.org/go/cpt",
+          "code": "99214",
+          "display": "Office or other outpatient visit for the evaluation and management of an established patient (telehealth)"
+        }
+      ],
+      "text": "Telemedicine — Video Visit"
+    }
+  ],
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "participant": [
+    {
+      "individual": {
+        "reference": "Practitioner/eTOf4r2-SAMPLE-EPIC-ID-x3",
+        "display": "Pruebas Sánchez-Müller, ARNP — 家庭医学"
+      }
+    }
+  ],
+  "period": {
+    "start": "2025-10-02T13:00:00-05:00",
+    "end": "2025-10-02T13:22:00-05:00"
+  },
+  "reasonCode": [
+    {
+      "coding": [
+        {
+          "system": "urn:oid:1.2.840.114350.1.13.999.2.7.2.728286",
+          "code": "84221",
+          "display": "Medication refill request"
+        },
+        {
+          "system": "http://snomed.info/sct",
+          "code": "182838006",
+          "display": "Change of medication (procedure)"
+        }
+      ],
+      "text": "Medication refill request"
+    }
+  ],
+  "location": [
+    {
+      "location": {
+        "display": "Breadth Test Virtual Care (display-only reference)"
+      }
+    }
+  ],
+  "serviceProvider": {
+    "reference": "Organization/organization-breadth-test-medical",
+    "display": "BREADTH TEST MEDICAL CENTER AND AFFILIATED PHYSICIAN GROUP OF SAMPLE CITY, WASHINGTON, INCORPORATED"
+  }
+}

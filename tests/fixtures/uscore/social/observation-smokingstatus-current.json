@@ -1,0 +1,58 @@
+{
+  "resourceType": "Observation",
+  "id": "observation-smokingstatus-current",
+  "extension": [
+    {
+      "url": "urn:oid:1.2.840.114350.1.13.535.2.7.10.737780.1001",
+      "valueString": "EPIC-NOISE: renderer must tolerate unknown extensions"
+    }
+  ],
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+          "code": "social-history",
+          "display": "Social History"
+        }
+      ],
+      "text": "Social History"
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "72166-2",
+        "display": "Tobacco smoking status"
+      }
+    ],
+    "text": "Smoking status"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "effectiveDateTime": "2025-03-14",
+  "performer": [
+    {
+      "display": "Dr. Sample Renderer"
+    }
+  ],
+  "valueCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "449868002",
+        "display": "Smokes tobacco daily (finding)"
+      },
+      {
+        "system": "http://loinc.org",
+        "code": "LA18976-3",
+        "display": "Current every day smoker"
+      }
+    ],
+    "text": "Current every day smoker"
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "resourceType": "AllergyIntolerance",
+  "id": "allergyintolerance-peanut-active-low",
+  "extension": [
+    {
+      "url": "https://open.epic.com/fhir/extensions/allergy-severity-noise",
+      "valueString": "MILD-INTERNAL-CODE-7"
+    }
+  ],
+  "clinicalStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical",
+        "code": "active",
+        "display": "Active"
+      }
+    ]
+  },
+  "verificationStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-verification",
+        "code": "confirmed",
+        "display": "Confirmed"
+      }
+    ]
+  },
+  "type": "allergy",
+  "category": ["food"],
+  "criticality": "low",
+  "code": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "91935009",
+        "display": "Allergy to peanut (finding)"
+      }
+    ],
+    "text": "Peanut allergy"
+  },
+  "patient": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "onsetAge": {
+    "value": 4,
+    "unit": "yr",
+    "system": "http://unitsofmeasure.org",
+    "code": "a"
+  },
+  "lastOccurrence": "2025-07-04",
+  "recordedDate": "2024-08-22T10:15:00-05:00",
+  "recorder": {
+    "reference": "Practitioner/practitioner-sample-renderer",
+    "display": "Dr. Sample Renderer"
+  },
+  "reaction": [
+    {
+      "manifestation": [
+        {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "126485001",
+              "display": "Urticaria (disorder)"
+            }
+          ],
+          "text": "Hives"
+        },
+        {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "422587007",
+              "display": "Nausea (finding)"
+            }
+          ],
+          "text": "Nausea"
+        }
+      ],
+      "description": "Perioral hives and mild nausea after eating a trail mix bar; resolved with oral antihistamine.",
+      "severity": "mild"
+    }
+  ],
+  "note": [
+    {
+      "text": "Tolerates tree nuts. Component testing (Ara h 2 low) consistent with low risk of severe systemic reaction."
+    }
+  ]
+}

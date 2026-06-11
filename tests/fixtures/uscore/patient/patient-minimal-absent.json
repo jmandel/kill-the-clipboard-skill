@@ -1,0 +1,22 @@
+{
+  "resourceType": "Patient",
+  "id": "patient-minimal-absent",
+  "identifier": [
+    { "system": "urn:oid:1.2.840.114350.1.13.999.2.7.3.688884.100", "value": "TRAUMA-2026-0007" }
+  ],
+  "name": [
+    {
+      "extension": [
+        { "url": "http://hl7.org/fhir/StructureDefinition/data-absent-reason", "valueCode": "unknown" }
+      ],
+      "use": "temp"
+    }
+  ],
+  "gender": "unknown",
+  "_birthDate": {
+    "extension": [
+      { "url": "http://hl7.org/fhir/StructureDefinition/data-absent-reason", "valueCode": "unknown" }
+    ]
+  },
+  "deceasedBoolean": true
+}

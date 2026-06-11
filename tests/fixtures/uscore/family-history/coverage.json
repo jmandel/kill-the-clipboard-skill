@@ -1,0 +1,85 @@
+{
+  "family": "family-history",
+  "uscoreVersion": "9.0.0",
+  "profiles": {
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-familymemberhistory": {
+      "mustSupport": ["status", "patient", "relationship", "condition", "condition.code"],
+      "additionalUscdi": ["extension:recorder"],
+      "covered": {
+        "status": [
+          "familymemberhistory-mother-completed.json",
+          "familymemberhistory-father-deceased.json",
+          "familymemberhistory-sister-partial.json",
+          "familymemberhistory-grandmother-unicode.json",
+          "familymemberhistory-brother-healthunknown.json"
+        ],
+        "patient": [
+          "familymemberhistory-mother-completed.json",
+          "familymemberhistory-father-deceased.json",
+          "familymemberhistory-sister-partial.json",
+          "familymemberhistory-grandmother-unicode.json",
+          "familymemberhistory-brother-healthunknown.json"
+        ],
+        "relationship": [
+          "familymemberhistory-mother-completed.json",
+          "familymemberhistory-father-deceased.json",
+          "familymemberhistory-sister-partial.json",
+          "familymemberhistory-grandmother-unicode.json",
+          "familymemberhistory-brother-healthunknown.json"
+        ],
+        "condition": [
+          "familymemberhistory-mother-completed.json",
+          "familymemberhistory-father-deceased.json",
+          "familymemberhistory-sister-partial.json",
+          "familymemberhistory-grandmother-unicode.json"
+        ],
+        "condition.code": [
+          "familymemberhistory-mother-completed.json",
+          "familymemberhistory-father-deceased.json",
+          "familymemberhistory-sister-partial.json",
+          "familymemberhistory-grandmother-unicode.json"
+        ],
+        "extension:recorder": [
+          "familymemberhistory-mother-completed.json"
+        ]
+      },
+      "gaps": [
+        "status entered-in-error not instantiated (lifecycle breadth: completed, partial, health-unknown are covered; entered-in-error rendering is exercised on Observation/Procedure fixtures elsewhere in the corpus)",
+        "extension:recorder targets only a Practitioner reference (PractitionerRole/Patient/RelatedPerson targets not repeated)"
+      ]
+    }
+  },
+  "variants": {
+    "status": ["completed", "partial", "health-unknown"],
+    "relationship (v3-RoleCode)": ["MTH", "FTH", "SIS", "BRO", "MGRMTH"],
+    "deceased[x]": [
+      "deceasedBoolean false (familymemberhistory-mother-completed.json)",
+      "deceasedAge (familymemberhistory-father-deceased.json)",
+      "deceasedDate (familymemberhistory-grandmother-unicode.json)",
+      "absent (familymemberhistory-sister-partial.json, familymemberhistory-brother-healthunknown.json)"
+    ],
+    "born[x]": [
+      "bornDate (familymemberhistory-mother-completed.json)",
+      "bornString (familymemberhistory-grandmother-unicode.json)"
+    ],
+    "age[x]": [
+      "ageRange + estimatedAge true (familymemberhistory-sister-partial.json; fhs-1/fhs-2 respected — no born[x] on that instance)"
+    ],
+    "condition.onset[x]": [
+      "onsetAge (mother breast cancer, grandmother stroke)",
+      "onsetString (mother hypertension 'mid-40s', sister 'childhood')",
+      "onsetRange (father myocardial infarction)",
+      "onsetPeriod (father diabetes, year-precision start/end)"
+    ],
+    "condition.contributedToDeath": ["true (father MI, grandmother stroke)"],
+    "dataAbsentReason": ["unable-to-obtain with text (familymemberhistory-brother-healthunknown.json, no condition list)"],
+    "edgeCases": [
+      "unicode name and note (王秀英, 外婆, 中风 — familymemberhistory-grandmother-unicode.json)",
+      "code-only coding without display (grandmother stroke SNOMED 230690007)",
+      "text-only condition.code (sister 'Asthma since childhood')",
+      "multiple codings incl. ICD-10-CM translation (mother breast cancer SNOMED + C50.911)",
+      "no name on a family member (familymemberhistory-brother-healthunknown.json — render the relationship)",
+      "condition-level and resource-level notes"
+    ]
+  }
+}

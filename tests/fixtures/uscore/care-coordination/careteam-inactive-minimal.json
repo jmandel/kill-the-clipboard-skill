@@ -1,0 +1,30 @@
+{
+  "resourceType": "CareTeam",
+  "id": "careteam-inactive-minimal",
+  "extension": [
+    {
+      "url": "https://open.epic.com/fhir/extensions/team-type",
+      "valueCode": "episode"
+    }
+  ],
+  "status": "inactive",
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001"
+  },
+  "period": { "start": "2024-03-04", "end": "2024-06-28" },
+  "participant": [
+    {
+      "role": [
+        {
+          "coding": [
+            { "system": "http://snomed.info/sct", "code": "41672002" }
+          ]
+        }
+      ],
+      "member": {
+        "reference": "PractitionerRole/practitionerrole-pulm-breadth",
+        "display": "Dr. Test Fixture, Pulmonology, Breadth Test Medical Center"
+      }
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "resourceType": "Procedure",
+  "id": "procedure-dialysis-inprogress",
+  "extension": [
+    {
+      "url": "https://breadth-test-medical.example.org/fhir/StructureDefinition/proprietary-noise",
+      "valueString": "renderer-must-tolerate-unknown-extensions"
+    }
+  ],
+  "status": "in-progress",
+  "category": {
+    "coding": [
+      { "system": "http://snomed.info/sct", "code": "277132007", "display": "Therapeutic procedure (procedure)" }
+    ]
+  },
+  "code": {
+    "coding": [
+      { "system": "http://snomed.info/sct", "code": "302497006" }
+    ]
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "performedPeriod": {
+    "start": "2026-01-05T07:30:00-06:00"
+  },
+  "location": {
+    "display": "Breadth Test Dialysis Center, Bay 3"
+  },
+  "note": [
+    { "text": "Maintenance hemodialysis course ongoing, 3 sessions per week. 透析治疗进行中 (unicode tolerance check)." }
+  ]
+}

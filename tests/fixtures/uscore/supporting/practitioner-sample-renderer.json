@@ -1,0 +1,64 @@
+{
+  "resourceType": "Practitioner",
+  "id": "practitioner-sample-renderer",
+  "identifier": [
+    {
+      "system": "http://hl7.org/fhir/sid/us-npi",
+      "value": "1234567893"
+    },
+    {
+      "system": "https://breadth-test-medical.example.org/staff-id",
+      "value": "STAFF-00042",
+      "type": {
+        "coding": [
+          { "system": "http://terminology.hl7.org/CodeSystem/v2-0203", "code": "EI", "display": "Employee number" }
+        ]
+      }
+    },
+    {
+      "system": "urn:oid:1.2.840.114350.1.13.999.2.7.2.836982",
+      "value": "eM5CWtq15N0WJeuCet5BJlQ3"
+    }
+  ],
+  "active": true,
+  "name": [
+    {
+      "use": "official",
+      "family": "Renderer",
+      "given": ["Sample", "Q."],
+      "prefix": ["Dr."],
+      "suffix": ["MD", "FACP"],
+      "text": "Dr. Sample Q. Renderer, MD"
+    }
+  ],
+  "telecom": [
+    { "system": "phone", "value": "555-555-0199", "use": "work" },
+    { "system": "fax", "value": "555-555-0198", "use": "work" },
+    { "system": "email", "value": "sample.renderer@breadth-test-medical.example.org", "use": "work" }
+  ],
+  "address": [
+    {
+      "use": "work",
+      "line": ["100 Renderer Way", "Suite 400"],
+      "city": "Sample City",
+      "state": "WA",
+      "postalCode": "98101",
+      "country": "US"
+    }
+  ],
+  "qualification": [
+    {
+      "identifier": [
+        { "system": "https://sample-state-medical-board.example.org/license", "value": "MD-99812" }
+      ],
+      "code": {
+        "coding": [
+          { "system": "http://terminology.hl7.org/CodeSystem/v2-0360", "code": "MD", "display": "Doctor of Medicine" }
+        ],
+        "text": "Doctor of Medicine"
+      },
+      "period": { "start": "2010-07-01", "end": "2027-06-30" },
+      "issuer": { "display": "Sample State Medical Board" }
+    }
+  ]
+}

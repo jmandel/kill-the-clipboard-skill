@@ -1,0 +1,153 @@
+{
+  "family": "labs",
+  "uscoreVersion": "9.0.0",
+  "profiles": {
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab": {
+      "mustSupport": [
+        "meta.lastUpdated",
+        "status",
+        "category:us-core (laboratory)",
+        "code",
+        "code.text",
+        "subject",
+        "encounter",
+        "effective[x] (effectiveDateTime)",
+        "performer",
+        "value[x]",
+        "valueQuantity",
+        "valueCodeableConcept",
+        "valueString",
+        "dataAbsentReason",
+        "interpretation",
+        "specimen",
+        "referenceRange"
+      ],
+      "covered": {
+        "meta.lastUpdated": ["observation-hemoglobin-low.json", "observation-potassium-high.json"],
+        "status": [
+          "observation-hemoglobin-low.json (final)",
+          "observation-potassium-high.json (preliminary)",
+          "observation-urine-dipstick.json (corrected)",
+          "observation-hba1c-cancelled.json (cancelled)"
+        ],
+        "category:us-core (laboratory)": ["observation-hemoglobin-low.json", "observation-potassium-high.json (plus Epic 'Lab' second category)"],
+        "code": ["all observation-*.json"],
+        "code.text": ["all observation-*.json"],
+        "subject": ["all observation-*.json (constant patient urn)"],
+        "encounter": ["observation-hemoglobin-low.json (display-only reference)"],
+        "effective[x] (effectiveDateTime)": ["all observation-*.json"],
+        "performer": ["all observation-*.json"],
+        "valueQuantity": ["observation-hemoglobin-low.json", "observation-potassium-high.json"],
+        "valueCodeableConcept": ["observation-blood-type.json", "observation-urine-dipstick.json (component, text-only)"],
+        "valueString": ["observation-urine-color.json", "observation-urine-dipstick.json (component)"],
+        "dataAbsentReason": ["observation-hba1c-cancelled.json", "observation-urine-dipstick.json (component-level)"],
+        "interpretation": [
+          "observation-hemoglobin-low.json (L)",
+          "observation-potassium-high.json (H)",
+          "observation-urine-nitrite.json (A)",
+          "observation-ana-titer.json (text-only)"
+        ],
+        "specimen": ["observation-hemoglobin-low.json", "observation-urine-dipstick.json"],
+        "referenceRange": ["observation-hemoglobin-low.json (low/high)", "observation-ana-titer.json (text-only)"]
+      },
+      "gaps": [
+        "effectivePeriod on an Observation not included (effectiveDateTime is the only MS variant; effectivePeriod IS covered on DiagnosticReport)"
+      ]
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-clinical-result": {
+      "mustSupport": [
+        "status",
+        "category:us-core (clinical result category value set)",
+        "code",
+        "subject",
+        "encounter",
+        "effective[x] (effectiveDateTime)",
+        "performer",
+        "value[x] (Quantity, CodeableConcept, string)",
+        "dataAbsentReason"
+      ],
+      "covered": {
+        "status": ["observation-clinical-ef.json (final)"],
+        "category:us-core (clinical result category value set)": ["observation-clinical-ef.json (imaging)"],
+        "code": ["observation-clinical-ef.json"],
+        "subject": ["observation-clinical-ef.json"],
+        "encounter": ["observation-clinical-ef.json (display-only reference)"],
+        "effective[x] (effectiveDateTime)": ["observation-clinical-ef.json"],
+        "performer": ["observation-clinical-ef.json"],
+        "value[x] (Quantity, CodeableConcept, string)": ["observation-clinical-ef.json (valueQuantity only)"],
+        "dataAbsentReason": []
+      },
+      "gaps": [
+        "Only one clinical-result instance (imaging/valueQuantity); valueCodeableConcept, valueString, and dataAbsentReason variants are exercised on the sibling us-core-observation-lab instances, which this profile is the base of — renderer paths are identical"
+      ]
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-lab": {
+      "mustSupport": [
+        "meta.lastUpdated",
+        "status",
+        "category:LaboratorySlice (LAB)",
+        "code",
+        "subject",
+        "encounter",
+        "effective[x] (effectiveDateTime, effectivePeriod)",
+        "issued",
+        "performer",
+        "resultsInterpreter",
+        "result"
+      ],
+      "covered": {
+        "meta.lastUpdated": ["diagnosticreport-cbc-panel.json", "diagnosticreport-urinalysis.json"],
+        "status": ["diagnosticreport-cbc-panel.json (final)", "diagnosticreport-urinalysis.json (preliminary)"],
+        "category:LaboratorySlice (LAB)": ["diagnosticreport-cbc-panel.json (LAB plus Epic 'Lab' system-less coding)", "diagnosticreport-urinalysis.json"],
+        "code": ["diagnosticreport-cbc-panel.json (58410-2)", "diagnosticreport-urinalysis.json (24356-8)"],
+        "subject": ["both"],
+        "encounter": ["diagnosticreport-cbc-panel.json (display-only reference)"],
+        "effective[x] (effectiveDateTime, effectivePeriod)": ["diagnosticreport-cbc-panel.json (dateTime)", "diagnosticreport-urinalysis.json (Period)"],
+        "issued": ["both"],
+        "performer": ["diagnosticreport-cbc-panel.json (contained Organization #lab-org)", "diagnosticreport-urinalysis.json (display-only)"],
+        "resultsInterpreter": ["both"],
+        "result": ["diagnosticreport-cbc-panel.json (relative reference + display-only-no-reference entry)", "diagnosticreport-urinalysis.json (3 relative references)"]
+      },
+      "gaps": []
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-specimen": {
+      "mustSupport": [
+        "identifier",
+        "accessionIdentifier",
+        "type",
+        "subject",
+        "collection",
+        "collection.bodySite",
+        "condition"
+      ],
+      "covered": {
+        "identifier": ["specimen-blood-venous.json"],
+        "accessionIdentifier": ["specimen-blood-venous.json", "specimen-urine-clean-catch.json"],
+        "type": ["both (SNOMED coded with text)"],
+        "subject": ["both (constant patient urn)"],
+        "collection": ["specimen-blood-venous.json (collector/collectedDateTime/quantity/method/bodySite)", "specimen-urine-clean-catch.json"],
+        "collection.bodySite": ["specimen-blood-venous.json"],
+        "condition": ["specimen-blood-venous.json (v2-0493 ROOM)"]
+      },
+      "gaps": []
+    }
+  },
+  "variants": {
+    "Observation.value[x]": ["Quantity", "CodeableConcept", "string", "Ratio", "boolean", "absent-with-dataAbsentReason", "component-only"],
+    "Observation.status": ["final", "preliminary", "corrected", "cancelled"],
+    "Observation.category": ["laboratory", "Epic 'Lab' (system-less) alongside laboratory", "imaging (clinical result)"],
+    "DiagnosticReport.effective[x]": ["dateTime", "Period"],
+    "DiagnosticReport.status": ["final", "preliminary"],
+    "edgeCases": [
+      "code-only coding without display (observation-potassium-high local POT coding; Epic 'Lab' category coding without system)",
+      "text-only CodeableConcept (dipstick protein component value, ANA interpretation, specimen collection.method)",
+      "multiple codings incl. local translation (potassium code, blood-type value)",
+      "text-only referenceRange (ANA '< 1:80')",
+      "very long string with unicode (observation-urine-color note: 中文, µL, Técnico-Müller)",
+      "multiple identifiers (diagnosticreport-cbc-panel PLAC+FILL; specimen identifier+accessionIdentifier)",
+      "contained resource (Organization #lab-org in diagnosticreport-cbc-panel)",
+      "reference-by-display-only (encounters, CBC platelet result entry, performers)",
+      "extension noise to tolerate (Epic-style extension on observation-potassium-high)"
+    ]
+  }
+}

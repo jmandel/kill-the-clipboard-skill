@@ -1,0 +1,109 @@
+{
+  "resourceType": "DocumentReference",
+  "id": "documentreference-discharge-summary-pdf",
+  "extension": [
+    {
+      "url": "https://breadth-test-medical.example.org/fhir/StructureDefinition/note-service-line",
+      "valueString": "Hospital Medicine"
+    }
+  ],
+  "identifier": [
+    {
+      "system": "https://breadth-test-medical.example.org/document-id",
+      "value": "DOC-2025-031502"
+    },
+    {
+      "system": "urn:oid:1.2.840.114350.1.13.999.2.7.8.737424.0",
+      "value": "987654321",
+      "type": {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+            "code": "FILL",
+            "display": "Filler Identifier"
+          }
+        ]
+      }
+    }
+  ],
+  "status": "current",
+  "docStatus": "final",
+  "type": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "18842-5",
+        "display": "Discharge summary"
+      }
+    ],
+    "text": "Discharge Summary"
+  },
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://hl7.org/fhir/us/core/CodeSystem/us-core-documentreference-category",
+          "code": "clinical-note",
+          "display": "Clinical Note"
+        },
+        {
+          "system": "urn:oid:1.2.840.114350.1.13.999.2.7.10.798268.30",
+          "code": "1",
+          "display": "Clinical References"
+        }
+      ],
+      "text": "Clinical Note"
+    }
+  ],
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "date": "2025-03-15T12:30:00Z",
+  "author": [
+    {
+      "reference": "Practitioner/practitioner-sample-renderer",
+      "display": "Dr. Sample Renderer"
+    },
+    {
+      "reference": "Organization/organization-breadth-test-medical",
+      "display": "Breadth Test Medical Center"
+    }
+  ],
+  "authenticator": {
+    "display": "Dr. Pretend Attending"
+  },
+  "custodian": {
+    "reference": "Organization/organization-breadth-test-medical",
+    "display": "Breadth Test Medical Center"
+  },
+  "description": "Discharge summary for the March 2025 inpatient admission for community-acquired pneumonia, including hospital course (admitted with fever, productive cough, and hypoxia; chest radiograph demonstrated a right lower lobe consolidation; treated with intravenous ceftriaxone and azithromycin with transition to oral amoxicillin-clavulanate on hospital day 3), discharge medications with detailed taper instructions, pending results at the time of discharge, follow-up appointments scheduled with primary care within one week and pulmonology within one month, return precautions reviewed with the patient who verbalized understanding, and contingency planning should symptoms recur or worsen after discharge from Breadth Test Medical Center.",
+  "content": [
+    {
+      "attachment": {
+        "contentType": "application/pdf",
+        "data": "JVBERi0xLjQKMSAwIG9iaiA8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4gZW5kb2JqCjIgMCBvYmogPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4gZW5kb2JqCjMgMCBvYmogPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvTWVkaWFCb3ggWzAgMCA2MTIgNzkyXSAvQ29udGVudHMgNCAwIFIgPj4gZW5kb2JqCjQgMCBvYmogPDwgL0xlbmd0aCA3MCA+PiBzdHJlYW0KQlQgL0YxIDEyIFRmIDcyIDcyMCBUZCAoRGlzY2hhcmdlIFN1bW1hcnkgLSBDYXNleSBCcmVhZHRoLVRlc3RlcikgVGogRVQKZW5kc3RyZWFtIGVuZG9iagp0cmFpbGVyIDw8IC9Sb290IDEgMCBSIC9TaXplIDUgPj4KJSVFT0YK",
+        "title": "Discharge Summary (PDF)",
+        "creation": "2025-03-15T12:25:00Z",
+        "size": 363
+      },
+      "format": {
+        "system": "http://ihe.net/fhir/ihe.formatcode.fhir/CodeSystem/formatcode",
+        "code": "urn:ihe:iti:xds:2017:mimeTypeSufficient",
+        "display": "mimeType Sufficient"
+      }
+    }
+  ],
+  "context": {
+    "encounter": [
+      {
+        "reference": "Encounter/encounter-imp-hospitalization",
+        "display": "Inpatient hospitalization, Breadth Test Medical Center"
+      }
+    ],
+    "period": {
+      "start": "2025-03-12T08:15:00Z",
+      "end": "2025-03-15T11:00:00Z"
+    }
+  }
+}

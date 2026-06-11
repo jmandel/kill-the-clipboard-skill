@@ -1,0 +1,99 @@
+{
+  "family": "allergies",
+  "uscoreVersion": "9.0.0",
+  "profiles": {
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-allergyintolerance": {
+      "mustSupport": [
+        "clinicalStatus",
+        "verificationStatus",
+        "code",
+        "patient",
+        "recorder",
+        "reaction",
+        "reaction.manifestation"
+      ],
+      "covered": {
+        "clinicalStatus": [
+          "allergyintolerance-penicillin-active-high.json",
+          "allergyintolerance-peanut-active-low.json",
+          "allergyintolerance-latex-inactive-unconfirmed.json",
+          "allergyintolerance-egg-resolved.json",
+          "allergyintolerance-shellfish-refuted.json",
+          "allergyintolerance-no-known-allergies.json"
+        ],
+        "verificationStatus": [
+          "allergyintolerance-penicillin-active-high.json",
+          "allergyintolerance-latex-inactive-unconfirmed.json",
+          "allergyintolerance-shellfish-refuted.json",
+          "allergyintolerance-sulfa-entered-in-error.json"
+        ],
+        "code": [
+          "allergyintolerance-penicillin-active-high.json",
+          "allergyintolerance-peanut-active-low.json",
+          "allergyintolerance-latex-inactive-unconfirmed.json",
+          "allergyintolerance-egg-resolved.json",
+          "allergyintolerance-shellfish-refuted.json",
+          "allergyintolerance-no-known-allergies.json",
+          "allergyintolerance-sulfa-entered-in-error.json"
+        ],
+        "patient": [
+          "allergyintolerance-penicillin-active-high.json",
+          "allergyintolerance-peanut-active-low.json",
+          "allergyintolerance-latex-inactive-unconfirmed.json",
+          "allergyintolerance-egg-resolved.json",
+          "allergyintolerance-shellfish-refuted.json",
+          "allergyintolerance-no-known-allergies.json",
+          "allergyintolerance-sulfa-entered-in-error.json"
+        ],
+        "recorder": [
+          "allergyintolerance-penicillin-active-high.json",
+          "allergyintolerance-peanut-active-low.json",
+          "allergyintolerance-egg-resolved.json",
+          "allergyintolerance-shellfish-refuted.json",
+          "allergyintolerance-no-known-allergies.json"
+        ],
+        "reaction": [
+          "allergyintolerance-penicillin-active-high.json",
+          "allergyintolerance-peanut-active-low.json",
+          "allergyintolerance-egg-resolved.json"
+        ],
+        "reaction.manifestation": [
+          "allergyintolerance-penicillin-active-high.json",
+          "allergyintolerance-peanut-active-low.json",
+          "allergyintolerance-egg-resolved.json"
+        ]
+      },
+      "gaps": []
+    }
+  },
+  "variants": {
+    "clinicalStatus": ["active", "inactive", "resolved", "absent (entered-in-error per ait-1/ait-2)"],
+    "verificationStatus": ["confirmed", "unconfirmed", "refuted", "entered-in-error"],
+    "criticality": ["high", "low", "unable-to-assess", "absent"],
+    "category": ["medication", "food", "environment", "absent (NKA)"],
+    "onset[x]": ["onsetDateTime", "onsetAge", "onsetString", "absent"],
+    "reaction": [
+      "multiple manifestations with severity severe + exposureRoute + substance + reaction.onset",
+      "two manifestations severity mild",
+      "single manifestation severity moderate",
+      "no reaction element"
+    ],
+    "code": [
+      "multiple codings (RxNorm + SNOMED translation)",
+      "single SNOMED coding",
+      "code-only coding without display (latex)",
+      "text-only CodeableConcept (sulfa)",
+      "SNOMED + Epic proprietary urn:oid coding (shellfish)",
+      "no-known-allergies 716186003"
+    ],
+    "note": ["very long note", "unicode note (Spanish + Chinese)", "authorString + time", "absent"],
+    "edgeCases": [
+      "extension noise (open.epic.com url) on peanut instance",
+      "recorder reference-by-display-only (penicillin, egg, NKA, shellfish)",
+      "recorder with unresolved Practitioner reference + display (peanut)",
+      "asserter = patient (penicillin)",
+      "lastOccurrence (peanut)",
+      "type element present vs absent"
+    ]
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "resourceType": "Procedure",
+  "id": "procedure-cholecystectomy-string",
+  "status": "completed",
+  "code": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "38102005",
+        "display": "Cholecystectomy (procedure)"
+      }
+    ],
+    "text": "Gallbladder removal"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "performedString": "Late 2019, while living overseas — exact date unknown",
+  "recorder": {
+    "reference": "Practitioner/practitioner-sample-renderer",
+    "display": "Dr. Sample Renderer"
+  },
+  "asserter": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester (self-reported)"
+  },
+  "reasonCode": [
+    {
+      "text": "Symptomatic gallstones"
+    }
+  ],
+  "note": [
+    {
+      "text": "Recorded at intake from patient recollection; outside records requested but never received."
+    }
+  ]
+}

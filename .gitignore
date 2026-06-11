@@ -1,0 +1,11 @@
+node_modules/
+*.db
+*.db-journal
+.env
+*.local.json
+*supplemental-pii*
+/tmp/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+nohup.out

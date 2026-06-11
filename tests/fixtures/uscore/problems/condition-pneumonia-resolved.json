@@ -1,0 +1,71 @@
+{
+  "resourceType": "Condition",
+  "id": "condition-pneumonia-resolved",
+  "meta": {
+    "lastUpdated": "2025-02-10T08:00:00Z"
+  },
+  "extension": [
+    {
+      "url": "https://open.epic.com/fhir/extensions/condition-display-rank",
+      "valueInteger": 3
+    }
+  ],
+  "clinicalStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+        "code": "resolved",
+        "display": "Resolved"
+      }
+    ]
+  },
+  "verificationStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+        "code": "confirmed",
+        "display": "Confirmed"
+      }
+    ]
+  },
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+          "code": "problem-list-item",
+          "display": "Problem List Item"
+        }
+      ]
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "385093006",
+        "display": "Community acquired pneumonia (disorder)"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "code": "J18.9",
+        "display": "Pneumonia, unspecified organism"
+      }
+    ],
+    "text": "Community-acquired pneumonia, right lower lobe, treated as outpatient with full radiographic and symptomatic resolution at follow-up"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "onsetPeriod": {
+    "start": "2024-12-18",
+    "end": "2024-12-22"
+  },
+  "abatementDateTime": "2025-01-20",
+  "recordedDate": "2024-12-22T16:45:00Z",
+  "recorder": {
+    "reference": "Practitioner/practitioner-sample-renderer",
+    "display": "Dr. Sample Renderer"
+  }
+}

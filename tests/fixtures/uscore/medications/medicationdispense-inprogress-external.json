@@ -1,0 +1,45 @@
+{
+  "resourceType": "MedicationDispense",
+  "id": "medicationdispense-inprogress-external",
+  "extension": [
+    {
+      "url": "https://breadth-test-pharmacy.example.org/fhir/extension/queue-position",
+      "valueInteger": 4
+    }
+  ],
+  "status": "in-progress",
+  "medicationReference": {
+    "reference": "Medication/medication-metformin-er",
+    "display": "metFORMIN HCl 24 hr ER (GLUCOPHAGE XR) 500 mg tablet"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "performer": [
+    {
+      "actor": {
+        "reference": "Practitioner/ePHARM8xQ2v0WJeuCet5XYZ9",
+        "display": "Pharmacist Pat Placeholder, PharmD"
+      }
+    }
+  ],
+  "authorizingPrescription": [
+    {
+      "display": "metformin ER 500 mg, prescribed 2026-01-20 by Dr. Sample Renderer"
+    }
+  ],
+  "type": {
+    "coding": [
+      { "system": "http://terminology.hl7.org/CodeSystem/v3-ActPharmacySupplyType", "code": "RF" }
+    ]
+  },
+  "quantity": { "value": 60, "unit": "tablet", "system": "http://unitsofmeasure.org", "code": "{tbl}" },
+  "daysSupply": { "value": 30, "unit": "days", "system": "http://unitsofmeasure.org", "code": "d" },
+  "whenPrepared": "2026-02-19T08:30:00-06:00",
+  "dosageInstruction": [
+    {
+      "text": "Tome 1 tableta (500 mg) por vía oral dos veces al día con las comidas — no triture ni mastique."
+    }
+  ]
+}

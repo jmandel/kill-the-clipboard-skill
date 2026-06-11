@@ -1,0 +1,30 @@
+{
+  "resourceType": "Goal",
+  "id": "goal-sodium-onhold-textonly",
+  "extension": [
+    {
+      "url": "urn:oid:1.2.840.114350.1.13.999.2.7.10.737780.30100",
+      "valueString": "GOL;772031"
+    }
+  ],
+  "lifecycleStatus": "on-hold",
+  "description": {
+    "text": "饮食目标 — Reduce dietary sodium to under 2,300 mg per day, primarily by replacing canned and restaurant meals with home-cooked food at least five evenings a week; patient and her spouse Jordan will plan a weekly menu together every Sunday and review the grocery list with the dietitian's handout (\"Lower-Sodium Swaps, 4th ed.\") until the follow-up nutrition visit"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001"
+  },
+  "target": [
+    {
+      "measure": {
+        "text": "Self-reported daily sodium intake"
+      },
+      "detailString": "Under 2,300 mg/day on at least 5 of 7 days"
+    }
+  ],
+  "statusDate": "2026-01-15",
+  "statusReason": "On hold during international travel; resume at February nutrition visit",
+  "expressedBy": {
+    "display": "Riley Placeholder, RD"
+  }
+}

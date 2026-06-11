@@ -1,0 +1,215 @@
+{
+  "family": "vitals",
+  "uscoreVersion": "9.0.0",
+  "profiles": {
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-vital-signs": {
+      "mustSupport": [
+        "status",
+        "category:VSCat",
+        "code",
+        "subject",
+        "effective[x]",
+        "value[x]",
+        "dataAbsentReason",
+        "performer",
+        "component",
+        "component.code",
+        "component.value[x]",
+        "component.dataAbsentReason"
+      ],
+      "covered": {
+        "status": [
+          "observation-bp.json (final)",
+          "observation-avg-bp.json (amended)",
+          "observation-respiratory-rate.json (preliminary)",
+          "observation-temperature-dar.json (entered-in-error)"
+        ],
+        "category:VSCat": ["all instances"],
+        "code": ["all instances"],
+        "subject": ["all instances (constant patient urn)"],
+        "effective[x]": [
+          "observation-bp.json (dateTime with offset)",
+          "observation-avg-bp.json (Period)",
+          "observation-temperature-dar.json (date-precision dateTime)"
+        ],
+        "value[x]": [
+          "observation-heart-rate.json (Quantity)",
+          "observation-weight.json (Quantity, [lb_av])",
+          "observation-pulse-oximetry.json (Quantity, %)"
+        ],
+        "dataAbsentReason": ["observation-temperature-dar.json"],
+        "performer": [
+          "observation-bp.json (contained Practitioner)",
+          "observation-avg-bp.json (patient self-measured)",
+          "observation-heart-rate.json (display-only)"
+        ],
+        "component": ["observation-bp.json", "observation-avg-bp.json", "observation-pulse-oximetry.json"],
+        "component.code": ["observation-bp.json", "observation-avg-bp.json", "observation-pulse-oximetry.json"],
+        "component.value[x]": ["observation-bp.json", "observation-pulse-oximetry.json"],
+        "component.dataAbsentReason": ["observation-avg-bp.json", "observation-pulse-oximetry.json"]
+      },
+      "gaps": [
+        "Observation.value[x] non-Quantity choice types (CodeableConcept, string, boolean, integer, Range, Ratio, SampledData, time, dateTime, Period) not exercised: real-world vital signs are Quantity-valued and all 13 concrete vitals profiles fix value[x] to Quantity; non-Quantity value[x] variants are covered by the laboratory observation family",
+        "hasMember is not flagged must-support in 9.0.0 but is exercised anyway via observation-vitals-panel.json (LOINC 85353-1)"
+      ]
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-blood-pressure": {
+      "mustSupport": [
+        "code (fixed LOINC 85354-9)",
+        "component:systolic (8480-6, mm[Hg])",
+        "component:systolic.value[x]",
+        "component:systolic.dataAbsentReason",
+        "component:diastolic (8462-4, mm[Hg])",
+        "component:diastolic.value[x]",
+        "component:diastolic.dataAbsentReason"
+      ],
+      "covered": {
+        "code (fixed LOINC 85354-9)": ["observation-bp.json"],
+        "component:systolic (8480-6, mm[Hg])": ["observation-bp.json"],
+        "component:systolic.value[x]": ["observation-bp.json"],
+        "component:diastolic (8462-4, mm[Hg])": ["observation-bp.json"],
+        "component:diastolic.value[x]": ["observation-bp.json"]
+      },
+      "gaps": [
+        "component.dataAbsentReason on this specific profile not shown (both BP components carry values); the component-DAR pattern is demonstrated on the sibling average-blood-pressure and pulse-oximetry profiles"
+      ]
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-average-blood-pressure": {
+      "mustSupport": [
+        "code (fixed LOINC 96607-7)",
+        "effective[x] (dateTime | Period)",
+        "component:averageSystolic (96608-5, mm[Hg])",
+        "component:averageDiastolic (96609-3, mm[Hg])",
+        "component.dataAbsentReason"
+      ],
+      "covered": {
+        "code (fixed LOINC 96607-7)": ["observation-avg-bp.json"],
+        "effective[x] (dateTime | Period)": ["observation-avg-bp.json (Period)"],
+        "component:averageSystolic (96608-5, mm[Hg])": ["observation-avg-bp.json (valueQuantity)"],
+        "component:averageDiastolic (96609-3, mm[Hg])": ["observation-avg-bp.json (dataAbsentReason)"],
+        "component.dataAbsentReason": ["observation-avg-bp.json"]
+      },
+      "gaps": []
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-heart-rate": {
+      "mustSupport": ["code (8867-4)", "valueQuantity (/min)"],
+      "covered": {
+        "code (8867-4)": ["observation-heart-rate.json (code-only coding, no display, no text)"],
+        "valueQuantity (/min)": ["observation-heart-rate.json"]
+      },
+      "gaps": []
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-respiratory-rate": {
+      "mustSupport": ["code (9279-1)", "valueQuantity (/min)"],
+      "covered": {
+        "code (9279-1)": ["observation-respiratory-rate.json"],
+        "valueQuantity (/min)": ["observation-respiratory-rate.json"]
+      },
+      "gaps": []
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-body-temperature": {
+      "mustSupport": ["code (8310-5)", "valueQuantity (Cel | [degF])", "dataAbsentReason"],
+      "covered": {
+        "code (8310-5)": ["observation-temperature.json (LOINC + SNOMED translation)", "observation-temperature-dar.json"],
+        "valueQuantity (Cel | [degF])": ["observation-temperature.json (Cel)"],
+        "dataAbsentReason": ["observation-temperature-dar.json"]
+      },
+      "gaps": ["[degF] unit variant not instantiated (Cel only); [lb_av]/cm/% variants elsewhere in family exercise non-metric and metric unit rendering"]
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-body-height": {
+      "mustSupport": ["code (8302-2)", "valueQuantity (cm | [in_i])"],
+      "covered": {
+        "code (8302-2)": ["observation-height.json"],
+        "valueQuantity (cm | [in_i])": ["observation-height.json (cm)"]
+      },
+      "gaps": []
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-body-weight": {
+      "mustSupport": ["code (29463-7)", "valueQuantity (kg | [lb_av] | g)"],
+      "covered": {
+        "code (29463-7)": ["observation-weight.json"],
+        "valueQuantity (kg | [lb_av] | g)": ["observation-weight.json ([lb_av])"]
+      },
+      "gaps": []
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-bmi": {
+      "mustSupport": ["code (39156-5)", "valueQuantity (kg/m2)"],
+      "covered": {
+        "code (39156-5)": ["observation-bmi.json"],
+        "valueQuantity (kg/m2)": ["observation-bmi.json"]
+      },
+      "gaps": []
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-head-circumference": {
+      "mustSupport": ["code (9843-4)", "valueQuantity (cm | [in_i])"],
+      "covered": {
+        "code (9843-4)": ["observation-head-circumference.json"],
+        "valueQuantity (cm | [in_i])": ["observation-head-circumference.json (cm)"]
+      },
+      "gaps": []
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-pulse-oximetry": {
+      "mustSupport": [
+        "code (both 2708-6 and 59408-5)",
+        "valueQuantity (%)",
+        "component:FlowRate (3151-8, L/min)",
+        "component:Concentration (3150-0, %)",
+        "component.dataAbsentReason"
+      ],
+      "covered": {
+        "code (both 2708-6 and 59408-5)": ["observation-pulse-oximetry.json"],
+        "valueQuantity (%)": ["observation-pulse-oximetry.json"],
+        "component:FlowRate (3151-8, L/min)": ["observation-pulse-oximetry.json (valueQuantity 2 L/min)"],
+        "component:Concentration (3150-0, %)": ["observation-pulse-oximetry.json (dataAbsentReason not-performed)"],
+        "component.dataAbsentReason": ["observation-pulse-oximetry.json"]
+      },
+      "gaps": ["Concentration component valueQuantity not instantiated (carries dataAbsentReason instead); flow-rate component demonstrates the valued case"]
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/pediatric-bmi-for-age": {
+      "mustSupport": ["code (59576-9)", "valueQuantity (%)"],
+      "covered": {
+        "code (59576-9)": ["observation-pediatric-bmi-age.json"],
+        "valueQuantity (%)": ["observation-pediatric-bmi-age.json"]
+      },
+      "gaps": []
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/pediatric-weight-for-height": {
+      "mustSupport": ["code (77606-2)", "valueQuantity (%)"],
+      "covered": {
+        "code (77606-2)": ["observation-pediatric-weight-height.json"],
+        "valueQuantity (%)": ["observation-pediatric-weight-height.json"]
+      },
+      "gaps": []
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/head-occipital-frontal-circumference-percentile": {
+      "mustSupport": ["code (8289-1)", "valueQuantity (%)"],
+      "covered": {
+        "code (8289-1)": ["observation-head-circumference-percentile.json"],
+        "valueQuantity (%)": ["observation-head-circumference-percentile.json"]
+      },
+      "gaps": []
+    }
+  },
+  "variants": {
+    "effective[x]": ["dateTime with tz offset", "dateTime date-only precision", "Period"],
+    "value[x]": ["Quantity only (all concrete vitals profiles fix Quantity)"],
+    "valueQuantity units": ["mm[Hg]", "/min", "Cel", "cm", "[lb_av]", "kg/m2", "%", "L/min"],
+    "dataAbsentReason": ["top-level (observation-temperature-dar)", "component-level (observation-avg-bp, observation-pulse-oximetry)"],
+    "status": ["final", "amended", "preliminary", "entered-in-error"],
+    "panel": ["observation-vitals-panel.json: LOINC 85353-1, hasMember to four sibling fixtures plus one display-only hasMember, no value, multiple identifiers"],
+    "representation edge cases": [
+      "code-only coding without display/text (observation-heart-rate code)",
+      "text-only CodeableConcept (observation-temperature.method, observation-bmi.interpretation)",
+      "multiple codings incl. cross-system translation (observation-temperature code LOINC+SNOMED; observation-pulse-oximetry dual LOINC)",
+      "very long note string with authorString/time (observation-weight)",
+      "unicode note text (observation-temperature: Spanish + Japanese)",
+      "multiple identifiers incl. Epic-style oid system (observation-vitals-panel)",
+      "contained resource referenced as performer #practitioner-inline (observation-bp)",
+      "reference-by-display-only (observation-vitals-panel.hasMember[4], observation-heart-rate.performer, observation-weight.performer)",
+      "unknown extension noise to tolerate (observation-respiratory-rate root extension)",
+      "Epic display-rich second category coding/CodeableConcept (observation-bp, observation-temperature)",
+      "component-level interpretation (observation-bp systolic H)",
+      "derivedFrom sibling references (observation-bmi, observation-head-circumference-percentile)"
+    ]
+  }
+}

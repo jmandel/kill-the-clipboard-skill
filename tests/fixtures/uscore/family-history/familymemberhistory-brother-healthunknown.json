@@ -1,0 +1,35 @@
+{
+  "resourceType": "FamilyMemberHistory",
+  "id": "familymemberhistory-brother-healthunknown",
+  "status": "health-unknown",
+  "patient": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "date": "2025-04-10",
+  "relationship": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+        "code": "BRO",
+        "display": "brother"
+      }
+    ],
+    "text": "Brother"
+  },
+  "dataAbsentReason": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/history-absent-reason",
+        "code": "unable-to-obtain",
+        "display": "Unable To Obtain"
+      }
+    ],
+    "text": "Estranged; no health information available"
+  },
+  "note": [
+    {
+      "text": "Patient has had no contact with her brother for over 20 years."
+    }
+  ]
+}

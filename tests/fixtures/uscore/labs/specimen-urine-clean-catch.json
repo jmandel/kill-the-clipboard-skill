@@ -1,0 +1,28 @@
+{
+  "resourceType": "Specimen",
+  "id": "specimen-urine-clean-catch",
+  "meta": { "lastUpdated": "2025-09-02T12:50:00Z" },
+  "accessionIdentifier": {
+    "system": "https://breadth-test-lab.example.org/accessions",
+    "value": "ACC-77-5678"
+  },
+  "status": "available",
+  "type": {
+    "coding": [
+      { "system": "http://snomed.info/sct", "code": "122575003", "display": "Urine specimen" }
+    ],
+    "text": "Urine, clean catch"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "receivedTime": "2025-09-02T12:40:00-05:00",
+  "collection": {
+    "collectedDateTime": "2025-09-02T07:30:00-05:00",
+    "method": { "text": "Clean catch, midstream" }
+  },
+  "note": [
+    { "text": "Patient self-collected at home; written instructions provided in English and 中文. Container volume ~50 mL; ambient transport." }
+  ]
+}

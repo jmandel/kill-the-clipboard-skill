@@ -1,0 +1,37 @@
+{
+  "resourceType": "Organization",
+  "id": "organization-breadth-test-medical",
+  "identifier": [
+    {
+      "system": "http://hl7.org/fhir/sid/us-npi",
+      "value": "1555666779"
+    },
+    {
+      "system": "https://breadth-test-medical.example.org/facility-id",
+      "value": "FAC-001"
+    }
+  ],
+  "active": true,
+  "type": [
+    {
+      "coding": [
+        { "system": "http://terminology.hl7.org/CodeSystem/organization-type", "code": "prov", "display": "Healthcare Provider" }
+      ]
+    }
+  ],
+  "name": "Breadth Test Medical Center",
+  "telecom": [
+    { "system": "phone", "value": "555-555-0100", "use": "work" },
+    { "system": "url", "value": "https://breadth-test-medical.example.org" }
+  ],
+  "address": [
+    {
+      "use": "work",
+      "line": ["1 Coverage Plaza", "Building A"],
+      "city": "Sample City",
+      "state": "WA",
+      "postalCode": "98101",
+      "country": "US"
+    }
+  ]
+}

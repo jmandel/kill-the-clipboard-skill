@@ -1,0 +1,38 @@
+{
+  "resourceType": "Observation",
+  "id": "observation-treatment-intervention-preference",
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://hl7.org/fhir/us/core/CodeSystem/us-core-category",
+          "code": "treatment-intervention-preference",
+          "display": "Treatment Intervention Preference"
+        }
+      ]
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "75773-2",
+        "display": "Goals, preferences, and priorities for medical treatment Narrative - Reported"
+      }
+    ],
+    "text": "Goals, preferences, and priorities for medical treatment"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "effectiveDateTime": "2025-06-11",
+  "performer": [
+    {
+      "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+      "display": "Casey Breadth-Tester"
+    }
+  ],
+  "valueString": "If I am ever unable to speak for myself, I want my care team to know the following. If I am having significant pain or suffering, I would like my doctors to consult a Supportive and Palliative Care Team to help treat my physical, emotional and spiritual discomfort, and to support my family. I would accept a time-limited trial of mechanical ventilation (up to two weeks) if my doctors believe there is a reasonable chance I could return to living independently and recognizing my family; if after that trial my condition has not improved, I would want the ventilator withdrawn and care focused entirely on my comfort. I do not want cardiopulmonary resuscitation if my heart stops in the setting of a progressive terminal illness. I would accept artificial nutrition through a feeding tube only as a short-term bridge during recovery from an acute, reversible illness, and not as a permanent measure. Dialysis is acceptable to me only if it is expected to be temporary. I would like to remain at home for end-of-life care if at all possible, with hospice support, and I want my sister, Jordan Breadth-Tester, consulted about any decision my designated health care agent cannot make. Spiritual care from a non-denominational chaplain is welcome. These preferences reflect long conversations with my family and my primary care physician and should be revisited yearly at my annual wellness visit, or sooner if my health changes substantially."
+}

@@ -1,0 +1,88 @@
+{
+  "family": "care-coordination",
+  "uscoreVersion": "9.0.0",
+  "profiles": {
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-careplan": {
+      "mustSupport": [
+        "text",
+        "text.status (generated | additional)",
+        "text.div",
+        "status",
+        "intent",
+        "category",
+        "subject"
+      ],
+      "covered": {
+        "text": ["careplan-narrative-active.json", "careplan-structured-completed.json"],
+        "text.status (generated | additional)": ["careplan-narrative-active.json", "careplan-structured-completed.json"],
+        "text.div": ["careplan-narrative-active.json", "careplan-structured-completed.json"],
+        "status": ["careplan-narrative-active.json", "careplan-structured-completed.json"],
+        "intent": ["careplan-narrative-active.json", "careplan-structured-completed.json"],
+        "category": ["careplan-narrative-active.json", "careplan-structured-completed.json"],
+        "subject": ["careplan-narrative-active.json", "careplan-structured-completed.json"]
+      },
+      "additionalUSCDI": {
+        "contributor": ["careplan-narrative-active.json"],
+        "addresses": ["careplan-narrative-active.json"]
+      },
+      "gaps": []
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-careteam": {
+      "mustSupport": [
+        "status",
+        "subject",
+        "participant",
+        "participant.role",
+        "participant.member (Practitioner | PractitionerRole | RelatedPerson MS targets; also Patient, Organization, CareTeam)"
+      ],
+      "covered": {
+        "status": ["careteam-active-multirole.json", "careteam-inactive-minimal.json"],
+        "subject": ["careteam-active-multirole.json", "careteam-inactive-minimal.json"],
+        "participant": ["careteam-active-multirole.json", "careteam-inactive-minimal.json"],
+        "participant.role": ["careteam-active-multirole.json", "careteam-inactive-minimal.json"],
+        "participant.member (Practitioner | PractitionerRole | RelatedPerson MS targets; also Patient, Organization, CareTeam)": ["careteam-active-multirole.json", "careteam-inactive-minimal.json"]
+      },
+      "gaps": [
+        "participant.member references (Practitioner/..., PractitionerRole/..., RelatedPerson/...) are intentionally unresolvable within this corpus except the constant patient urn and the contained Practitioner"
+      ]
+    },
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-goal": {
+      "mustSupport": [
+        "lifecycleStatus",
+        "description",
+        "subject",
+        "start[x]:startDate",
+        "target",
+        "target.due[x]:dueDate",
+        "expressedBy"
+      ],
+      "covered": {
+        "lifecycleStatus": ["goal-a1c-active.json", "goal-walking-completed.json", "goal-sodium-onhold-textonly.json"],
+        "description": ["goal-a1c-active.json", "goal-walking-completed.json", "goal-sodium-onhold-textonly.json"],
+        "subject": ["goal-a1c-active.json", "goal-walking-completed.json", "goal-sodium-onhold-textonly.json"],
+        "start[x]:startDate": ["goal-a1c-active.json", "goal-walking-completed.json"],
+        "target": ["goal-a1c-active.json", "goal-walking-completed.json", "goal-sodium-onhold-textonly.json"],
+        "target.due[x]:dueDate": ["goal-a1c-active.json", "goal-walking-completed.json"],
+        "expressedBy": ["goal-a1c-active.json", "goal-walking-completed.json", "goal-sodium-onhold-textonly.json"]
+      },
+      "gaps": []
+    }
+  },
+  "variants": {
+    "CarePlan.text": ["status=additional with long rich XHTML (headings, table, entities) carrying the actual plan content, Epic-style", "status=generated short summary div"],
+    "CarePlan.status": ["active", "completed"],
+    "CarePlan.intent": ["plan", "order"],
+    "CarePlan.category": ["us-core assess-plan coding", "SNOMED + Epic urn:oid translation dual coding", "text-only"],
+    "CarePlan.activity": ["none (narrative-only plan)", "detail with code+scheduledTiming+performer", "detail with scheduledPeriod+location+CPT/LOINC dual coding", "activity.reference display-only with progress annotation"],
+    "CareTeam.status": ["active", "inactive"],
+    "CareTeam.participant.role": ["SNOMED + NUCC dual coding with text", "NUCC single coding", "text-only", "code-only coding without display (41672002)"],
+    "CareTeam.participant.member": ["Practitioner reference+display", "contained Practitioner (#contained-cdces)", "RelatedPerson reference", "constant patient urn (patient as team member)", "Organization display-only", "PractitionerRole display-rich reference"],
+    "Goal.lifecycleStatus": ["active", "completed", "on-hold"],
+    "Goal.achievementStatus": ["in-progress", "achieved (coding without text)", "absent"],
+    "Goal.description": ["LOINC-coded with text", "text-only", "text-only very long with unicode (饮食目标) and embedded quotes"],
+    "Goal.target": ["measure+detailRange+dueDate", "dueDate only (no measure/detail)", "text-only measure + detailString, no due date"],
+    "Goal.expressedBy": ["practitioner reference", "patient self (constant urn)", "display-only dietitian"],
+    "references": ["constant patient urn everywhere", "display-only contributor/addresses/outcomeReference/managingOrganization", "contained resource", "cross-family CarePlan.goal -> Goal/goal-walking-completed (resolvable within this family)"],
+    "quirks": ["Epic proprietary extensions (open.epic.com careplan-episode, team-type; urn:oid goal extension)", "Epic urn:oid identifier and category translation coding", "timezone variety: date-only, Z, -05:00, -06:00"]
+  }
+}

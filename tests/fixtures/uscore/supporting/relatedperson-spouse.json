@@ -1,0 +1,45 @@
+{
+  "resourceType": "RelatedPerson",
+  "id": "relatedperson-spouse",
+  "active": true,
+  "patient": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "relationship": [
+    {
+      "coding": [
+        { "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode", "code": "SPS", "display": "spouse" }
+      ],
+      "text": "Spouse"
+    },
+    {
+      "coding": [
+        { "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode", "code": "ECON", "display": "emergency contact" }
+      ],
+      "text": "Emergency contact"
+    }
+  ],
+  "name": [
+    {
+      "use": "official",
+      "family": "Breadth-Tester",
+      "given": ["Jordan", "Avery"],
+      "text": "Jordan Avery Breadth-Tester"
+    }
+  ],
+  "telecom": [
+    { "system": "phone", "value": "555-555-0143", "use": "mobile" },
+    { "system": "email", "value": "jordan.breadth@example.org" }
+  ],
+  "address": [
+    {
+      "use": "home",
+      "line": ["4242 Coverage Court", "Unit B"],
+      "city": "Sample City",
+      "state": "WA",
+      "postalCode": "98100",
+      "country": "US"
+    }
+  ]
+}

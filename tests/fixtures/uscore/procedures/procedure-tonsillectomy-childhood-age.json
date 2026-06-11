@@ -1,0 +1,39 @@
+{
+  "resourceType": "Procedure",
+  "id": "procedure-tonsillectomy-childhood-age",
+  "status": "completed",
+  "code": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "173422009",
+        "display": "Tonsillectomy and adenoidectomy (procedure)"
+      },
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "42820",
+        "display": "Tonsillectomy and adenoidectomy; younger than age 12"
+      }
+    ],
+    "text": "Tonsillectomy and adenoidectomy (childhood)"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "performedAge": {
+    "value": 7,
+    "unit": "years",
+    "system": "http://unitsofmeasure.org",
+    "code": "a"
+  },
+  "asserter": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester (self-reported)"
+  },
+  "note": [
+    {
+      "text": "Patient-reported childhood surgery; no records available. Age-at-procedure captured instead of a date."
+    }
+  ]
+}

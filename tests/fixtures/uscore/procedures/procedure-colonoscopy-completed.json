@@ -1,0 +1,75 @@
+{
+  "resourceType": "Procedure",
+  "id": "procedure-colonoscopy-completed",
+  "identifier": [
+    { "system": "https://breadth-test-medical.example.org/procedure-id", "value": "PROC-2024-00417" },
+    { "system": "urn:oid:1.2.840.114350.1.13.999.2.7.2.737780", "value": "eProcQuirk.8842" }
+  ],
+  "basedOn": [
+    {
+      "reference": "ServiceRequest/servicerequest-colonoscopy-completed",
+      "display": "Colonoscopy, diagnostic — screening order"
+    }
+  ],
+  "status": "completed",
+  "code": {
+    "coding": [
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "45378",
+        "display": "Colonoscopy, flexible; diagnostic, including collection of specimen(s) by brushing or washing, when performed (separate procedure)"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "code": "73761001",
+        "display": "Colonoscopy (procedure)"
+      }
+    ],
+    "text": "Screening colonoscopy"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "encounter": {
+    "display": "Ambulatory endoscopy visit, 2024-09-17, Breadth Test Endoscopy Suite"
+  },
+  "performedDateTime": "2024-09-17T09:42:00-05:00",
+  "performer": [
+    {
+      "function": {
+        "coding": [
+          { "system": "http://snomed.info/sct", "code": "59058001", "display": "General physician" }
+        ],
+        "text": "Primary endoscopist"
+      },
+      "actor": { "display": "Dr. Sample Renderer, MD" },
+      "onBehalfOf": { "display": "Breadth Test Medical Center — Gastroenterology" }
+    }
+  ],
+  "reasonCode": [
+    {
+      "coding": [
+        { "system": "http://snomed.info/sct", "code": "171057006", "display": "Screening for malignant neoplasm of large intestine (procedure)" }
+      ],
+      "text": "Colorectal cancer screening, average risk"
+    }
+  ],
+  "bodySite": [
+    {
+      "coding": [
+        { "system": "http://snomed.info/sct", "code": "71854001", "display": "Colon structure (body structure)" }
+      ]
+    }
+  ],
+  "outcome": {
+    "text": "Completed to cecum; two diminutive polyps removed; recommend repeat in 10 years"
+  },
+  "note": [
+    {
+      "authorString": "Dr. Sample Renderer, MD",
+      "time": "2024-09-17T11:05:00-05:00",
+      "text": "Cecal intubation achieved at 9 minutes. Boston Bowel Prep Score 8/9. Two 3 mm sessile polyps in the sigmoid colon removed by cold snare and sent to pathology. Patient tolerated the procedure well under moderate sedation and was discharged with standard post-endoscopy instructions, including resuming regular diet this evening and avoiding driving for 24 hours. This deliberately long note exists so the renderer is exercised against multi-sentence narrative content that must wrap across several lines without truncation."
+    }
+  ]
+}

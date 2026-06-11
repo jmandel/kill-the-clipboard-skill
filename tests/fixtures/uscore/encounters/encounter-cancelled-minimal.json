@@ -1,0 +1,26 @@
+{
+  "resourceType": "Encounter",
+  "id": "encounter-cancelled-minimal",
+  "status": "cancelled",
+  "class": {
+    "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+    "code": "AMB"
+  },
+  "type": [
+    {
+      "coding": [
+        {
+          "system": "http://www.ama-assn.org/go/cpt",
+          "code": "99395"
+        }
+      ]
+    }
+  ],
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "period": {
+    "start": "2024-11-03"
+  }
+}

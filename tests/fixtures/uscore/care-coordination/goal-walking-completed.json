@@ -1,0 +1,32 @@
+{
+  "resourceType": "Goal",
+  "id": "goal-walking-completed",
+  "lifecycleStatus": "completed",
+  "achievementStatus": {
+    "coding": [
+      { "system": "http://terminology.hl7.org/CodeSystem/goal-achievement", "code": "achieved", "display": "Achieved" }
+    ]
+  },
+  "description": {
+    "text": "Walk 30 minutes daily without dyspnea by end of pulmonary rehab"
+  },
+  "subject": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester"
+  },
+  "startDate": "2024-03-04",
+  "target": [
+    {
+      "dueDate": "2024-06-30"
+    }
+  ],
+  "statusDate": "2024-06-28",
+  "statusReason": "Met goal at final pulmonary rehab session",
+  "expressedBy": {
+    "reference": "urn:uuid:00000000-b4ea-4d01-9871-000000000001",
+    "display": "Casey Breadth-Tester (patient-stated goal)"
+  },
+  "outcomeReference": [
+    { "display": "6-minute walk test 510 m, no desaturation (2024-06-28)" }
+  ]
+}
