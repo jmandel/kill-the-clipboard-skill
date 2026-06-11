@@ -13,14 +13,25 @@ description: |
 # Kill The Clipboard
 
 Turn a patient's health records into a SMART Health Link they can present at clinic
-check-in — a QR code that hands the front desk their medication list, allergies,
-problems, immunizations, and their own story, instead of a clipboard form.
+check-in — a QR code that hands the front desk whatever the patient chose to share,
+plus their own story, instead of a clipboard form.
 
 All encryption happens here, on the patient's side. The hosting server stores only
 ciphertext; it never sees the records or the key.
 
 **Prerequisites:** [Bun](https://bun.sh) (`curl -fsSL https://bun.sh/install | bash`)
 and, for visual PDF checks, `pdftoppm` from poppler-utils (`apt install poppler-utils`).
-All scripts run with `bun <skill-dir>/scripts/<name>.ts`. Before first use, run
-`bun install` once inside `<skill-dir>/scripts/` (a pinned `package.json` + lockfile
-ship in the zip; the install pulls the PDF/QR libraries the scripts need).
+
+**Locate the scripts FIRST — don't assume a layout.** Installs vary (claude.ai
+extraction, manual unzip, files copied flat). Find them once and reuse the path:
+
+```bash
+SCRIPTS=$(dirname "$(find . -name 'create-shl.ts' -not -path '*/node_modules/*' 2>/dev/null | head -1)")
+bun install --cwd "$SCRIPTS"   # once per install; pulls the pinned PDF/QR libraries
+```
+
+Every command in this document writes `<skill-dir>/scripts/` — substitute your
+`$SCRIPTS`. If a script exits 1 with no JSON on stdout, run it by itself and read
+stderr: `error: Module not found` means the path is wrong (re-locate); anything else
+is a real error message. Don't chain script invocations with `&&` until each has
+succeeded once on its own.
