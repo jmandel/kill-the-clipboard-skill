@@ -3,9 +3,13 @@
 
 // --- Control plane --------------------------------------------------------------------
 
+// The control capability (auth = base64url HKDF(M, "ktc-shl/v1/auth")) travels in the
+// Authorization: Bearer header — NEVER in the URL path, where proxies and access logs
+// retain it. The server stores sha256(auth) only. (A deprecated path-form alias,
+// /api/manage/{auth}, remains for already-extracted skills.)
 export interface CreateLinkRequest {
-  /** base64url HKDF(M, "ktc-shl/v1/auth"); server stores sha256 only. */
-  auth: string;
+  /** DEPRECATED: legacy body-borne capability; prefer the Authorization header. */
+  auth?: string;
   /** Flag chars in alphabetical order. Default "U". */
   flag?: string;
   /** Epoch seconds. Required (KTC). */
@@ -14,8 +18,13 @@ export interface CreateLinkRequest {
   maxUses?: number | null;
   /** Only meaningful with P flag. */
   passcode?: string;
-  /** ≤80 chars. */
-  label?: string;
+  /**
+   * Label, JWE-encrypted client-side with the link key (compact serialization,
+   * cty text/plain) — OPAQUE to the server. Receivers get the plaintext label
+   * inside the encrypted shlink payload; the owner page decrypts this copy for
+   * display and QR rebuilds. The server never learns the patient's name.
+   */
+  labelEnc?: string;
 }
 
 export interface CreateLinkResponse {
@@ -45,7 +54,8 @@ export interface ManageState {
   id: string;
   url: string;
   flag: string;
-  label: string | null;
+  /** JWE-encrypted label (see CreateLinkRequest.labelEnc); null when none was set. */
+  labelEnc: string | null;
   exp: number;
   maxUses: number | null;
   uses: number;
@@ -65,7 +75,8 @@ export interface ManagePatch {
   active?: boolean;
   /** Set/replace passcode (P-flag links); null clears nothing — passcode removal not supported. */
   passcode?: string;
-  label?: string;
+  /** Replacement label, JWE-encrypted client-side (see CreateLinkRequest.labelEnc). */
+  labelEnc?: string;
 }
 
 export interface AddFileResponse {

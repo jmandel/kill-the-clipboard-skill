@@ -46,9 +46,9 @@ export async function fetchRetry(url: string, init?: RequestInit, attempts = 5):
 }
 
 /**
- * Throw an actionable error on non-2xx. `what` must be a redacted route label
- * (e.g. "PATCH /api/manage/{auth}") — never a real URL: manage URLs embed the
- * auth capability, which must not reach error messages or logs.
+ * Throw an actionable error on non-2xx. `what` is a route label (e.g.
+ * "PATCH /api/manage"). The auth capability rides the Authorization header —
+ * never URLs — so labels and error text stay secret-free by construction.
  */
 export async function expectOk(res: Response, what: string): Promise<Response> {
   if (res.ok) return res;

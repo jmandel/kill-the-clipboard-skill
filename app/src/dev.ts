@@ -82,11 +82,12 @@ for (const seed of seeds) {
   const key = await deriveKey(m);
   const id = b64url(crypto.getRandomValues(new Uint8Array(32)));
   jweById.set(id, await encryptJWE(new TextEncoder().encode(JSON.stringify(MOCK_BUNDLE)), key, { cty: 'application/fhir+json', deflate: true }));
+  const plainLabel = `Casey Tester — mock ${seed.name} link`;
   const state: ManageState = {
     id,
     url: `${base}/shl/${id}`,
     flag: 'U',
-    label: `Casey Tester — mock ${seed.name} link`,
+    labelEnc: await encryptJWE(new TextEncoder().encode(plainLabel), key, { cty: 'text/plain' }),
     exp: nowSec() + 24 * 3600,
     maxUses: 5,
     uses: 2,
@@ -104,7 +105,7 @@ for (const seed of seeds) {
 
   lines.push(`  ${seed.name.padEnd(10)} owner:  ${buildOwnerLink(base, m)}`);
   if (seed.name === 'live') {
-    const shlink = buildShlink({ url: state.url, key, exp: state.exp, flag: state.flag, label: state.label ?? undefined });
+    const shlink = buildShlink({ url: state.url, key, exp: state.exp, flag: state.flag, label: plainLabel });
     lines.push(`  ${''.padEnd(10)} viewer: ${buildViewerLink(base, shlink)}`);
   }
 }
@@ -160,7 +161,7 @@ Bun.serve({
         if (patch.exp !== undefined) s.exp = patch.exp;
         if (patch.maxUses !== undefined) s.maxUses = patch.maxUses;
         if (patch.active !== undefined) s.active = patch.active;
-        if (patch.label !== undefined) s.label = patch.label;
+        if (patch.labelEnc !== undefined) s.labelEnc = patch.labelEnc;
         s.live = computeLive(s);
         return json(s);
       },

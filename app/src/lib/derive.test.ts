@@ -83,15 +83,16 @@ describe('status derivation matrix', () => {
 });
 
 describe('payload reconstruction', () => {
-  const state = { url: 'https://s.example/shl/abc', exp: 1750000000, flag: 'U', label: 'Casey — visit summary' };
+  const state = { url: 'https://s.example/shl/abc', exp: 1750000000, flag: 'U' };
+  const label = 'Casey — visit summary';
 
   test('rebuilt payload uses the HKDF-derived key and current state', async () => {
-    const payload = await rebuildPayload(M, state);
+    const payload = await rebuildPayload(M, state, label);
     expect(payload.key).toBe(await deriveKey(M));
     expect(payload.url).toBe(state.url);
     expect(payload.exp).toBe(state.exp);
     expect(payload.flag).toBe('U');
-    expect(payload.label).toBe(state.label);
+    expect(payload.label).toBe(label);
   });
 
   test('auth derivation matches the kernel', async () => {
@@ -99,13 +100,13 @@ describe('payload reconstruction', () => {
   });
 
   test('null label is omitted, not serialized', async () => {
-    const payload = await rebuildPayload(M, { ...state, label: null });
+    const payload = await rebuildPayload(M, state, null);
     expect('label' in payload).toBe(false);
     expect(parseShlink(payloadToShlink(payload)).label).toBeUndefined();
   });
 
   test('shlink round-trips through the kernel parser', async () => {
-    const payload = await rebuildPayload(M, state);
+    const payload = await rebuildPayload(M, state, label);
     expect(parseShlink(payloadToShlink(payload))).toEqual(payload);
   });
 
@@ -113,13 +114,13 @@ describe('payload reconstruction', () => {
     const now = 1750000000;
     const patch = rearmPatch({ uses: 5, maxUses: 5 }, 24, 5, now);
     const rearmedState = { ...state, exp: patch.exp! };
-    const payload = await rebuildPayload(M, rearmedState);
+    const payload = await rebuildPayload(M, rearmedState, label);
     expect(payload.exp).toBe(now + 24 * 3600);
     expect(parseShlink(payloadToShlink(payload)).exp).toBe(now + 24 * 3600);
   });
 
   test('viewer link is the viewer-prefixed shlink on the page origin', async () => {
-    const payload = await rebuildPayload(M, state);
+    const payload = await rebuildPayload(M, state, label);
     const link = viewerLinkFor('https://host.example', payload);
     expect(link).toBe(`https://host.example/v#${payloadToShlink(payload)}`);
     expect(routeFragment(link.split('#')[1]!).mode).toBe('viewer');

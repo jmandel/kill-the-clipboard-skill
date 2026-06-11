@@ -72,7 +72,7 @@ function toManageState(l: MockLink, base: string): ManageState {
     id: l.id,
     url: `${base}/shl/${l.id}`,
     flag: l.flag,
-    label: l.label,
+    labelEnc: l.label,
     exp: l.exp,
     maxUses: l.maxUses,
     uses: l.uses,
@@ -118,14 +118,17 @@ function startMockServer(): void {
       const url = new URL(req.url);
       const path = url.pathname;
 
+      const bearer = req.headers.get('authorization')?.match(/^Bearer\s+(.+)$/i)?.[1] ?? null;
+
       if (req.method === 'POST' && path === '/api/links') {
         const body = (await req.json()) as CreateLinkRequest;
-        if (!body.auth || !body.exp) return json({ error: 'auth and exp required' }, 400);
+        const auth = bearer ?? body.auth;
+        if (!auth || !body.exp) return json({ error: 'auth (Authorization header) and exp required' }, 400);
         const link: MockLink = {
           id: randomToken(),
-          authHash: await authHash(body.auth),
+          authHash: await authHash(auth),
           flag: body.flag ?? 'U',
-          label: body.label ?? null,
+          label: body.labelEnc ?? null,
           exp: body.exp,
           maxUses: body.maxUses ?? null,
           uses: 0,
@@ -139,10 +142,12 @@ function startMockServer(): void {
         return json({ id: link.id, url: `${baseUrl}/shl/${link.id}` });
       }
 
-      const manage = path.match(/^\/api\/manage\/([^/]+)(?:\/files(?:\/([^/]+))?)?$/);
+      // Header-first contract: /api/manage[/files[/:fileId]] with Authorization: Bearer.
+      const manage = path.match(/^\/api\/manage(?:\/files(?:\/([^/]+))?)?$/);
       if (manage) {
-        const [, authParam, fileId] = manage;
-        const link = await findByAuth(authParam!);
+        const [, fileId] = manage;
+        if (!bearer) return json({ error: 'Authorization header required' }, 401);
+        const link = await findByAuth(bearer);
         if (!link) return json({ error: 'unknown capability' }, 404);
         const isFilesRoute = path.includes('/files');
 
@@ -150,11 +155,11 @@ function startMockServer(): void {
           if (req.method === 'GET') return json(toManageState(link, baseUrl));
           if (req.method === 'PATCH') {
             const patch = (await req.json()) as ManagePatch;
-            if (patch.label !== undefined && patch.label.length > 80) return json({ error: 'label too long' }, 400);
+            if (patch.labelEnc !== undefined && patch.labelEnc.length > 2048) return json({ error: 'labelEnc too long' }, 400);
             if (patch.exp !== undefined) link.exp = patch.exp;
             if (patch.maxUses !== undefined) link.maxUses = patch.maxUses;
             if (patch.active !== undefined) link.active = patch.active;
-            if (patch.label !== undefined) link.label = patch.label;
+            if (patch.labelEnc !== undefined) link.label = patch.labelEnc;
             return json(toManageState(link, baseUrl));
           }
           if (req.method === 'DELETE') {
@@ -350,6 +355,14 @@ describe('create-shl', () => {
     expect(payload.exp).toBe(out.exp);
     expect(payload.flag).toBe('U');
     expect(payload.label).toBe(out.label!);
+
+    // Privacy: the server-side copy of the label is an opaque JWE — the plaintext
+    // (which names the patient) never reaches the server; only the owner can decrypt.
+    const stored = [...links.values()][0]!;
+    expect(stored.label).not.toContain('Casey');
+    expect(stored.label!.split('.')).toHaveLength(5); // compact JWE
+    const labelPlain = await decryptJWE(stored.label!, (await ownerSecretsFrom(outDir)).key);
+    expect(new TextDecoder().decode(labelPlain.plaintext)).toBe(out.label!);
 
     const { key, ownerLink } = await ownerSecretsFrom(outDir);
     expect(payload.key).toBe(key);

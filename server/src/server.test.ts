@@ -450,14 +450,15 @@ describe('control plane validation + capability lookup', () => {
       });
     const exp = epoch() + 3600;
     expect((await post({ auth: 'tooshort', exp })).status).toBe(400);
-    expect((await post({ auth, exp, label: 'x'.repeat(81) })).status).toBe(400);
+    expect((await post({ auth, exp, labelEnc: 'x'.repeat(2049) })).status).toBe(400); // blob bound
+    expect((await post({ auth: await deriveAuth(generateMasterSecret()), exp, labelEnc: 'eyJfake.jwe.blob' })).status).toBe(200); // opaque — server never inspects
     expect((await post({ auth, exp, flag: 'X' })).status).toBe(400);
     expect((await post({ auth, exp, flag: 'UP' })).status).toBe(400); // non-alphabetical
     expect((await post({ auth, exp, flag: 'PU', passcode: 'p' })).status).toBe(400); // U excludes P
     expect((await post({ auth, exp: undefined })).status).toBe(400);
     expect((await post({ auth, exp, flag: 'P' })).status).toBe(400); // P without passcode
     expect((await post({ auth, exp, passcode: 'p' })).status).toBe(400); // passcode without P
-    expect((await post({ auth, exp, flag: 'LU', label: 'ok' })).status).toBe(200);
+    expect((await post({ auth, exp, flag: 'LU' })).status).toBe(200);
   });
 
   test('duplicate auth registration → 409', async () => {

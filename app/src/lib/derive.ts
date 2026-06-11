@@ -2,6 +2,7 @@
 // re-arm patch construction. No DOM — everything here is unit-testable headlessly.
 
 import { deriveAuth, deriveKey } from '../../../lib/hkdf.ts';
+import { decryptJWE, encryptJWE } from '../../../lib/jwe.ts';
 import {
   buildShlink,
   buildViewerLink,
@@ -70,7 +71,8 @@ export async function authForSecret(masterSecret: Uint8Array): Promise<string> {
 
 export async function rebuildPayload(
   masterSecret: Uint8Array,
-  state: Pick<ManageState, 'url' | 'exp' | 'flag' | 'label'>,
+  state: Pick<ManageState, 'url' | 'exp' | 'flag'>,
+  label: string | null,
 ): Promise<ShlinkPayload> {
   const key = await deriveKey(masterSecret);
   return {
@@ -78,8 +80,27 @@ export async function rebuildPayload(
     key,
     exp: state.exp,
     flag: state.flag,
-    ...(state.label != null && state.label !== '' ? { label: state.label } : {}),
+    ...(label != null && label !== '' ? { label } : {}),
   };
+}
+
+// The server stores the label only as a client-encrypted JWE (it typically names the
+// patient); the owner page is the one place it gets decrypted. The shlink payload's
+// plaintext label (spec-required, for receivers) is a separate, client-built copy.
+export async function decryptLabel(masterSecret: Uint8Array, labelEnc: string | null): Promise<string | null> {
+  if (!labelEnc) return null;
+  try {
+    const key = await deriveKey(masterSecret);
+    const { plaintext } = await decryptJWE(labelEnc, key);
+    return new TextDecoder().decode(plaintext);
+  } catch {
+    return null; // unreadable blob: show nothing rather than garbage
+  }
+}
+
+export async function encryptLabel(masterSecret: Uint8Array, label: string): Promise<string> {
+  const key = await deriveKey(masterSecret);
+  return encryptJWE(new TextEncoder().encode(label), key, { cty: 'text/plain' });
 }
 
 export function payloadToShlink(payload: ShlinkPayload): string {

@@ -79,12 +79,140 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
   const requireLink = async (auth: string): Promise<LinkRow | null> =>
     store.getLinkByAuthHash(db, await authHash(auth));
 
+  type RouteSet = Record<string, (req: Request & { params?: Record<string, string> }) => Response | Promise<Response>>;
+  const manageRoutes: RouteSet = {
+        OPTIONS: preflight,
+        GET: async (req) => {
+          const link = await requireLink(authOf(req));
+          if (!link) return notFound();
+          return json(manageState(link));
+        },
+        PATCH: async (req) => {
+          const link = await requireLink(authOf(req));
+          if (!link) return notFound();
+          let patch: ManagePatch;
+          try {
+            patch = (await req.json()) as ManagePatch;
+          } catch {
+            return err('request body must be JSON', 400);
+          }
+          if ('exp' in patch && (!Number.isInteger(patch.exp) || patch.exp! <= 0)) {
+            return err('exp must be epoch seconds', 400);
+          }
+          if ('maxUses' in patch && patch.maxUses !== null && (!Number.isInteger(patch.maxUses) || patch.maxUses! < 1)) {
+            return err('maxUses must be a positive integer or null', 400);
+          }
+          if ('active' in patch && typeof patch.active !== 'boolean') {
+            return err('active must be a boolean', 400);
+          }
+          if ('labelEnc' in patch && (typeof patch.labelEnc !== 'string' || patch.labelEnc.length > 2048)) {
+            return err('labelEnc must be a JWE string of at most 2048 chars', 400);
+          }
+          if ('passcode' in patch) {
+            if (!link.flag.includes('P')) return err('passcode applies only to P-flag links', 400);
+            if (typeof patch.passcode !== 'string' || patch.passcode.length === 0) {
+              return err('passcode must be a non-empty string', 400);
+            }
+          }
+          // Setting a passcode resets the attempt budget — that's the lockout re-arm path
+          const passcodeHash =
+            patch.passcode !== undefined
+              ? await Bun.password.hash(patch.passcode, { algorithm: 'argon2id' })
+              : link.passcode_hash;
+          store.updateLink(db, link.id, {
+            exp: patch.exp ?? link.exp,
+            maxUses: 'maxUses' in patch ? (patch.maxUses ?? null) : link.max_uses,
+            active: 'active' in patch ? (patch.active ? 1 : 0) : link.active,
+            label: 'labelEnc' in patch ? patch.labelEnc! : link.label,
+            passcodeHash,
+            passcodeAttemptsRemaining:
+              patch.passcode !== undefined ? PASSCODE_BUDGET : link.passcode_attempts_remaining,
+            now: epoch(),
+          });
+          return json(manageState(store.getLinkById(db, link.id)!));
+        },
+        DELETE: async (req) => {
+          const link = await requireLink(authOf(req));
+          if (!link) return notFound();
+          store.purgeLink(db, link.id, epoch());
+          return json(manageState(store.getLinkById(db, link.id)!));
+        },
+      };
+  const manageFilesRoutes: RouteSet = {
+        OPTIONS: preflight,
+        POST: async (req) => {
+          const link = await requireLink(authOf(req));
+          if (!link) return notFound();
+          const body = new Uint8Array(await req.arrayBuffer());
+          if (body.length === 0) return err('empty body', 400);
+          if (body.length > config.limits.maxFileBytes) {
+            return err(`file exceeds ${config.limits.maxFileBytes} byte limit`, 413);
+          }
+          if (link.flag.includes('U') && store.countFiles(db, link.id) >= 1) {
+            return err('U-flag links carry exactly one file; PUT the existing file to replace it', 400);
+          }
+          const fileId = b64url(crypto.getRandomValues(new Uint8Array(16)));
+          store.insertFile(db, {
+            id: fileId,
+            linkId: link.id,
+            contentType: req.headers.get('content-type') ?? 'application/octet-stream',
+            ciphertext: body,
+            now: epoch(),
+          });
+          return json({ fileId } satisfies AddFileResponse);
+        },
+      };
+  const manageFileIdRoutes: RouteSet = {
+        OPTIONS: preflight,
+        PUT: async (req) => {
+          const link = await requireLink(authOf(req));
+          if (!link) return notFound();
+          const file = store.getFile(db, link.id, req.params?.fileId ?? "");
+          if (!file) return notFound();
+          const body = new Uint8Array(await req.arrayBuffer());
+          if (body.length === 0) return err('empty body', 400);
+          if (body.length > config.limits.maxFileBytes) {
+            return err(`file exceeds ${config.limits.maxFileBytes} byte limit`, 413);
+          }
+          store.replaceFile(db, {
+            id: file.id,
+            linkId: link.id,
+            contentType: req.headers.get('content-type') ?? file.content_type,
+            ciphertext: body,
+            now: epoch(),
+          });
+          return json({ fileId: file.id } satisfies AddFileResponse);
+        },
+        DELETE: async (req) => {
+          const link = await requireLink(authOf(req));
+          if (!link) return notFound();
+          const file = store.getFile(db, link.id, req.params?.fileId ?? "");
+          if (!file) return notFound();
+          if (link.flag.includes('U') && link.active === 1 && store.countFiles(db, link.id) === 1) {
+            return err('cannot delete the only file of an active U-flag link; pause or destroy it first', 400);
+          }
+          store.deleteFile(db, link.id, file.id);
+          return new Response(null, { status: 204, headers: CORS_HEADERS });
+        },
+      };
+
+  // The control capability arrives in the Authorization header — never the URL path,
+  // where proxies/access logs retain it. (Path-form routes remain as deprecated aliases.)
+  const bearerAuth = (req: Request): string | null => {
+    const h = req.headers.get('authorization');
+    const m = h?.match(/^Bearer\s+(.+)$/i);
+    return m?.[1]?.trim() || null;
+  };
+  /** Header-borne capability, falling back to the deprecated path segment. */
+  const authOf = (req: Request & { params?: Record<string, string> }): string =>
+    bearerAuth(req) ?? (req as any).params?.auth ?? '';
+
   function manageState(link: LinkRow): ManageState {
     return {
       id: link.id,
       url: `${base()}/shl/${link.id}`,
       flag: link.flag,
-      label: link.label,
+      labelEnc: link.label,
       exp: link.exp,
       maxUses: link.max_uses,
       uses: link.uses,
@@ -240,8 +368,9 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
           } catch {
             return err('request body must be JSON', 400);
           }
-          if (typeof body?.auth !== 'string' || !AUTH_SHAPE.test(body.auth)) {
-            return err('auth must be 43-char base64url', 400);
+          const auth = bearerAuth(req) ?? body?.auth; // header preferred; body form is legacy
+          if (typeof auth !== 'string' || !AUTH_SHAPE.test(auth)) {
+            return err('auth must be 43-char base64url (Authorization: Bearer header)', 400);
           }
           const flag = body.flag === undefined ? 'U' : body.flag;
           if (typeof flag !== 'string' || !validFlag(flag)) {
@@ -254,9 +383,11 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
           if (maxUses !== null && (!Number.isInteger(maxUses) || maxUses < 1)) {
             return err('maxUses must be a positive integer or null', 400);
           }
-          const label = body.label ?? null;
-          if (label !== null && (typeof label !== 'string' || label.length > 80)) {
-            return err('label must be a string of at most 80 chars', 400);
+          // labelEnc is client-encrypted and opaque here — the server never sees the
+          // plaintext label (which typically names the patient). Bound the blob only.
+          const labelEnc = body.labelEnc ?? null;
+          if (labelEnc !== null && (typeof labelEnc !== 'string' || labelEnc.length > 2048)) {
+            return err('labelEnc must be a JWE string of at most 2048 chars', 400);
           }
           const hasP = flag.includes('P');
           if (hasP && (typeof body.passcode !== 'string' || body.passcode.length === 0)) {
@@ -275,9 +406,9 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
           try {
             store.insertLink(db, {
               id,
-              mgmtTokenHash: await authHash(body.auth),
+              mgmtTokenHash: await authHash(auth),
               flag,
-              label,
+              label: labelEnc,
               exp: body.exp,
               maxUses,
               passcodeHash,
@@ -294,123 +425,15 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
         },
       },
 
-      '/api/manage/:auth': {
-        OPTIONS: preflight,
-        GET: async (req) => {
-          const link = await requireLink(req.params.auth);
-          if (!link) return notFound();
-          return json(manageState(link));
-        },
-        PATCH: async (req) => {
-          const link = await requireLink(req.params.auth);
-          if (!link) return notFound();
-          let patch: ManagePatch;
-          try {
-            patch = (await req.json()) as ManagePatch;
-          } catch {
-            return err('request body must be JSON', 400);
-          }
-          if ('exp' in patch && (!Number.isInteger(patch.exp) || patch.exp! <= 0)) {
-            return err('exp must be epoch seconds', 400);
-          }
-          if ('maxUses' in patch && patch.maxUses !== null && (!Number.isInteger(patch.maxUses) || patch.maxUses! < 1)) {
-            return err('maxUses must be a positive integer or null', 400);
-          }
-          if ('active' in patch && typeof patch.active !== 'boolean') {
-            return err('active must be a boolean', 400);
-          }
-          if ('label' in patch && (typeof patch.label !== 'string' || patch.label.length > 80)) {
-            return err('label must be a string of at most 80 chars', 400);
-          }
-          if ('passcode' in patch) {
-            if (!link.flag.includes('P')) return err('passcode applies only to P-flag links', 400);
-            if (typeof patch.passcode !== 'string' || patch.passcode.length === 0) {
-              return err('passcode must be a non-empty string', 400);
-            }
-          }
-          // Setting a passcode resets the attempt budget — that's the lockout re-arm path
-          const passcodeHash =
-            patch.passcode !== undefined
-              ? await Bun.password.hash(patch.passcode, { algorithm: 'argon2id' })
-              : link.passcode_hash;
-          store.updateLink(db, link.id, {
-            exp: patch.exp ?? link.exp,
-            maxUses: 'maxUses' in patch ? (patch.maxUses ?? null) : link.max_uses,
-            active: 'active' in patch ? (patch.active ? 1 : 0) : link.active,
-            label: 'label' in patch ? patch.label! : link.label,
-            passcodeHash,
-            passcodeAttemptsRemaining:
-              patch.passcode !== undefined ? PASSCODE_BUDGET : link.passcode_attempts_remaining,
-            now: epoch(),
-          });
-          return json(manageState(store.getLinkById(db, link.id)!));
-        },
-        DELETE: async (req) => {
-          const link = await requireLink(req.params.auth);
-          if (!link) return notFound();
-          store.purgeLink(db, link.id, epoch());
-          return json(manageState(store.getLinkById(db, link.id)!));
-        },
-      },
+      // Header-first manage routes; ':auth' path forms are DEPRECATED aliases.
+      '/api/manage': manageRoutes,
+      '/api/manage/files': manageFilesRoutes,
+      '/api/manage/files/:fileId': manageFileIdRoutes,
+      '/api/manage/:auth': manageRoutes,
 
-      '/api/manage/:auth/files': {
-        OPTIONS: preflight,
-        POST: async (req) => {
-          const link = await requireLink(req.params.auth);
-          if (!link) return notFound();
-          const body = new Uint8Array(await req.arrayBuffer());
-          if (body.length === 0) return err('empty body', 400);
-          if (body.length > config.limits.maxFileBytes) {
-            return err(`file exceeds ${config.limits.maxFileBytes} byte limit`, 413);
-          }
-          if (link.flag.includes('U') && store.countFiles(db, link.id) >= 1) {
-            return err('U-flag links carry exactly one file; PUT the existing file to replace it', 400);
-          }
-          const fileId = b64url(crypto.getRandomValues(new Uint8Array(16)));
-          store.insertFile(db, {
-            id: fileId,
-            linkId: link.id,
-            contentType: req.headers.get('content-type') ?? 'application/octet-stream',
-            ciphertext: body,
-            now: epoch(),
-          });
-          return json({ fileId } satisfies AddFileResponse);
-        },
-      },
+      '/api/manage/:auth/files': manageFilesRoutes,
 
-      '/api/manage/:auth/files/:fileId': {
-        OPTIONS: preflight,
-        PUT: async (req) => {
-          const link = await requireLink(req.params.auth);
-          if (!link) return notFound();
-          const file = store.getFile(db, link.id, req.params.fileId);
-          if (!file) return notFound();
-          const body = new Uint8Array(await req.arrayBuffer());
-          if (body.length === 0) return err('empty body', 400);
-          if (body.length > config.limits.maxFileBytes) {
-            return err(`file exceeds ${config.limits.maxFileBytes} byte limit`, 413);
-          }
-          store.replaceFile(db, {
-            id: file.id,
-            linkId: link.id,
-            contentType: req.headers.get('content-type') ?? file.content_type,
-            ciphertext: body,
-            now: epoch(),
-          });
-          return json({ fileId: file.id } satisfies AddFileResponse);
-        },
-        DELETE: async (req) => {
-          const link = await requireLink(req.params.auth);
-          if (!link) return notFound();
-          const file = store.getFile(db, link.id, req.params.fileId);
-          if (!file) return notFound();
-          if (link.flag.includes('U') && link.active === 1 && store.countFiles(db, link.id) === 1) {
-            return err('cannot delete the only file of an active U-flag link; pause or destroy it first', 400);
-          }
-          store.deleteFile(db, link.id, file.id);
-          return new Response(null, { status: 204, headers: CORS_HEADERS });
-        },
-      },
+      '/api/manage/:auth/files/:fileId': manageFileIdRoutes,
     },
     fetch() {
       return notFound();

@@ -21,7 +21,9 @@ One **PatientSharedBundle** — a FHIR collection bundle containing:
    resource in the bundle, so a clinic that can't ingest FHIR still gets everything.
 
 The bundle is encrypted locally and uploaded as ciphertext; the SHL QR encodes the
-fetch URL plus the decryption key. The server never sees plaintext or keys.
+fetch URL plus the decryption key. The server never sees plaintext, keys, or even
+the link's label (stored client-encrypted) — it learns only sizes, timing, and the
+access log it keeps for the patient.
 
 ### What the receiving clinic does with it
 

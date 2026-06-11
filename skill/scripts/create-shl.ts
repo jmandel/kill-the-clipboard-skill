@@ -106,11 +106,14 @@ async function main(): Promise<void> {
   const exp = Math.floor(Date.now() / 1000 + expHours * 3600);
 
   progress(`-> registering link with ${server} ...`);
-  const createReq: CreateLinkRequest = { auth, flag, exp, maxUses, label };
+  // The capability rides the Authorization header (never the URL path, which proxies
+  // log); the label goes up encrypted with the link key — the server never sees it.
+  const labelEnc = label ? await encryptJWE(new TextEncoder().encode(label), key, { cty: 'text/plain' }) : undefined;
+  const createReq: CreateLinkRequest = { flag, exp, maxUses, ...(labelEnc ? { labelEnc } : {}) };
   const createRes = await expectOk(
     await fetchRetry(`${server}/api/links`, {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      headers: { 'content-type': 'application/json', authorization: `Bearer ${auth}` },
       body: JSON.stringify(createReq),
     }),
     'POST /api/links',
@@ -123,12 +126,12 @@ async function main(): Promise<void> {
 
   progress(`-> uploading ciphertext (${jweSize} bytes) ...`);
   const fileRes = await expectOk(
-    await fetchRetry(`${server}/api/manage/${auth}/files`, {
+    await fetchRetry(`${server}/api/manage/files`, {
       method: 'POST',
-      headers: { 'content-type': BUNDLE_CONTENT_TYPE },
+      headers: { 'content-type': BUNDLE_CONTENT_TYPE, authorization: `Bearer ${auth}` },
       body: jwe,
     }),
-    'POST /api/manage/{auth}/files',
+    'POST /api/manage/files',
   );
   const { fileId } = (await fileRes.json()) as AddFileResponse;
   if (!fileId) throw new Error('server did not return a fileId');

@@ -200,7 +200,19 @@ GET  /shl/{id}/f/{fileId}?t=...   ticketed file fetch → JWE (application/jose)
   `active && now < exp && (max_uses IS NULL || uses < max_uses) && (passcode_attempts IS NULL || > 0)`.
   Any failure → 404 (spec). Re-arm = PATCH flips a failing condition; no state machine.
 
-### Control plane (capability URL)
+### Control plane (capability via Authorization header)
+
+External-review hardening (2026-06-11):
+- The auth capability travels in `Authorization: Bearer <auth>` — never the URL path,
+  which proxies/access logs retain (the deployment's own fronting proxy demonstrated
+  the leak class). `/api/manage/{auth}` path forms remain as DEPRECATED aliases for
+  already-extracted skills.
+- The label is stored CLIENT-ENCRYPTED (`labelEnc`: compact JWE under the link key,
+  cty text/plain) — the server never learns the patient's name. The shlink payload's
+  plaintext label (spec-required, receiver-facing) is unchanged: it's visible only to
+  link holders, who already hold the decryption key. Residual server knowledge:
+  timing, ciphertext sizes, access patterns, and audit-log recipient strings —
+  inherent to hosting + the audit feature itself.
 
 ```
 POST  /api/links                  {authTokenHash—no: auth, flag?, exp?, maxUses?, passcode?, label?}

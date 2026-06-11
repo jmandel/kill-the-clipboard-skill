@@ -1,5 +1,6 @@
 // Control-plane client (docs/DESIGN.md §4). Same-origin by default; &api= fragment param
-// overrides. The auth capability rides in the path, never in logs or error text.
+// overrides. The auth capability rides in the Authorization header — never the URL
+// path (proxies and access logs retain paths) and never in error text.
 
 import type { ApiError, ManagePatch, ManageState } from '../../../lib/types.ts';
 
@@ -10,8 +11,12 @@ export class ManageApi {
     this.base = (base ?? '').replace(/\/$/, '');
   }
 
-  private url(auth: string): string {
-    return `${this.base}/api/manage/${auth}`;
+  private url(): string {
+    return `${this.base}/api/manage`;
+  }
+
+  private headers(auth: string, json = false): Record<string, string> {
+    return { authorization: `Bearer ${auth}`, ...(json ? { 'content-type': 'application/json' } : {}) };
   }
 
   private async parse<T>(res: Response): Promise<T> {
@@ -28,14 +33,14 @@ export class ManageApi {
   }
 
   async get(auth: string): Promise<ManageState> {
-    return this.parse<ManageState>(await fetch(this.url(auth)));
+    return this.parse<ManageState>(await fetch(this.url(), { headers: this.headers(auth) }));
   }
 
   async patch(auth: string, patch: ManagePatch): Promise<ManageState> {
     await this.parse<unknown>(
-      await fetch(this.url(auth), {
+      await fetch(this.url(), {
         method: 'PATCH',
-        headers: { 'content-type': 'application/json' },
+        headers: this.headers(auth, true),
         body: JSON.stringify(patch),
       }),
     );
@@ -43,7 +48,7 @@ export class ManageApi {
   }
 
   async destroy(auth: string): Promise<ManageState> {
-    await this.parse<unknown>(await fetch(this.url(auth), { method: 'DELETE' }));
+    await this.parse<unknown>(await fetch(this.url(), { method: 'DELETE', headers: this.headers(auth) }));
     return this.get(auth);
   }
 }

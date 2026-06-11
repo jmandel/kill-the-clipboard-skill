@@ -51,10 +51,10 @@ owner page /m#M ─────────────────────�
                                        re-arm, pause, rename, revoke
 ```
 
-Privacy by architecture: the server stores only ciphertext, a hashed control token,
-link configuration, and an access log. It can never read the records it hosts —
-the encryption key is derived client-side from the owner secret and is carried only
-inside the `shlink:/` payload the patient shares.
+Privacy by architecture: the server stores only ciphertext, a hashed control token
+(sent via Authorization header, never URL paths), client-encrypted labels, link
+settings, and an access log. It can never read the records it hosts — or even the
+link's label — because every key derives client-side from the owner secret.
 
 ## Components
 

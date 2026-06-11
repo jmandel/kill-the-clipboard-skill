@@ -28,6 +28,7 @@
 import { statSync } from 'node:fs';
 import { join } from 'node:path';
 import { deriveAuth, deriveKey } from '../../lib/hkdf.ts';
+import { decryptJWE } from '../../lib/jwe.ts';
 import { encryptJWE } from '../../lib/jwe.ts';
 import { parseFragment } from '../../lib/shlink.ts';
 import type { ManagePatch, ManageState } from '../../lib/types.ts';
@@ -82,22 +83,37 @@ interface Ctx {
   masterSecret: Uint8Array;
 }
 
+const authHeaders = (ctx: Ctx, json = false): Record<string, string> => ({
+  authorization: `Bearer ${ctx.auth}`,
+  ...(json ? { 'content-type': 'application/json' } : {}),
+});
+
+async function displayLabel(ctx: Ctx, state: ManageState): Promise<string | null> {
+  if (!state.labelEnc) return null;
+  try {
+    const { plaintext } = await decryptJWE(state.labelEnc, await deriveKey(ctx.masterSecret));
+    return new TextDecoder().decode(plaintext);
+  } catch {
+    return null;
+  }
+}
+
 async function getState(ctx: Ctx): Promise<ManageState> {
   const res = await expectOk(
-    await fetchRetry(`${ctx.server}/api/manage/${ctx.auth}`),
-    'GET /api/manage/{auth}',
+    await fetchRetry(`${ctx.server}/api/manage`, { headers: authHeaders(ctx) }),
+    'GET /api/manage',
   );
   return (await res.json()) as ManageState;
 }
 
 async function patchState(ctx: Ctx, patch: ManagePatch): Promise<void> {
   await expectOk(
-    await fetchRetry(`${ctx.server}/api/manage/${ctx.auth}`, {
+    await fetchRetry(`${ctx.server}/api/manage`, {
       method: 'PATCH',
-      headers: { 'content-type': 'application/json' },
+      headers: authHeaders(ctx, true),
       body: JSON.stringify(patch),
     }),
-    'PATCH /api/manage/{auth}',
+    'PATCH /api/manage',
   );
 }
 
@@ -125,8 +141,9 @@ async function main(): Promise<void> {
 
   switch (verb) {
     case 'status': {
-      const { accessLog: _omitted, ...state } = await getState(ctx);
-      emit(state);
+      const full = await getState(ctx);
+      const { accessLog: _omitted, labelEnc: _enc, ...state } = full;
+      emit({ ...state, label: await displayLabel(ctx, full) });
       break;
     }
     case 'log': {
@@ -170,9 +187,10 @@ async function main(): Promise<void> {
       const label = rest[0];
       if (label === undefined) throw new Error('relabel requires the new label text');
       if (label.length > 80) throw new Error(`label exceeds 80 chars (${label.length})`);
-      await patchState(ctx, { label });
+      const key = await deriveKey(ctx.masterSecret);
+      await patchState(ctx, { labelEnc: await encryptJWE(new TextEncoder().encode(label), key, { cty: 'text/plain' }) });
       const state = await getState(ctx);
-      emit({ status: 'relabeled', id: state.id, label: state.label });
+      emit({ status: 'relabeled', id: state.id, label });
       break;
     }
     case 'replace': {
@@ -192,12 +210,12 @@ async function main(): Promise<void> {
       progress('-> re-encrypting with the original key (fresh IV) ...');
       const jwe = await encryptJWE(bytes, key, { cty: BUNDLE_CONTENT_TYPE, deflate: true });
       await expectOk(
-        await fetchRetry(`${ctx.server}/api/manage/${ctx.auth}/files/${fileMeta.fileId}`, {
+        await fetchRetry(`${ctx.server}/api/manage/files/${fileMeta.fileId}`, {
           method: 'PUT',
-          headers: { 'content-type': BUNDLE_CONTENT_TYPE },
+          headers: { 'content-type': BUNDLE_CONTENT_TYPE, authorization: `Bearer ${ctx.auth}` },
           body: jwe,
         }),
-        'PUT /api/manage/{auth}/files/{fileId}',
+        'PUT /api/manage/files/{fileId}',
       );
       emit({
         status: 'replaced',
@@ -212,8 +230,8 @@ async function main(): Promise<void> {
       if (!yes) throw new Error('destroy is irreversible; pass --yes to confirm');
       const state = await getState(ctx);
       await expectOk(
-        await fetchRetry(`${ctx.server}/api/manage/${ctx.auth}`, { method: 'DELETE' }),
-        'DELETE /api/manage/{auth}',
+        await fetchRetry(`${ctx.server}/api/manage`, { method: 'DELETE', headers: authHeaders(ctx) }),
+        'DELETE /api/manage',
       );
       emit({ status: 'destroyed', id: state.id });
       break;

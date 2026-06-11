@@ -3,6 +3,8 @@ import type { ManagePatch, ManageState } from '../../../lib/types.ts';
 import { ManageApi } from '../lib/api.ts';
 import {
   authForSecret,
+  decryptLabel,
+  encryptLabel,
   DEFAULT_REARM_HOURS,
   deriveStatus,
   formatCountdown,
@@ -38,6 +40,7 @@ export function OwnerView({
   const [auth, setAuth] = useState<string | null>(null);
   const [state, setState] = useState<ManageState | null>(null);
   const [shlink, setShlink] = useState<string | null>(null);
+  const [label, setLabel] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
@@ -71,14 +74,22 @@ export function OwnerView({
   }, [client, masterSecret]);
 
   // QR/shlink ALWAYS reconstructed from current state (docs/DESIGN.md §3) so label/exp
-  // edits and re-arms propagate without anything being stored.
+  // edits and re-arms propagate without anything being stored. The server holds the
+  // label only as a client-encrypted blob; decrypt here for display and the payload.
   useEffect(() => {
     if (!state) return;
     let cancelled = false;
-    rebuildPayload(masterSecret, state).then(
-      (p) => { if (!cancelled) setShlink(payloadToShlink(p)); },
-      (e) => { if (!cancelled) setError(e instanceof Error ? e.message : 'Failed to rebuild link'); },
-    );
+    (async () => {
+      try {
+        const plain = await decryptLabel(masterSecret, state.labelEnc);
+        if (cancelled) return;
+        setLabel(plain);
+        const p = await rebuildPayload(masterSecret, state, plain);
+        if (!cancelled) setShlink(payloadToShlink(p));
+      } catch (e) {
+        if (!cancelled) setError(e instanceof Error ? e.message : 'Failed to rebuild link');
+      }
+    })();
     return () => { cancelled = true; };
   }, [state, masterSecret]);
 
@@ -156,7 +167,7 @@ export function OwnerView({
               className="relabel-form"
               onSubmit={(e) => {
                 e.preventDefault();
-                applyPatch({ label: labelDraft.slice(0, 80) });
+                void (async () => applyPatch({ labelEnc: await encryptLabel(masterSecret, labelDraft.slice(0, 80)) }))();
                 setEditingLabel(false);
               }}
             >
@@ -171,7 +182,7 @@ export function OwnerView({
               <button type="button" onClick={() => setEditingLabel(false)}>Cancel</button>
             </form>
           ) : (
-            <p className="link-label">{state.label ?? 'SMART Health Link'}</p>
+            <p className="link-label">{label ?? 'SMART Health Link'}</p>
           )}
           {live && (
             <div className="link-sub">
@@ -204,7 +215,7 @@ export function OwnerView({
               <button
                 type="button"
                 className="btn-block secondary grow"
-                onClick={() => void shareOrCopy({ title: state.label ?? 'SMART Health Link', url: shlink })}
+                onClick={() => void shareOrCopy({ title: label ?? 'SMART Health Link', url: shlink })}
               >
                 {Icon.share}
                 Share
@@ -304,7 +315,7 @@ export function OwnerView({
                 type="button"
                 className="btn-outline"
                 disabled={busy}
-                onClick={() => { setLabelDraft(state.label ?? ''); setEditingLabel(true); window.scrollTo({ top: 0 }); }}
+                onClick={() => { setLabelDraft(label ?? ''); setEditingLabel(true); window.scrollTo({ top: 0 }); }}
               >
                 {Icon.pencil}
                 Rename
