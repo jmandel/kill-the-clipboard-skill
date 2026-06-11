@@ -47,7 +47,8 @@ Re-arm = `PATCH` flipping whichever condition failed.
 | `DELETE /api/manage/files/{fileId}` | Rejected for the last file of an active U-flag link. |
 | `DELETE /api/manage` | Destroy: immediate ciphertext purge + terminal deactivation; tombstone + audit log remain. |
 
-CORS is permissive on `/api/*` (third-party handoff pages) and harmless on the data plane.
+CORS is data-plane only (`/shl/*` — third-party SHL viewers fetch manifests and files
+cross-origin). The control plane advertises none; management is same-origin by design.
 
 ### Static / bundle
 

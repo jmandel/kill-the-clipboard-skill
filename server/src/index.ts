@@ -29,21 +29,40 @@ import { startSweeper } from './sweep.ts';
 import { Ticketer } from './tickets.ts';
 import { buildSkillZip } from './zip.ts';
 
-const CORS_HEADERS: Record<string, string> = {
+// CORS is a DATA-PLANE-ONLY affordance: third-party SHL viewers fetch manifests and
+// files cross-origin (spec interop). The control plane is same-origin by design (owner
+// page served by this server; skill scripts run outside the browser) and advertises
+// no CORS — cross-origin management is not a supported interface.
+const DATA_CORS: Record<string, string> = {
   'access-control-allow-origin': '*',
-  'access-control-allow-methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-  'access-control-allow-headers': 'authorization, content-type',
+  'access-control-allow-methods': 'GET, POST, OPTIONS',
+  'access-control-allow-headers': 'content-type',
   'access-control-max-age': '86400',
 };
 
 const json = (body: unknown, status = 200): Response =>
-  new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json', ...CORS_HEADERS } });
+  new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 const err = (message: string, status: number): Response => json({ error: message } satisfies ApiError, status);
 const notFound = (): Response => err('not found', 404);
-const preflight = (): Response => new Response(null, { status: 204, headers: CORS_HEADERS });
+const preflight = (): Response => new Response(null, { status: 204, headers: DATA_CORS });
+
+type Handler = (req: Request & { params?: Record<string, string> }) => Response | Promise<Response>;
+/** Data-plane wrapper: OPTIONS preflight + DATA_CORS on every response, errors included
+ * (a cross-origin viewer can only read a 401/404 outcome if the error carries CORS too). */
+const corsify = (routes: Record<string, Handler>): Record<string, Handler> => {
+  const out: Record<string, Handler> = { OPTIONS: preflight };
+  for (const [method, h] of Object.entries(routes)) {
+    out[method] = async (req) => {
+      const res = await h(req);
+      for (const [k, v] of Object.entries(DATA_CORS)) res.headers.set(k, v);
+      return res;
+    };
+  }
+  return out;
+};
 const jose = (ciphertext: Uint8Array): Response =>
   new Response(ciphertext as Uint8Array<ArrayBuffer>, {
-    headers: { 'content-type': 'application/jose', ...CORS_HEADERS },
+    headers: { 'content-type': 'application/jose' },
   });
 
 const AUTH_SHAPE = /^[A-Za-z0-9_-]{43}$/;
@@ -81,7 +100,6 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
 
   type RouteSet = Record<string, (req: Request & { params?: Record<string, string> }) => Response | Promise<Response>>;
   const manageRoutes: RouteSet = {
-        OPTIONS: preflight,
         GET: async (req) => {
           const link = await requireLink(authOf(req));
           if (!link) return notFound();
@@ -139,7 +157,6 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
         },
       };
   const manageFilesRoutes: RouteSet = {
-        OPTIONS: preflight,
         POST: async (req) => {
           const link = await requireLink(authOf(req));
           if (!link) return notFound();
@@ -163,7 +180,6 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
         },
       };
   const manageFileIdRoutes: RouteSet = {
-        OPTIONS: preflight,
         PUT: async (req) => {
           const link = await requireLink(authOf(req));
           if (!link) return notFound();
@@ -192,7 +208,7 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
             return err('cannot delete the only file of an active U-flag link; pause or destroy it first', 400);
           }
           store.deleteFile(db, link.id, file.id);
-          return new Response(null, { status: 204, headers: CORS_HEADERS });
+          return new Response(null, { status: 204 });
         },
       };
 
@@ -266,7 +282,7 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
 
       // --- Data plane -----------------------------------------------------------------
 
-      '/shl/:id': {
+      '/shl/:id': corsify({
         // U-flag direct fetch: ?recipient= is REQUIRED by the KTC profile
         GET: async (req) => {
           const id = req.params.id;
@@ -339,9 +355,9 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
           }
           return json({ files: out } satisfies Manifest);
         },
-      },
+      }),
 
-      '/shl/:id/f/:fileId': {
+      '/shl/:id/f/:fileId': corsify({
         GET: async (req) => {
           const { id, fileId } = req.params;
           const t = new URL(req.url).searchParams.get('t');
@@ -352,12 +368,11 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
           store.audit(db, id, '', 'file', 'ok', epoch());
           return jose(file.ciphertext);
         },
-      },
+      }),
 
-      // --- Control plane --------------------------------------------------------------
+      // --- Control plane (same-origin only; no CORS) ------------------------------------
 
       '/api/links': {
-        OPTIONS: preflight,
         POST: async (req) => {
           let body: CreateLinkRequest;
           try {

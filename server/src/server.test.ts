@@ -487,14 +487,24 @@ describe('control plane validation + capability lookup', () => {
     expect(res.status).toBe(413);
   });
 
-  test('CORS: preflight + headers on manage responses', async () => {
+  test('CORS: data plane only — manage/links advertise none, /shl/* carries it on every outcome', async () => {
     const ctx = await makeServer();
-    const pre = await fetch(`${ctx.base}/api/links`, { method: 'OPTIONS' });
+    const link = await createLink(ctx);
+    await uploadFile(ctx, link);
+
+    // Control plane: no CORS, no preflight (cross-origin management is unsupported)
+    const manage = await fetch(`${ctx.base}/api/manage`, { headers: { authorization: `Bearer ${link.auth}` } });
+    expect(manage.headers.get('access-control-allow-origin')).toBeNull();
+
+    // Data plane: preflight + headers on success AND error responses (third-party viewers)
+    const pre = await fetch(`${link.url}`, { method: 'OPTIONS' });
     expect(pre.status).toBe(204);
     expect(pre.headers.get('access-control-allow-origin')).toBe('*');
-    const link = await createLink(ctx);
-    const res = await fetch(`${ctx.base}/api/manage`, { headers: { authorization: `Bearer ${link.auth}` } });
-    expect(res.headers.get('access-control-allow-origin')).toBe('*');
+    const ok = await fetch(`${link.url}?recipient=clinic`);
+    expect(ok.headers.get('access-control-allow-origin')).toBe('*');
+    const bad = await fetch(`${link.url}`); // missing recipient → 400
+    expect(bad.status).toBe(400);
+    expect(bad.headers.get('access-control-allow-origin')).toBe('*');
   });
 });
 

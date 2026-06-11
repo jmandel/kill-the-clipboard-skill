@@ -110,16 +110,17 @@ for (const seed of seeds) {
   }
 }
 
+// Data-plane only, matching production: the control plane is same-origin (no CORS).
 const CORS = {
   'access-control-allow-origin': '*',
-  'access-control-allow-methods': 'GET, PATCH, DELETE, OPTIONS',
-  'access-control-allow-headers': 'authorization, content-type',
+  'access-control-allow-methods': 'GET, POST, OPTIONS',
+  'access-control-allow-headers': 'content-type',
 };
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { 'content-type': 'application/json', ...CORS },
+    headers: { 'content-type': 'application/json' },
   });
 }
 
@@ -143,15 +144,19 @@ Bun.serve({
     '/v': indexHtml,
     '/shl/:id': (req) => {
       const url = new URL(req.url);
-      if (!url.searchParams.get('recipient')) return json({ error: 'recipient required' }, 400);
+      if (!url.searchParams.get('recipient')) {
+        return new Response(JSON.stringify({ error: 'recipient required' }), {
+          status: 400,
+          headers: { 'content-type': 'application/json', ...CORS },
+        });
+      }
       const s = [...store.values()].find((x) => x.url.endsWith(`/shl/${req.params.id}`));
-      if (!s || !computeLive(s)) return new Response(null, { status: 404 });
+      if (!s || !computeLive(s)) return new Response(null, { status: 404, headers: CORS });
       s.uses += 1;
       s.accessLog.unshift({ ts: iso(nowSec()), recipient: url.searchParams.get('recipient')!, action: 'direct', outcome: 'ok' });
       return new Response(jweById.get(req.params.id) ?? '', { status: 200, headers: { 'content-type': 'application/jose', ...CORS } });
     },
     '/api/manage': {
-      OPTIONS: () => new Response(null, { status: 204, headers: CORS }),
       GET: (req) =>
         withState(bearerOf(req), (s) => {
           s.live = computeLive(s);

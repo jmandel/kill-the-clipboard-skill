@@ -232,7 +232,10 @@ DELETE /api/manage                purge + terminal deactivation
 
 - U-flag links: exactly one file (reject 2nd POST; reject DELETE of last file while active).
 - `PATCH {active:false}` = reversible pause; `DELETE` = destroy. Patient-meaningful distinction.
-- CORS open on `/api/manage/*` (third-party pages); page served same-origin by default.
+- CORS is data-plane only (`/shl/*`, for third-party SHL viewers). The control plane
+  advertises none: the owner page is served same-origin by this server and the skill
+  scripts run outside the browser, so cross-origin management is not a supported
+  interface.
 
 ### Schema
 
