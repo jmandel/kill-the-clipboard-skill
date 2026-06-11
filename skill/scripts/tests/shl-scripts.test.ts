@@ -318,7 +318,7 @@ describe('create-shl', () => {
     const { out, outDir } = await createLink('rt');
 
     expect(out.status).toBe('created');
-    expect(Object.keys(out).sort()).toEqual(['artifacts', 'exp', 'files', 'flag', 'id', 'label', 'maxUses', 'status']);
+    expect(Object.keys(out).sort()).toEqual(['artifacts', 'exp', 'files', 'flag', 'handoffMarkdown', 'id', 'label', 'maxUses', 'status']);
     expect(out.flag).toBe('U');
     expect(out.maxUses).toBe(5);
     expect(out.label).toBe('Casey Tester — visit summary');
@@ -334,14 +334,14 @@ describe('create-shl', () => {
     expect(out.artifacts.meta.endsWith('link-meta.json')).toBeTrue();
     expect(out.artifacts.handoff.endsWith('handoff.md')).toBeTrue();
 
-    // handoff.md is the verbatim closing message: owner page as a markdown link,
-    // shlink as inline code, lifetime filled in. Pasteable as-is.
-    const handoff = readFileSync(out.artifacts.handoff, 'utf8');
+    // handoffMarkdown is the verbatim closing message: owner page as a markdown link,
+    // shlink as inline code, lifetime filled in. Pasteable as-is; handoff.md = same text.
     const ownerLinkText = readFileSync(out.artifacts.ownerLink, 'utf8').trim();
-    expect(handoff).toContain(`**[Your link setup & control page](${ownerLinkText})**`);
-    expect(handoff).toContain(`\`${readFileSync(out.artifacts.shlink, 'utf8').trim()}\``);
-    expect(handoff).toContain(out.artifacts.qrPng);
-    expect(handoff).toContain('5 opens');
+    expect(out.handoffMarkdown).toContain(`**[Your link setup & control page](${ownerLinkText})**`);
+    expect(out.handoffMarkdown).toContain(`\`${readFileSync(out.artifacts.shlink, 'utf8').trim()}\``);
+    expect(out.handoffMarkdown).toContain(out.artifacts.qrPng);
+    expect(out.handoffMarkdown).toContain('5 opens');
+    expect(readFileSync(out.artifacts.handoff, 'utf8')).toBe(out.handoffMarkdown);
 
     // Viewer-prefixed form (decision 11): page URL + '#' + the exact bare shlink.
     const viewerText = readFileSync(out.artifacts.viewerLink, 'utf8').trim();
@@ -388,21 +388,25 @@ describe('create-shl', () => {
     expect(Buffer.from(plaintext).equals(Buffer.from(bundleBytes))).toBeTrue();
   });
 
-  test('SECRETS: stdout/stderr carry no master secret, auth, key, shlink, or fragment URL', async () => {
+  test('SECRETS: stdout carries the relay links; bare auth/key/M never appear standalone', async () => {
     const { out, outDir, raw } = await createLink('secrets');
     const { m, auth, key } = await ownerSecretsFrom(outDir);
-    const mB64 = b64url(m);
+    const ownerLink = readFileSync(join(outDir, 'owner-link.txt'), 'utf8').trim();
+    const shlink = readFileSync(join(outDir, 'shlink.txt'), 'utf8').trim();
 
+    // Relay secrets (patient deliverables): the handoff message IS the stdout payload.
+    expect(out.handoffMarkdown).toContain(ownerLink);
+    expect(out.handoffMarkdown).toContain(shlink);
+
+    // Script-internal secrets: the derived auth and key never appear as standalone
+    // strings anywhere (the shlink embeds the key only inside its base64url payload).
     for (const channel of [raw.out, raw.err]) {
-      expect(channel).not.toContain('shlink:');
-      expect(channel).not.toContain('#');
-      expect(channel).not.toContain(mB64);
       expect(channel).not.toContain(auth);
       expect(channel).not.toContain(key);
     }
-    // The public link id is the ONLY 43-char base64url token permitted on stdout.
-    const tokens = raw.out.match(/[A-Za-z0-9_-]{43,}/g) ?? [];
-    for (const t of tokens) expect(t).toBe(out.id);
+    // The bare master secret appears ONLY embedded in the owner link, never on its own.
+    const stripped = (raw.out + raw.err).replaceAll(ownerLink, '');
+    expect(stripped).not.toContain(b64url(m));
   });
 
   test('refuses to overwrite a non-empty outdir', async () => {
@@ -446,7 +450,7 @@ describe('manage-shl', () => {
     outDir = created.outDir;
   });
 
-  test('status: ManageState minus accessLog, no secrets', async () => {
+  test('status: ManageState minus accessLog, plus ownerLink; no script-internal secrets', async () => {
     const r = await manage(['status']);
     expect(r.code).toBe(0);
     const state = JSON.parse(r.out);
@@ -456,8 +460,12 @@ describe('manage-shl', () => {
     expect(state.files).toHaveLength(1);
     expect('accessLog' in state).toBeFalse();
     expect(r.out).not.toContain('shlink:');
+    // ownerLink is a relay secret — "give me my link again" works via status alone
+    const ownerLinkText = readFileSync(join(outDir, 'owner-link.txt'), 'utf8').trim();
+    expect(state.ownerLink).toBe(ownerLinkText);
     const { m, auth, key } = await ownerSecretsFrom(outDir);
-    for (const secret of [b64url(m), auth, key]) expect(r.out + r.err).not.toContain(secret);
+    for (const secret of [auth, key]) expect(r.out + r.err).not.toContain(secret);
+    expect((r.out + r.err).replaceAll(ownerLinkText, '')).not.toContain(b64url(m));
   });
 
   test('accepts the owner-link.txt file path as target too', async () => {

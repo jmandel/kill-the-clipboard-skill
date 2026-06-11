@@ -22,8 +22,9 @@
 //
 // Output:
 //   stdout: one JSON object per invocation; stderr: human progress.
-//   The master secret, derived auth/key, owner link, and shlinks NEVER appear on
-//   stdout/stderr or in error messages.
+//   `status` echoes the owner link (a patient deliverable — relay it when the patient
+//   asks for their link again). The bare master secret and derived auth/key never
+//   appear standalone on stdout or in error messages.
 
 import { statSync } from 'node:fs';
 import { join } from 'node:path';
@@ -59,7 +60,9 @@ function progress(msg: string): void {
   console.error(msg);
 }
 
-async function loadOwnerSecret(target: string): Promise<{ masterSecret: Uint8Array; linkOrigin: string }> {
+async function loadOwnerSecret(
+  target: string,
+): Promise<{ masterSecret: Uint8Array; linkOrigin: string; ownerLink: string }> {
   let path = target;
   try {
     if (statSync(target).isDirectory()) path = join(target, 'owner-link.txt');
@@ -74,7 +77,7 @@ async function loadOwnerSecret(target: string): Promise<{ masterSecret: Uint8Arr
   const parsed = parseFragment(ownerLink.slice(hashIdx + 1));
   if (parsed.mode !== 'owner') throw new Error(`not an owner link (viewer shlink found): ${path}`);
   const linkOrigin = ownerLink.slice(0, hashIdx).replace(/\/s$/, '');
-  return { masterSecret: parsed.masterSecret, linkOrigin };
+  return { masterSecret: parsed.masterSecret, linkOrigin, ownerLink };
 }
 
 interface Ctx {
@@ -128,7 +131,7 @@ async function main(): Promise<void> {
   const [target, verb, ...rest] = args;
   if (!target || !verb) throw new Error('missing <outdir|owner-link.txt> or <verb>');
 
-  const { masterSecret, linkOrigin } = await loadOwnerSecret(target);
+  const { masterSecret, linkOrigin, ownerLink } = await loadOwnerSecret(target);
   let server: string;
   try {
     server = await resolveServerUrl(serverArg);
@@ -143,7 +146,8 @@ async function main(): Promise<void> {
     case 'status': {
       const full = await getState(ctx);
       const { accessLog: _omitted, labelEnc: _enc, ...state } = full;
-      emit({ ...state, label: await displayLabel(ctx, full) });
+      // ownerLink is a patient deliverable — status is how "give me my link again" works
+      emit({ ...state, label: await displayLabel(ctx, full), ownerLink });
       break;
     }
     case 'log': {

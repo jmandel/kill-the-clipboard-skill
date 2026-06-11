@@ -9,10 +9,15 @@ Read docs/DESIGN.md before any work; its decisions log (§1) is settled — do n
 - **The kernel is frozen**: `lib/*.ts`, `server/src/schema.sql`, root `package.json` deps,
   and this file. Need an interface change or a new dependency? Stop and ask the
   orchestrator — never change unilaterally, never `bun add`.
-- **Secrets never go to stdout, logs, or error messages**: the master secret M, derived
-  key/auth, shlinks, owner links, passcodes. Scripts write secret-bearing artifacts to
-  files and print paths (see `CreateShlOutput` in lib/types.ts). The server stores only
-  `sha256(auth)` and argon2id passcode hashes; plaintext data and keys never reach it.
+- **Secrets have two tiers.** *Relay secrets* — the owner link, shlinks, qr.png, the
+  handoff text — are patient deliverables: scripts emit them on stdout
+  (`handoffMarkdown`) and the agent relays them in conversation, but they never go to
+  any external service. *Script-internal secrets* — the bare master secret M and
+  derived key/auth as standalone strings, passcodes — live in files only: never on
+  stdout, never as command-line arguments. Error messages and usage strings are always
+  secret-free (both tiers) — error text travels into bug reports and searches. The
+  server stores only `sha256(auth)` and argon2id passcode hashes; plaintext data and
+  keys never reach it.
 - **Stay in your unit's directories.** Parallel units own disjoint paths.
 
 ## Script conventions (skill/*/scripts)

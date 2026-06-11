@@ -15,20 +15,20 @@
 //   -o, --out <dir>     Output directory; must be empty or absent (never overwrites)
 //
 // Output:
-//   stdout: one CreateShlOutput JSON object — file PATHS and non-secret metadata only.
+//   stdout: one CreateShlOutput JSON object (includes `handoffMarkdown`, below).
 //   stderr: human progress.
-//   <outdir>/owner-link.txt   owner capability URL (contains master secret M) — SECRET
+//   <outdir>/owner-link.txt   owner capability URL (embeds master secret M)
 //   <outdir>/viewer-link.txt  viewer-prefixed shlink (read capability) — for preview/share,
 //                             never the form presented for scanning
-//   <outdir>/shlink.txt       bare shlink URI (contains the encryption key)   — SECRET
-//   <outdir>/qr.png           QR of the bare shlink                           — SECRET
-//   <outdir>/handoff.md       ready-made closing message (owner link as markdown,
-//                             shlink as code) — paste VERBATIM into the chat; the
-//                             owner link must reach the patient as a clickable link
-//                             in message text, never only as a file attachment
+//   <outdir>/shlink.txt       bare shlink URI (embeds the encryption key)
+//   <outdir>/qr.png           QR of the bare shlink
+//   <outdir>/handoff.md       durable copy of stdout's `handoffMarkdown`
 //   <outdir>/link-meta.json   non-secret metadata (id, label, exp, ...)
-// The master secret, derived key/auth, shlink, and owner link NEVER appear on
-// stdout/stderr or in error messages.
+// stdout includes `handoffMarkdown` — the complete closing message (owner page as a
+// markdown link, shlink as inline code). Paste it VERBATIM into the chat; the links
+// must reach the patient as message text, never only as file attachments. The bare
+// master secret / derived key / auth never appear standalone on stdout or in errors —
+// they're script plumbing, read from the files by manage-shl.ts.
 
 import { existsSync, mkdirSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -160,7 +160,8 @@ async function main(): Promise<void> {
   await Bun.write(paths.shlink, shlink + '\n');
   await Bun.write(paths.viewerLink, viewerLink + '\n');
   await QRCode.toFile(paths.qrPng, shlink, { errorCorrectionLevel: 'M' });
-  await Bun.write(paths.handoff, buildHandoff({ ownerLink, shlink, qrPng: paths.qrPng, exp, maxUses }));
+  const handoffMarkdown = buildHandoff({ ownerLink, shlink, qrPng: paths.qrPng, exp, maxUses });
+  await Bun.write(paths.handoff, handoffMarkdown);
   const meta = {
     id,
     label,
@@ -181,6 +182,7 @@ async function main(): Promise<void> {
     exp,
     maxUses,
     files: [{ contentType: BUNDLE_CONTENT_TYPE, size: jweSize }],
+    handoffMarkdown,
     artifacts: paths,
   };
   console.log(JSON.stringify(output));
@@ -189,7 +191,7 @@ async function main(): Promise<void> {
 /**
  * The closing chat message, pre-composed so the agent pastes it verbatim instead of
  * reconstructing it (where the owner link tends to drift into a file attachment).
- * Secret-bearing by design — it lives in a file, never on stdout.
+ * Emitted on stdout (`handoffMarkdown`) AND written to handoff.md as the durable copy.
  */
 function buildHandoff(args: {
   ownerLink: string;

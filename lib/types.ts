@@ -108,7 +108,9 @@ export interface PasscodeError {
   remainingAttempts: number;
 }
 
-// --- Script stdout contracts (stable shapes agents parse; secrets NEVER appear here) ---
+// --- Script stdout contracts (stable shapes agents parse) ------------------------------
+// Relay secrets (owner link, shlink — patient deliverables) MAY appear here; the bare
+// master secret / derived key / auth as standalone strings NEVER do (CLAUDE.md tiers).
 
 export interface CreateShlOutput {
   status: 'created';
@@ -118,8 +120,12 @@ export interface CreateShlOutput {
   exp: number;
   maxUses: number | null;
   files: { contentType: string; size: number }[];
-  /** Paths to secret-bearing artifacts written to disk. `handoff` is the ready-made
-   * closing message (markdown, links pre-formatted) the agent pastes verbatim. */
+  /** The complete closing chat message — owner page as a markdown link, shlink as
+   * inline code, lifetime filled in. The agent pastes this verbatim; composing it
+   * by hand is the documented failure mode. */
+  handoffMarkdown: string;
+  /** Paths to artifacts written to disk. `handoff` is the durable copy of
+   * `handoffMarkdown`; `ownerLink`/`shlink` files are what manage-shl.ts reads. */
   artifacts: { ownerLink: string; shlink: string; viewerLink: string; qrPng: string; meta: string; handoff: string };
 }
 

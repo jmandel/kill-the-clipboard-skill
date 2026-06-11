@@ -23,7 +23,7 @@ into a `PatientSharedBundle`, encrypted client-side, and hosted as a U-flag SHL.
 
 1. **Server supports the full SHL feature set** (manifest links, P/L flags, passcode lockout, file updates); **the skill guides agents to KTC-compliant links** (U flag, exp required, single `application/fhir+json` JWE containing one PatientSharedBundle).
 2. **Standalone repo**, skill name **kill-the-clipboard**. health-skillz documented as a recommended upstream data source by URL (health-skillz.joshuamandel.com); its format is self-documenting — we don't bake in its details (though SKILL.md may note the general shape).
-3. **All crypto in the agent's compute environment.** Key never touches our server. Key secrecy vs. the LLM context is best-effort/partly symbolic (agent already handles plaintext); convention: secrets go to files, not stdout.
+3. **All crypto in the agent's compute environment.** Key never touches our server. AMENDED 2026-06-11: the "keys out of LLM context" ideal is formally retired — handoff necessarily places the capability URLs in the conversation, and the conversation is the patient's own channel. Secrets now have two tiers (CLAUDE.md): *relay secrets* (owner link, shlink, handoff text) ride stdout (`handoffMarkdown`) and the chat; *script-internal secrets* (bare M, derived key/auth as standalone strings) stay file-only — never stdout, never CLI arguments, never error text. The real boundaries are external services, command-line arguments, and error messages — not the conversation.
 4. **Single owner secret M** with HKDF-derived read + control capabilities (§3). Owner handoff page reconstructs the QR from derivation + API discovery; nothing embedded, nothing redundant.
 5. **KTC defaults**: exp = 24h, maxUses = 5, manual re-arm (PATCH + client-side QR rebuild). Grace and flexibility over crushing users in short windows.
 6. **Type-specific PDF rendering for all US Core resource types** + generic fallback (§7). Test fixture: `~/Downloads/health-records.json` (UnityPoint/Epic via health-skillz; 19 resource types, 321 Observations across 11 category codes).
@@ -120,7 +120,7 @@ kill-the-clipboard/
 │   │   ├── background.md      KTC explainer for the agent (what receivers must persist, PAMI, two PDF kinds)
 │   │   ├── workflow.md        Steps 1–10 (§6)
 │   │   ├── bundle-rules.md    PatientSharedBundle + DocumentReference profile rules (§5)
-│   │   ├── secrets.md         file-not-stdout conventions, per-platform handoff guidance
+│   │   ├── secrets.md         two-tier secret handling (decision 3), handoff guidance
 │   │   └── script-reference.md
 │   └── kill-the-clipboard/
 │       └── scripts/           shipped, dependency-light Bun TS (§6)

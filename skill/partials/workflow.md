@@ -260,6 +260,7 @@ stdout contract:
   "exp": 1781234567,
   "maxUses": 5,
   "files": [{"contentType": "application/fhir+json", "size": 187234}],
+  "handoffMarkdown": "You're set!\n\n**[Your link setup & control page](https://…/m#…)** — keep this one private. …",
   "artifacts": {
     "ownerLink": "/abs/path/shl-out/owner-link.txt",
     "shlink": "/abs/path/shl-out/shlink.txt",
@@ -272,18 +273,18 @@ stdout contract:
 ```
 
 The script generates the key material, registers the link, encrypts the bundle
-locally, uploads ciphertext, and writes the secret-bearing artifacts to files —
-**stdout never contains the secrets, and neither should your messages** (see the
-secrets section).
+locally, uploads ciphertext, and writes the artifacts to files. `handoffMarkdown` is
+your closing message, ready to paste (Step 8); `handoff.md` is its durable copy.
 
-### Step 8: Hand off — paste handoff.md
+### Step 8: Hand off — paste handoffMarkdown
 
-Your closing message is already written: `artifacts.handoff` (`handoff.md`) holds the
-hand-off text with both links named by role — the owner page as a labeled markdown
-link, the shareable shlink as code text — and the expiry/use figures filled in. Read
-the file and paste its contents **verbatim** as the body of your final message; you
-may add to it (the patient's name, a platform note), but don't reconstruct it. Also
-deliver `qr.png` if your platform shows or delivers files.
+Your closing message is already written: the create output's `handoffMarkdown` holds
+the hand-off text with both links named by role — the owner page as a labeled
+markdown link, the shareable shlink as code text — and the expiry/use figures filled
+in. Paste it **verbatim** as the body of your final message; you may add to it (the
+patient's name, a platform note), but don't reconstruct it. Also deliver `qr.png` if
+your platform shows or delivers files. (`handoff.md` in the output directory is the
+same text if you need it again later.)
 
 **The one requirement that survives every platform habit: both links appear in your
 message TEXT — the owner page as a clickable markdown link, the shlink as inline
@@ -325,10 +326,11 @@ The first argument is the `-o` directory from `create-shl.ts` (or a path to
 `owner-link.txt` directly). `re-arm` extends expiry to now + N hours and grants N
 *more* uses; `destroy` demands `--yes` because it's irreversible — confirm with the
 patient first. `status` emits the link state (id, label, exp, uses/maxUses, active,
-`live` — i.e. serving right now — plus file metadata), e.g.:
+`live` — i.e. serving right now — plus file metadata and `ownerLink`, so "give me my
+link again" is one `status` call), e.g.:
 
 ```json
-{"id":"…","url":"…","flag":"U","label":"Josh Mandel — visit summary for June 12","exp":1781234567,"maxUses":5,"uses":1,"active":true,"live":true,"purgedAt":null,"passcodeAttemptsRemaining":null,"createdAt":"2026-06-10T16:00:00Z","files":[{"fileId":"…","contentType":"application/fhir+json","size":187234,"lastUpdated":"2026-06-10T16:00:00Z"}]}
+{"id":"…","url":"…","flag":"U","label":"Josh Mandel — visit summary for June 12","exp":1781234567,"maxUses":5,"uses":1,"active":true,"live":true,"purgedAt":null,"passcodeAttemptsRemaining":null,"createdAt":"2026-06-10T16:00:00Z","files":[{"fileId":"…","contentType":"application/fhir+json","size":187234,"lastUpdated":"2026-06-10T16:00:00Z"}],"ownerLink":"https://…/m#…"}
 ```
 
 - **Re-arm vs pause vs destroy** (patient-meaningful distinctions): *re-arm* revives
