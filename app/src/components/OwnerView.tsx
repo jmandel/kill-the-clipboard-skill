@@ -123,7 +123,7 @@ export function OwnerView({
   const maxUses = state.maxUses;
   const pct = maxUses === null ? 0 : Math.min(uses / maxUses, 1);
   const usesLeft = maxUses === null ? null : Math.max(maxUses - uses, 0);
-  const viewerUrl = shlink ? `${location.origin}/s#${shlink}` : null;
+  const viewerUrl = shlink ? `${location.origin}/v#${shlink}` : null;
 
   return (
     <>
@@ -199,18 +199,38 @@ export function OwnerView({
                 onClick={async () => { if (await copyText(shlink)) flashCopied('link'); }}
               >
                 {copied === 'link' ? Icon.check : Icon.copy}
-                {copied === 'link' ? 'Copied!' : 'Copy link'}
+                {copied === 'link' ? 'Copied!' : 'Copy'}
               </button>
               <button
                 type="button"
-                className="btn-block secondary"
-                aria-label="Share"
+                className="btn-block secondary grow"
                 onClick={() => void shareOrCopy({ title: state.label ?? 'SMART Health Link', url: shlink })}
               >
                 {Icon.share}
+                Share
               </button>
+              {viewerUrl && (
+                <button type="button" className="btn-block secondary grow" onClick={() => window.open(viewerUrl, '_blank', 'noopener')}>
+                  {Icon.eye}
+                  Preview
+                </button>
+              )}
             </div>
             <div className="url-preview">{shlink.slice(0, 56)}…</div>
+            {viewerUrl && (
+              <p className="row-hint" style={{ marginTop: -16, marginBottom: 24 }}>
+                Preview opens what a recipient sees ·{' '}
+                <a
+                  href={viewerUrl}
+                  target="_blank"
+                  rel="noopener"
+                  onClick={async (e) => { e.preventDefault(); if (await copyText(viewerUrl)) flashCopied('viewer'); }}
+                >
+                  {copied === 'viewer' ? 'Copied!' : 'copy a view-only page link'}
+                </a>{' '}
+                to send the QR without your controls
+              </p>
+            )}
           </>
         )}
 
@@ -304,35 +324,6 @@ export function OwnerView({
             </div>
           )}
 
-          {viewerUrl && !destroyed && (
-            <div className="manage-row">
-              <button
-                type="button"
-                className="btn-outline"
-                onClick={() => window.open(viewerUrl, '_blank', 'noopener')}
-              >
-                {Icon.eye}
-                Preview as recipient
-              </button>
-              <div className="row-hint">
-                Opens a view-only copy in a new tab — what someone sees when they open your link
-              </div>
-              <div className="row-hint">
-                <a
-                  href={viewerUrl}
-                  target="_blank"
-                  rel="noopener"
-                  onClick={async (e) => {
-                    e.preventDefault();
-                    if (await copyText(viewerUrl)) flashCopied('viewer');
-                  }}
-                >
-                  {copied === 'viewer' ? 'Copied!' : 'Copy view-only page link'}
-                </a>{' '}
-                to send someone the QR without these controls
-              </div>
-            </div>
-          )}
 
           <div className="row-divider" />
 

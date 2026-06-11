@@ -52,6 +52,27 @@ const seeds: Seed[] = [
   { name: 'destroyed', tweak: (s) => { s.active = false; s.purgedAt = iso(nowSec() - 60); s.files = []; } },
 ];
 
+// --- mock data plane: a real encrypted bundle so the viewer's content view works ---
+import { encryptJWE } from '../../lib/jwe.ts';
+
+const TINY_PDF = `JVBERi0xLjEKMSAwIG9iajw8L1R5cGUvQ2F0YWxvZy9QYWdlcyAyIDAgUj4+ZW5kb2JqCjIgMCBvYmo8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PmVuZG9iagozIDAgb2JqPDwvVHlwZS9QYWdlL1BhcmVudCAyIDAgUi9NZWRpYUJveFswIDAgNjEyIDc5Ml0+PmVuZG9iagp0cmFpbGVyPDwvUm9vdCAxIDAgUj4+`;
+
+const MOCK_BUNDLE = {
+  resourceType: 'Bundle', type: 'collection', timestamp: new Date().toISOString(),
+  entry: [
+    { fullUrl: 'urn:uuid:p1', resource: { resourceType: 'Patient', id: 'p1', name: [{ text: 'Casey Tester' }], birthDate: '1980-02-29', gender: 'female' } },
+    { fullUrl: 'urn:uuid:c1', resource: { resourceType: 'Condition', id: 'c1', code: { text: 'Post-concussion syndrome' }, clinicalStatus: { coding: [{ code: 'active', display: 'Active' }] }, onsetDateTime: '2024-05-01' } },
+    { fullUrl: 'urn:uuid:c2', resource: { resourceType: 'Condition', id: 'c2', code: { text: 'Migraine without aura' }, clinicalStatus: { coding: [{ display: 'Active' }] }, onsetDateTime: '2015-06-01' } },
+    { fullUrl: 'urn:uuid:m1', resource: { resourceType: 'MedicationRequest', id: 'm1', status: 'active', medicationCodeableConcept: { text: 'Nortriptyline 10 mg capsule' }, dosageInstruction: [{ text: '1 capsule nightly' }], authoredOn: '2026-03-02' } },
+    { fullUrl: 'urn:uuid:a1', resource: { resourceType: 'AllergyIntolerance', id: 'a1', code: { text: 'Penicillin' }, criticality: 'high', reaction: [{ manifestation: [{ text: 'Anaphylaxis' }] }] } },
+    { fullUrl: 'urn:uuid:o1', resource: { resourceType: 'Observation', id: 'o1', code: { text: 'Blood pressure' }, component: [{ code: { text: 'Systolic' }, valueQuantity: { value: 118, unit: 'mmHg' } }, { code: { text: 'Diastolic' }, valueQuantity: { value: 76, unit: 'mmHg' } }], effectiveDateTime: '2026-06-01' } },
+    { fullUrl: 'urn:uuid:d1', resource: { resourceType: 'DocumentReference', id: 'd1', status: 'current', type: { text: 'Patient Story' }, date: new Date().toISOString(), content: [{ attachment: { contentType: 'application/pdf', data: TINY_PDF } }] } },
+    { fullUrl: 'urn:uuid:d2', resource: { resourceType: 'DocumentReference', id: 'd2', status: 'current', type: { text: 'MRI Brain — report' }, date: '2020-07-14', content: [{ attachment: { contentType: 'text/plain', data: btoa('IMPRESSION: No acute intracranial abnormality.') } }] } },
+  ],
+};
+
+const jweById = new Map<string, string>();
+
 const base = `http://localhost:${port}`;
 const lines: string[] = [];
 
@@ -60,6 +81,7 @@ for (const seed of seeds) {
   const auth = await deriveAuth(m);
   const key = await deriveKey(m);
   const id = b64url(crypto.getRandomValues(new Uint8Array(32)));
+  jweById.set(id, await encryptJWE(new TextEncoder().encode(JSON.stringify(MOCK_BUNDLE)), key, { cty: 'application/fhir+json', deflate: true }));
   const state: ManageState = {
     id,
     url: `${base}/shl/${id}`,
@@ -106,11 +128,23 @@ function withState(auth: string, fn: (s: ManageState) => Response): Response {
   return fn(s);
 }
 
+
 Bun.serve({
   port,
   routes: {
-    '/': () => Response.redirect('/s', 302),
+    '/': () => Response.redirect('/m', 302),
     '/s': indexHtml,
+    '/m': indexHtml,
+    '/v': indexHtml,
+    '/shl/:id': (req) => {
+      const url = new URL(req.url);
+      if (!url.searchParams.get('recipient')) return json({ error: 'recipient required' }, 400);
+      const s = [...store.values()].find((x) => x.url.endsWith(`/shl/${req.params.id}`));
+      if (!s || !computeLive(s)) return new Response(null, { status: 404 });
+      s.uses += 1;
+      s.accessLog.unshift({ ts: iso(nowSec()), recipient: url.searchParams.get('recipient')!, action: 'direct', outcome: 'ok' });
+      return new Response(jweById.get(req.params.id) ?? '', { status: 200, headers: { 'content-type': 'application/jose', ...CORS } });
+    },
     '/api/manage/:auth': {
       OPTIONS: () => new Response(null, { status: 204, headers: CORS }),
       GET: (req) =>

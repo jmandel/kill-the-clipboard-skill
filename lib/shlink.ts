@@ -35,16 +35,17 @@ export function parseShlink(s: string): ShlinkPayload {
   return payload;
 }
 
-// --- Handoff-page fragments (page at <base>/s) ---------------------------------------
-// Owner mode:  <base>/s#<base64url(M)>            (43-char token → manage + reconstruct QR)
-// Viewer mode: <base>/s#shlink:/...               (standard SHL viewer-prefix convention)
+// --- Handoff-page fragments ------------------------------------------------------------
+// Owner page:  <base>/m#<base64url(M)>            (43-char token → manage + reconstruct QR)
+// Viewer page: <base>/v#shlink:/...               (standard SHL viewer-prefix convention)
+// The app routes by fragment shape, so /s remains a working legacy alias server-side.
 
 export function buildOwnerLink(baseUrl: string, masterSecret: Uint8Array): string {
-  return `${baseUrl.replace(/\/$/, '')}/s#${b64url(masterSecret)}`;
+  return `${baseUrl.replace(/\/$/, '')}/m#${b64url(masterSecret)}`;
 }
 
 export function buildViewerLink(baseUrl: string, shlink: string): string {
-  return `${baseUrl.replace(/\/$/, '')}/s#${shlink}`;
+  return `${baseUrl.replace(/\/$/, '')}/v#${shlink}`;
 }
 
 export type FragmentParse =

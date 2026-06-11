@@ -330,7 +330,7 @@ describe('create-shl', () => {
 
     // Viewer-prefixed form (decision 11): page URL + '#' + the exact bare shlink.
     const viewerText = readFileSync(out.artifacts.viewerLink, 'utf8').trim();
-    expect(viewerText).toBe(`${baseUrl}/s#${readFileSync(out.artifacts.shlink, 'utf8').trim()}`);
+    expect(viewerText).toBe(`${baseUrl}/v#${readFileSync(out.artifacts.shlink, 'utf8').trim()}`);
 
     const qr = readFileSync(out.artifacts.qrPng);
     expect(qr.subarray(0, 4)).toEqual(Buffer.from([0x89, 0x50, 0x4e, 0x47]));
@@ -353,7 +353,7 @@ describe('create-shl', () => {
 
     const { key, ownerLink } = await ownerSecretsFrom(outDir);
     expect(payload.key).toBe(key);
-    expect(ownerLink.startsWith(`${baseUrl}/s#`)).toBeTrue();
+    expect(ownerLink.startsWith(`${baseUrl}/m#`)).toBeTrue();
 
     const res = await fetchDataPlane(out.id);
     expect(res.status).toBe(200);

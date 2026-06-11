@@ -119,9 +119,11 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
         ? (landingApp as Response) // Bun HTMLBundle route value
         : () => err('landing not built', 503),
 
-      '/s': handoffApp
-        ? (handoffApp as Response) // Bun HTMLBundle route value
-        : () => err('handoff app not built yet', 503),
+      // /m = manage (owner fragment), /v = view (shlink fragment); /s = legacy alias.
+      // One app serves all three — it routes by fragment shape.
+      '/m': handoffApp ? (handoffApp as Response) : () => err('handoff app not built yet', 503),
+      '/v': handoffApp ? (handoffApp as Response) : () => err('handoff app not built yet', 503),
+      '/s': handoffApp ? (handoffApp as Response) : () => err('handoff app not built yet', 503),
 
       '/skill.zip': async () => {
         try {

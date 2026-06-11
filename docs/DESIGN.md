@@ -32,13 +32,17 @@ into a `PatientSharedBundle`, encrypted client-side, and hosted as a U-flag SHL.
 9. **Insurance card photo→CARIN transcription: phase 2/3.** Phase 1 is USCDI/US Core structured content.
 10. **No arbitrary patient content** in phase 1; agent helps patient choose structured data + existing documents (notes from FHIR payloads — RTF/PDF/etc. — as generically coded DocumentReferences if patient insists). **Validator enforces inline attachments (`attachment.data`, never `url`)** — location-based attachments are unreachable in this scheme.
 11. **Viewer prefix: supported** (amended 2026-06-10, twice). The handoff page's viewer
-    mode (`/s#shlink:/...`) IS a viewer-prefix target; create-shl emits `viewer-link.txt`.
+    mode (`/v#shlink:/...`) IS a viewer-prefix target; create-shl emits `viewer-link.txt`.
     QR display and copy-link DEFAULT to the bare shlink because that's what KTC clinic
     scanners expect at check-in — a flow preference, NOT a security rule; the prefixed
     form carries the identical shlink and is fine (often better) to share wherever a
     human clicks rather than scans. The management UI offers **"Preview as recipient"**
     (opens the prefixed viewer link in a new tab — functional self-test + patient
-    empathy). The server-hosted FHIR-rendering rich viewer remains phase 2.
+    empathy). Amended again 2026-06-10: the viewer page now RENDERS the shared content
+    in-browser (fetches via U-flag or the full manifest flow incl. passcodes, decrypts
+    with the link key, type-aware resource sections, documents open in new tabs via
+    blob URLs, raw FHIR bundle openable as JSON). Routes split: /m manage, /v view,
+    /s legacy alias. A richer server-hosted viewer experience remains future polish.
 12. Label crafting is a first-class agent task (≤80 chars, e.g. "Josh Mandel — visit summary for June 12") — it's the most visible receiver-facing string.
 13. Handoff page: `history.replaceState` strips the fragment on load; **no localStorage by default**; explicit "Make this page bookmarkable" toggle restores the fragment. Re-manage by re-opening from the agent.
 14. **Confirmed**: per-file ciphertext cap 25 MB; ciphertext purge 30 days after exp (tombstone + audit log remain).
@@ -158,10 +162,10 @@ key  = base64url( HKDF-SHA256(ikm=M, salt=<empty>, info="ktc-shl/v1/key",  L=32)
 **Fragment shapes** (the page's only inputs; fragments never reach servers):
 
 ```
-https://<base>/s#<base64url(M)>          owner mode  (43 chars)
-https://<base>/s#shlink:/eyJ...          viewer mode (STANDARD SHL viewer-prefix convention)
-https://<base>/s#<auth>&cap=auth         monitor mode (manage w/o read) — falls out free, deferred UI
-https://<base>/s#<M>&api=https://other   cross-host page→API (optional; same-origin default)
+https://<base>/m#<base64url(M)>          owner mode  (43 chars)
+https://<base>/v#shlink:/eyJ...          viewer mode (STANDARD SHL viewer-prefix convention)
+https://<base>/m#<auth>&cap=auth         monitor mode (manage w/o read) — falls out free, deferred UI
+https://<base>/m#<M>&api=https://other   cross-host page→API (optional; same-origin default)
 ```
 
 Owner mode flow: derive auth → `GET /api/manage/{auth}` → `{url, flag, exp, label, ...}` →

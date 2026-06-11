@@ -107,12 +107,13 @@ button:focus-visible, input:focus-visible { outline: none; box-shadow: var(--sha
   background: var(--gray-0);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
-  padding: 20px;
+  padding: 24px;
+  width: fit-content;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-bottom: 16px;
+  margin: 0 auto 16px;
   position: relative;
   overflow: hidden;
 }
@@ -165,6 +166,36 @@ button:focus-visible, input:focus-visible { outline: none; box-shadow: var(--sha
   padding: 0 8px;
   margin-bottom: 28px;
 }
+
+.btn-block.grow { flex: 1 1 0; width: auto; }
+
+/* ---- recipient content view ----------------------------------------------------- */
+.passcode-input {
+  width: 100%; font: inherit; font-size: 16px;
+  padding: 13px 14px; margin-bottom: 10px;
+  border: 1.5px solid var(--border-strong); border-radius: var(--radius-lg);
+}
+.pt-card {
+  background: var(--surface-alt); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 12px 16px; margin: 16px 0 4px;
+}
+.pt-name { font-size: 16px; font-weight: var(--fw-bold); color: var(--fg-1); }
+.bundle-actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 4px; }
+.btn-mini {
+  font: 600 13px var(--font-sans); color: var(--brand);
+  background: var(--surface); border: 1px solid var(--brand);
+  border-radius: var(--radius-sm); padding: 6px 12px;
+}
+.btn-mini:hover { background: var(--info-wash); }
+.res-list { list-style: none; margin: 0 0 8px; padding: 0; }
+.res-list li {
+  padding: 8px 2px; border-bottom: 1px solid var(--border-subtle);
+  font-size: 14px; line-height: 1.45;
+}
+.res-list li.doc-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.res-primary { color: var(--fg-1); font-weight: var(--fw-medium); }
+.res-secondary { color: var(--fg-3); font-size: 12.5px; display: block; }
+.doc-meta { font-size: 12.5px; color: var(--fg-3); }
 
 /* ---- usage card --------------------------------------------------------------- */
 .usage-card {

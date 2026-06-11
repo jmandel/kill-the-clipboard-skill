@@ -47,7 +47,7 @@ create-shl:
   JWE(bundle, key) ─────────────────▶  ciphertext only
   QR = shlink:/{url, key, exp, …}                                  scan ─▶ GET url
                                        /shl/{id}?recipient=… ────────────▶ JWE
-owner page /s#M ─────────────────────▶ manage API: status, access log,
+owner page /m#M ─────────────────────▶ manage API: status, access log,
                                        re-arm, pause, rename, revoke
 ```
 
@@ -62,7 +62,7 @@ inside the `shlink:/` payload the patient shares.
 |---|---|
 | `lib/` | Frozen kernel: HKDF capability derivation, compact JWE (`dir`/`A256GCM`), shlink build/parse, shared API types, and the semantic PDF document builder (`doc.tsx` on @react-pdf/renderer, story + summary themes, CJK fallback) |
 | `server/` | Single-process Bun server: SHL data plane (U-flag direct GET + full manifest protocol with passcode lockout), capability-URL manage API, retention sweeper, and per-request `skill.zip` builder that bakes its own public URL into the skill it vends |
-| `app/` | The patient-facing handoff page (`/s`), served via Bun HTML imports. Owner mode (`#<secret>`): QR, usage, access log, re-arm/pause/rename/revoke, "Preview as recipient". Viewer mode (`#shlink:/…`): view-only QR page — also a working SHL viewer-prefix target. SMART Health IT visual language |
+| `app/` | The patient-facing handoff page (`/m` manage · `/v` view), served via Bun HTML imports. Owner mode (`#<secret>`): QR, usage, access log, re-arm/pause/rename/revoke, "Preview as recipient". Viewer mode (`#shlink:/…`): in-browser viewer: decrypts and renders the shared bundle, opens PDFs, also shows the QR — a working SHL viewer-prefix target. SMART Health IT visual language |
 | `skill/` | The agent skill: `SKILL.md` (composed from `partials/`) plus Bun scripts — `assemble-bundle`, `validate-bundle`, `render-fhir-pdf` (15 US Core family renderers + fallback), `md-to-pdf`, `preview-pdf`, `create-shl`, `manage-shl` |
 | `tests/fixtures/uscore/` | Synthetic US Core 9.0.0 breadth corpus: ~140 instances across 16 families, every must-support element and choice-type variant covered, audited (`COVERAGE-REPORT.md`) |
 | `tests/fixtures/real-world/` | A real Epic/UnityPoint export, PII-masked by a reproducible script and adversarially audited (`SANITIZATION.md`) |
@@ -87,7 +87,7 @@ Then:
 - `http://localhost:8000/skill.zip` — download the agent skill, pre-configured to
   point at this server. Install it in Claude Code / Claude.ai / any agent runtime
   with shell + network access, and ask the agent to help you share your records.
-- `http://localhost:8000/s` — the handoff page (opened via the owner link the
+- `http://localhost:8000/m` — the management page (opened via the owner link the
   skill's `create-shl` script produces).
 
 A deployment sets `BASE_URL` (and a systemd unit is provided in `server/`); the

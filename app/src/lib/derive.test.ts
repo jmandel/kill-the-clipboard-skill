@@ -121,7 +121,7 @@ describe('payload reconstruction', () => {
   test('viewer link is the viewer-prefixed shlink on the page origin', async () => {
     const payload = await rebuildPayload(M, state);
     const link = viewerLinkFor('https://host.example', payload);
-    expect(link).toBe(`https://host.example/s#${payloadToShlink(payload)}`);
+    expect(link).toBe(`https://host.example/v#${payloadToShlink(payload)}`);
     expect(routeFragment(link.split('#')[1]!).mode).toBe('viewer');
   });
 });

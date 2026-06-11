@@ -17,7 +17,7 @@ test('index.html bundles for the browser', async () => {
   expect(css).toBeDefined();
   expect(html).toBeDefined();
   const bundled = await js!.text();
-  for (const marker of ['ktc-shl/v1/auth', 'ktc-shl/v1/key', 'shlink:/', 'Keep this page bookmarkable', 'Preview as recipient']) {
+  for (const marker of ['ktc-shl/v1/auth', 'ktc-shl/v1/key', 'shlink:/', 'Keep this page bookmarkable', 'Open shared records']) {
     expect(bundled).toContain(marker);
   }
 }, 30_000);

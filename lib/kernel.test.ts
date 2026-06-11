@@ -128,7 +128,7 @@ describe('shlink', () => {
 
   test('owner/viewer fragments parse back', () => {
     const owner = buildOwnerLink('https://ktc.example/', FIXED_M);
-    expect(owner).toBe(`https://ktc.example/s#${b64url(FIXED_M)}`);
+    expect(owner).toBe(`https://ktc.example/m#${b64url(FIXED_M)}`);
     const po = parseFragment(owner.split('#')[1]!);
     if (po.mode !== 'owner') throw new Error('expected owner');
     expect(po.masterSecret).toEqual(FIXED_M);
