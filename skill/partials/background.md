@@ -11,9 +11,9 @@ receiver's side, and the patient's shared data lands in the chart.
 One **PatientSharedBundle** — a FHIR collection bundle containing:
 
 1. **Exactly one Patient resource** with matching demographics (name, birth date, sex)
-2. **Discrete US Core resources** the patient chose to share — typically PAMI:
-   **P**roblems (Conditions), **A**llergies, **M**edications, **I**mmunizations,
-   plus whatever else is relevant (recent vitals, labs, procedures, ...)
+2. **Discrete US Core resources the patient chose to share** — anything from their
+   record. The patient's choice is the whole point: scope the share to the visit
+   and the patient's wishes, not to any fixed category list.
 3. **A Patient Story PDF** (optional but valuable): the patient's own words — concerns,
    corrections, context, goals for the visit. It should NOT restate the discrete
    clinical facts; the data already carries those.
@@ -25,14 +25,17 @@ fetch URL plus the decryption key. The server never sees plaintext or keys.
 
 ### What the receiving clinic does with it
 
-Set the patient's expectations honestly:
+Set the patient's expectations honestly — and keep the framing simple: **you choose
+what to share, and the clinic sees everything you shared.** That's the message.
 
-- KTC-participating receivers commit to **persisting the PAMI data and BOTH PDFs**
-  in the patient's chart, **labeled as patient-shared** (provenance is explicit —
-  clinicians always see that this came from the patient, not another clinician).
+- The clinic receives the full bundle and files it into the chart, **labeled as
+  patient-shared** (clinicians always see this came from the patient).
 - **A clinician may review before filing.** The data doesn't necessarily appear in
-  the chart instantly; staff may reconcile medications/allergies/problems the way
-  they would any outside records.
+  the chart instantly; staff may reconcile it the way they would any outside records.
+- Receiver-side spec details (minimum-persistence categories and the like) are not
+  useful frames for scoping or for talking to the patient — leave them out of the
+  conversation and out of your reasoning. Scope by what's relevant to THIS visit and
+  what the patient wants.
 - **Rollout is staged.** Participants are piloting acceptance from around **April
   2026**, with broader availability targeted around **July 2026** (this skill targets
   the July 2026 draft of the KTC specification). Many clinics can't scan these yet.

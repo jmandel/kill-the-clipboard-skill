@@ -33,19 +33,29 @@ the data ("I'm also on metformin"), it does NOT become a FHIR resource — it ca
 the Patient Story, in their own words. Only resources that exist in source files go in
 the bundle.
 
-### Step 2: Scope the share with the patient
+### Step 2: Help the patient decide what to share
 
-Conversational, not a checkbox per resource. Propose a sensible default and let the
-patient adjust:
+Your job here: help the patient decide what THEY want the clinic to have. Look at
+what's actually in their records and the visit they're preparing for, make a concrete
+recommendation, and ask whether they'd like to share broadly or focus:
 
-> "For a clinic visit, the standard share is your problem list, medications, allergies,
-> and immunizations — that's what check-in is usually after. I'd add your recent
-> vitals and labs since they're relevant to this visit. Want me to include anything
-> else, or leave anything out?"
+> "I can share anything from your records — you decide what the clinic sees. For
+> your [neurology visit], I'd suggest a solid clinical summary — problems,
+> medications, allergies, immunizations, recent vitals and labs — and then go
+> deeper on what matters for this visit: [the imaging reports and consult notes
+> from your head injury]. Want to share broadly like that, focus just on
+> [the concussion history], or adjust?"
 
-Default proposal: **PAMI** — Conditions, MedicationRequests (+ referenced
-Medications), AllergyIntolerances, Immunizations — plus recent vitals/labs when
-relevant. **Inform, don't ask** for routine inclusions (e.g. "I'm including the
+The general steer: **good clinical-summary content as the base, then depth where the
+visit calls for it** — clinical notes you have on hand, a richer history of labs or
+vitals when the trend matters, prior imaging or consults for the presenting problem.
+Tailor the recommendation to what the records actually contain; never offer content
+that isn't there.
+
+While scoping, also **offer to help the patient tell their own story** (Step 4) —
+what they're worried about, what they want from the visit — alongside the records.
+
+**Inform, don't ask** for routine inclusions (e.g. "I'm including the
 Patient resource with your name and birth date — the clinic needs it to match you").
 Reserve actual questions for genuinely sensitive categories (mental health, substance
 use, reproductive health) — flag those explicitly rather than silently including them.
@@ -235,10 +245,10 @@ the viewer link wherever a human will click rather than scan.
 
 Close the loop with the patient:
 
-- **At the clinic:** they show the QR (phone screen or paper); the clinic scans it and
-  receives the data. The clinic files the problem/med/allergy/immunization data and
-  both PDFs into the chart, labeled as patient-shared; a clinician may review before
-  it appears. If the clinic can't scan SHLs yet, nothing is lost — check in normally.
+- **At the clinic:** they show the QR (phone screen or paper); the clinic scans it
+  and sees everything the patient chose to share, filed into the chart and labeled as
+  coming from the patient; a clinician may review before it appears. If the clinic
+  can't scan SHLs yet, nothing is lost — check in normally.
 - **Watching and managing:** everything is on the owner page — access log, re-arm,
   pause/resume, relabel, destroy. The same operations work from here:
 
