@@ -50,21 +50,7 @@ const AUTH_SHAPE = /^[A-Za-z0-9_-]{43}$/;
 const FLAG_SHAPE = /^L?P?U?$/; // alphabetical order + no repeats by construction
 const PASSCODE_BUDGET = 5;
 
-const LANDING_HTML = `<!doctype html>
-<html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>kill-the-clipboard</title>
-<style>body{font-family:system-ui,sans-serif;max-width:42rem;margin:4rem auto;padding:0 1.5rem;line-height:1.6;color:#1a202c}
-h1{font-size:1.6rem}a{color:#2b6cb0}</style>
-</head><body><main>
-<h1>kill-the-clipboard</h1>
-<p>An AI-agent skill and companion server for sharing your own health records the modern way:
-your agent helps you pick the FHIR data that matters for a visit, writes a Patient Story PDF in
-your words, renders a readable summary of every record, encrypts everything on your device, and
-publishes it as a SMART Health Link QR code the front desk can scan — no clipboard required.
-This server only ever stores ciphertext; keys never leave your machine.</p>
-<p><a href="/skill.zip">Download the agent skill (skill.zip)</a></p>
-</main></body></html>`;
+
 
 function validFlag(flag: string): boolean {
   return FLAG_SHAPE.test(flag) && !(flag.includes('P') && flag.includes('U'));
@@ -80,6 +66,14 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
     handoffApp = (await import('../../app/index.html')).default;
   } catch {
     handoffApp = null;
+  }
+
+  // Landing page: plain static HTML (no framework), served as a Bun HTML bundle like /s.
+  let landingApp: unknown = null;
+  try {
+    landingApp = (await import('../../app/landing.html')).default;
+  } catch {
+    landingApp = null;
   }
 
   const requireLink = async (auth: string): Promise<LinkRow | null> =>
@@ -121,7 +115,9 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
       return err(e instanceof Error ? e.message : 'internal error', 500);
     },
     routes: {
-      '/': () => new Response(LANDING_HTML, { headers: { 'content-type': 'text/html; charset=utf-8' } }),
+      '/': landingApp
+        ? (landingApp as Response) // Bun HTMLBundle route value
+        : () => err('landing not built', 503),
 
       '/s': handoffApp
         ? (handoffApp as Response) // Bun HTMLBundle route value
