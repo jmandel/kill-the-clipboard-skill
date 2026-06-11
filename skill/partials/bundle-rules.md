@@ -30,7 +30,8 @@ findings and to keep your selection script honest.
 **Attachments are ALWAYS inline `data`, never `url`** — anywhere in the bundle,
 including any extra DocumentReferences the patient asked to carry along (e.g. a note
 from their record). A `url` attachment points at something the receiver can't reach
-from an encrypted offline bundle; the validator rejects it as an error.
+from an encrypted offline bundle; the validator rejects it as an error. Source
+documents rarely arrive inline — the re-homing recipe is in Step 3 of the workflow.
 
 **The SHL payload itself** (built by `create-shl.ts`): `exp` required, flag `U`,
 label ≤80 chars, no passcode, single encrypted file of type `application/fhir+json`.

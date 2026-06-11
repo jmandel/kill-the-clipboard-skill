@@ -65,12 +65,31 @@ use, reproductive health) — flag those explicitly rather than silently includi
 Write a small ad hoc Bun script for this session: read the source files, filter to the
 agreed scope, and emit `selected-resources.json` — a JSON array of FHIR resource
 objects copied **verbatim** from the source (never edit, trim, or "clean up" resource
-content; never invent ids). Include:
+content; never invent ids). One sanctioned exception: re-homing document content
+inline, below. Include:
 
 - Exactly one Patient resource
 - Every selected clinical resource, each with `resourceType` and `id`
 - Resources that selected resources reference, when available in the source
   (e.g. the Medication a MedicationRequest points to)
+
+**Including documents (notes, imaging reports, consults).** Documents ride as
+DocumentReferences whose content is **inline**: `content[].attachment = {contentType,
+data: <base64>}`. Real exports almost never arrive that way — portal FHIR uses
+`attachment.url` pointing at a Binary on the source server (unreachable from an
+encrypted bundle; the validator rejects any `url` attachment), and health-skillz
+exports strip inline data into their `attachments[]` sidecar (look for
+`bestEffortPlaintext` and the original bytes there). So this is the ONE transform
+you're expected to perform:
+
+1. Find the document body you actually have locally — original bytes (PDF/RTF) if
+   available, otherwise extracted plaintext.
+2. Rebuild `content` as a single attachment: `contentType` matching what you embed
+   (`application/pdf`, `text/rtf`, `text/plain`...), `data` base64-encoded; drop
+   every `url` entry.
+3. Keep the rest of the DocumentReference (type, date, category, author display)
+   verbatim. If you have no local body at all, the document can't ride along — say
+   so rather than including an empty shell.
 
 Treat the FHIR as hostile: optional-chain everything, never assume `display` strings
 or `text` exist, tolerate unknown categories and extension noise. Real exports are
