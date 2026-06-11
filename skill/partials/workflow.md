@@ -102,7 +102,8 @@ you're expected to perform:
    ```
 
    (plaintext is fine as input — unknown markdown constructs degrade to plain
-   paragraphs; spot-check with `preview-pdf.ts`). Embedding `text/plain` directly is
+   paragraphs; glance at the result with `preview-pdf.ts` only if the source text was
+   messy). Embedding `text/plain` directly is
    legal US Core but not guaranteed-supported — use PDF when in doubt.
 3. Rebuild `content` as a single attachment: `contentType` matching what you embed
    (usually `application/pdf` after step 2), `data` base64-encoded; drop every
@@ -143,18 +144,11 @@ bun <skill-dir>/scripts/md-to-pdf.ts story.md story.pdf
 {"status":"rendered","output":"story.pdf","pages":2}
 ```
 
-Visually verify, always — "it compiled" is not "it renders correctly":
-
-```bash
-bun <skill-dir>/scripts/preview-pdf.ts story.pdf
-```
-
-```json
-{"status":"rendered","pages":["story-1.png","story-2.png"]}
-```
-
-Inspect the PNGs yourself (wrapping, spacing, nothing cut off), then show the patient
-the PDF and get their OK before it goes in the bundle.
+The patient already approved the words; the render is mechanical and the layout
+engine is heavily tested — a successful exit means it rendered correctly. Offer to
+show the patient their finished page (`preview-pdf.ts story.pdf` makes PNGs) but
+don't make it a gate, and don't inspect it yourself unless something was unusual
+about the content.
 
 ### Step 5: Render the FHIR-Rendered PDF
 
@@ -167,12 +161,15 @@ bun <skill-dir>/scripts/render-fhir-pdf.ts --resources selected-resources.json \
 {"status":"rendered","output":"/abs/path/rendered.pdf","idsOut":"/abs/path/rendered-ids.json","pages":9,"sections":[{"key":"problems","count":14},{"key":"medications","count":9}],"fallbackCount":0}
 ```
 
-`fallbackCount > 0` means some resources were unrecognized types rendered through the
-generic fallback — still complete, just less pretty; worth a visual spot-check.
-
 This is the complete human-readable rendering of every selected resource — the spec
 requires it to cover all of them, and `rendered-ids.json` is the coverage manifest the
-validator cross-checks. Spot-check a page or two with `preview-pdf.ts`.
+validator cross-checks.
+
+**Don't page through the output by default.** The layout engine is regression-tested;
+a successful exit means clean pages. Inspect (with `preview-pdf.ts`) only on a
+signal: `fallbackCount > 0` (unrecognized types went through the generic fallback —
+complete but plain; glance at those pages), unusually messy source content, or
+anything surprising in the stdout summary. Otherwise move on.
 
 ### Step 6: Assemble the bundle
 
