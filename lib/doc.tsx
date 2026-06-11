@@ -688,6 +688,16 @@ export function pageFooter(t: Theme, footerLeft: string = PROVENANCE_BASE) {
   );
 }
 
+// react-pdf's reconciler re-creates children in a way that drops the auto-keys
+// React.Children.toArray assigns (warning noise on every render); explicit keys
+// survive it. Scripts must keep stderr clean — warnings get misread as failures.
+function keyed(children: React.ReactNode): React.ReactNode {
+  const arr = Array.isArray(children) ? children : [children];
+  return arr.map((c, i) =>
+    React.isValidElement(c) ? React.cloneElement(c, { key: c.key ?? `k${i}` }) : c,
+  );
+}
+
 // ----------------------------------------------------------------- page ----
 
 /** Letter page with theme margins and the mandatory footer baked in. */
@@ -711,7 +721,7 @@ export function page(
         color: t.ink,
       }}
     >
-      {React.Children.toArray(children)}
+      {keyed(children)}
       {pageFooter(t, opts?.footerLeft)}
     </Page>
   );
@@ -726,7 +736,7 @@ export async function renderDoc(
   registerFonts();
   const docEl = (
     <Document title={meta.title} author={meta.author} producer="kill-the-clipboard" creator="kill-the-clipboard">
-      {React.Children.toArray(pages)}
+      {keyed(pages)}
     </Document>
   );
   await renderToFile(docEl, outPath);

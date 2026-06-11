@@ -6,6 +6,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { $ } from "bun";
 import React from "react";
+import { countPages } from "../pdf-pages.ts";
 import type { FamilyRenderer } from "./types.ts";
 import { callout, page, para, renderDoc, section, summaryTheme, title } from "./engine.ts";
 import fallbackFamily from "./fallback.tsx";
@@ -137,13 +138,7 @@ export async function pdfText(pdf: string, pageNum?: number): Promise<string> {
   return await $`pdftotext -layout ${pdf} -`.text();
 }
 
-/** Page count straight from PDF object headers; no poppler dependency at runtime. */
-export async function countPages(pdf: string): Promise<number> {
-  const text = await Bun.file(pdf).text();
-  const count = text.match(/\/Type\s*\/Pages[^>]*?\/Count\s+(\d+)/);
-  if (count?.[1]) return Number(count[1]);
-  return (text.match(/\/Type\s*\/Page\b/g) ?? []).length;
-}
+export { countPages };
 
 const AMPLIFY_DATE_FIELDS = [
   "effectiveDateTime",

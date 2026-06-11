@@ -21,8 +21,8 @@
  * stderr carries progress; exit 1 + usage on failure.
  */
 import { existsSync } from 'node:fs';
+import { countPages } from './lib/pdf-pages.ts';
 import path from 'node:path';
-import { $ } from 'bun';
 import { page, para, renderDoc, summaryTheme, title as titleBlock, provenanceLine } from '../../lib/doc.tsx';
 import { htmlToText, rtfToText, sniffType, type SourceType } from './lib/extract-text.ts';
 
@@ -80,9 +80,8 @@ async function main() {
 
   if (sourceType === 'pdf') {
     if (path.resolve(input) !== output) await Bun.write(output, bytes as Uint8Array<ArrayBuffer>);
-    const info = await $`pdfinfo ${output}`.text();
-    const pages = Number(info.match(/Pages:\s+(\d+)/)?.[1] ?? 0);
-    if (!pages) fail(`${input} sniffed as PDF but pdfinfo can't read it`);
+    const pages = await countPages(output);
+    if (!pages) fail(`${input} sniffed as PDF but contains no readable pages`);
     console.log(JSON.stringify({ status: 'copied', output, pages, sourceType }));
     return;
   }
@@ -110,9 +109,8 @@ async function main() {
   console.error(`attachment-to-pdf: rendering ${input} (${sourceType}, ${children.length - 1} lines)`);
   await renderDoc([page(t, children, { key: 'p1', footerLeft: provenanceLine(flags.date) })], { title: docTitle }, output);
 
-  const info = await $`pdfinfo ${output}`.text();
-  const pages = Number(info.match(/Pages:\s+(\d+)/)?.[1] ?? 0);
-  if (!pages) fail(`rendered ${output} but pdfinfo reported no pages`);
+  const pages = await countPages(output);
+  if (!pages) fail(`rendered ${output} but it contains no pages`);
   console.log(JSON.stringify({ status: 'rendered', output, pages, sourceType }));
 }
 

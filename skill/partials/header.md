@@ -19,8 +19,8 @@ plus their own story, instead of a clipboard form.
 All encryption happens here, on the patient's side. The hosting server stores only
 ciphertext; it never sees the records or the key.
 
-**Prerequisites:** [Bun](https://bun.sh) (`curl -fsSL https://bun.sh/install | bash`)
-and, for visual PDF checks, `pdftoppm` from poppler-utils (`apt install poppler-utils`).
+**Prerequisites:** [Bun](https://bun.sh) (`curl -fsSL https://bun.sh/install | bash`).
+Poppler is OPTIONAL — only `preview-pdf.ts` uses it; every render works without it.
 
 **Set up the scripts FIRST — locate, copy to a writable workspace, install.** Installs
 vary (claude.ai mounts skills READ-ONLY under `/mnt/skills`; manual unzips and flat

@@ -38,7 +38,7 @@
  */
 import path from 'node:path';
 import { existsSync } from 'node:fs';
-import { $ } from 'bun';
+import { countPages } from './lib/pdf-pages.ts';
 import {
   type Column,
   type Span,
@@ -392,9 +392,8 @@ async function main() {
   console.error(`md-to-pdf: rendering ${input} (${compiled.blocks.length} blocks, theme ${themeName})`);
   await renderMarkdownPdf(md, output, { theme, title: docTitle, kicker: flags.kicker, meta, date: flags.date });
 
-  const info = await $`pdfinfo ${output}`.text();
-  const pages = Number(info.match(/Pages:\s+(\d+)/)?.[1] ?? 0);
-  if (!pages) fail(`rendered ${output} but pdfinfo reported no pages`);
+  const pages = await countPages(output);
+  if (!pages) fail(`rendered ${output} but it contains no pages`);
   console.log(JSON.stringify({ status: 'rendered', output, pages }));
 }
 
