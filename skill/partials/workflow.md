@@ -1,6 +1,6 @@
 ## Workflow
 
-Ten steps. Shipped scripts own everything conformance-critical (bundle structure,
+Nine steps. Shipped scripts own everything conformance-critical (bundle structure,
 DocumentReference construction, encryption, the server protocol); you own the
 conversation, the data selection, and the patient story. Don't narrate every step to
 the patient — run the deterministic parts quietly and surface only the decisions that
@@ -217,17 +217,20 @@ Accept them without deliberation — they only warrant attention when the dangli
 reference is to *clinical* content the patient meant to include (a Medication a
 selected MedicationRequest points to, a result a report needs).
 
-### Step 8: Create the link
+### Step 8: One approval, then create the link
 
-First, two approvals — **⚠️ CRITICAL: get explicit approval of the story PDF and the
-share scope before creating the link.** Recap exactly what's in the bundle ("your
-concussion-related problems, the 2 medications, 4 allergies, both imaging reports
-with full text, your story page, and a readable summary PDF") and wait for a clear
-yes.
+**⚠️ CRITICAL: get explicit approval before creating the link** — but make it ONE
+decision moment, not a series. Present a single recap that covers all three things,
+then ask once (a structured question with options works well here):
 
-Second, craft the **label** with the patient — it's the most visible string the clinic
-sees, shown wherever the link lands. ≤80 characters; lead with the patient's name and
-say what/when:
+> "Here's what your share will contain: your concussion-related problems, the 2
+> medications, 4 allergies, both imaging reports with full text, your story page,
+> and a readable summary PDF. The link works for 24 hours or 5 scans — if your visit
+> slips, re-arming takes one command. I'd label it **Josh Mandel — visit summary for
+> June 12** (it's the most visible text the front desk sees). Build it? [Yes, build
+> it / Use a different label / Change what's shared first]"
+
+The label is ≤80 characters; lead with the patient's name and say what/when:
 
 - `Josh Mandel — visit summary for June 12`
 - `Maria Quintana — new patient intake, Lakeside Family Medicine`
@@ -239,10 +242,10 @@ bun <skill-dir>/scripts/create-shl.ts --bundle bundle.json \
 ```
 
 Defaults: `--exp-hours 24`, `--max-uses 5` (`--max-uses unlimited` to lift the cap),
-`--flag U`. The `-o` directory must be new or empty — the script never overwrites a
-previous link's artifacts; use a fresh directory per link. Defaults are deliberately
-forgiving-but-bounded; mention them, don't ask ("the link works for 24 hours or 5
-scans — if the visit slips, re-arming takes one command"). Exact stdout contract:
+`--flag U` — deliberately forgiving-but-bounded; they're mentioned in the recap above,
+never asked about separately. The `-o` directory must be new or empty — the script
+never overwrites a previous link's artifacts; use a fresh directory per link. Exact
+stdout contract:
 
 ```json
 {
@@ -268,17 +271,19 @@ locally, uploads ciphertext, and writes the secret-bearing artifacts to files �
 **stdout never contains the secrets, and neither should your messages** (see the
 secrets section).
 
-### Step 9: Hand off to the patient
+### Step 9: Hand off — one closing message
 
 One move: read `owner-link.txt` and **present the owner page link to the patient** as
-a clickable link (plus `qr.png` if your platform shows or delivers files). The owner
-page has everything — the QR to present at check-in, the access log, and the
-re-arm/pause/destroy controls. That's the handoff; don't deliberate about it.
+a clickable link (plus `qr.png` if your platform shows or delivers files), with the
+what-happens-next woven into the same message — not a separate explanation step.
+Don't deliberate about it.
 
 > "You're set — here's your link page: [owner link]. Open it and keep it; it shows
 > the QR code to present at check-in, who's accessed your records, and buttons to
 > extend or kill the link. The QR is also saved at shl-out/qr.png if you'd rather
-> print it or save it to your phone's photos."
+> print it or save it to your phone's photos. At the clinic, they scan it and
+> everything you chose lands in your chart, labeled as coming from you — and if they
+> can't scan these yet, nothing's lost; you check in the usual way."
 
 **Preview (recommended):** offer to show the patient what a recipient sees —
 `viewer-link.txt` holds a viewer-prefixed copy of the link that opens a view-only
@@ -290,16 +295,9 @@ The QR and `shlink.txt` default to the bare `shlink:/` form simply because that'
 what KTC clinic scanners expect at check-in; prefer the bare form for that flow,
 the viewer link wherever a human will click rather than scan.
 
-### Step 10: Explain what happens next, and how to manage the link
-
-Close the loop with the patient:
-
-- **At the clinic:** they show the QR (phone screen or paper); the clinic scans it
-  and sees everything the patient chose to share, filed into the chart and labeled as
-  coming from the patient; a clinician may review before it appears. If the clinic
-  can't scan SHLs yet, nothing is lost — check in normally.
-- **Watching and managing:** everything is on the owner page — access log, re-arm,
-  pause/resume, relabel, destroy. The same operations work from here:
+After handoff, management lives on the owner page (access log, re-arm, pause/resume,
+relabel, destroy); a clinician may review shared data before it appears in the chart.
+The same operations work from here — when the patient asks:
 
 ```bash
 bun <skill-dir>/scripts/manage-shl.ts ./shl-out status
