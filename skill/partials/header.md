@@ -22,12 +22,15 @@ ciphertext; it never sees the records or the key.
 **Prerequisites:** [Bun](https://bun.sh) (`curl -fsSL https://bun.sh/install | bash`)
 and, for visual PDF checks, `pdftoppm` from poppler-utils (`apt install poppler-utils`).
 
-**Locate the scripts FIRST — don't assume a layout.** Installs vary (claude.ai
-extraction, manual unzip, files copied flat). Find them once and reuse the path:
+**Set up the scripts FIRST — locate, copy to a writable workspace, install.** Installs
+vary (claude.ai mounts skills READ-ONLY under `/mnt/skills`; manual unzips and flat
+copies differ too), and `bun install` plus your outputs need a writable directory —
+copying is the expected step, not a workaround:
 
 ```bash
-SCRIPTS=$(dirname "$(find . -name 'create-shl.ts' -not -path '*/node_modules/*' 2>/dev/null | head -1)")
-bun install --cwd "$SCRIPTS"   # once per install; pulls the pinned PDF/QR libraries
+SRC=$(dirname "$(find . /mnt/skills -name 'create-shl.ts' -not -path '*/node_modules/*' 2>/dev/null | head -1)")
+cp -r "$SRC" ./ktc-scripts && SCRIPTS=./ktc-scripts
+bun install --cwd "$SCRIPTS"   # once per session; pulls the pinned PDF/QR libraries
 ```
 
 Every command in this document writes `<skill-dir>/scripts/` — substitute your
