@@ -52,11 +52,14 @@ export async function fetchRetry(url: string, init?: RequestInit, attempts = 5):
  */
 export async function expectOk(res: Response, what: string): Promise<Response> {
   if (res.ok) return res;
+  // Surface WHY: our server sends {error}; proxies/gateways in front of a deployment
+  // send HTML or plaintext (e.g. an auth challenge) — show a snippet of whatever came.
   let detail = '';
+  const body = await res.text().catch(() => '');
   try {
-    detail = ((await res.json()) as { error?: string }).error ?? '';
+    detail = (JSON.parse(body) as { error?: string }).error ?? '';
   } catch {
-    /* non-JSON error body */
+    detail = body.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 160);
   }
   throw new Error(`${what} failed (HTTP ${res.status}${detail ? `: ${detail}` : ''})`);
 }

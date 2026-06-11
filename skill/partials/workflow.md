@@ -6,6 +6,14 @@ conversation, the data selection, and the patient story. Don't narrate every ste
 the patient — run the deterministic parts quietly and surface only the decisions that
 are theirs to make.
 
+**Interaction style (soft guideline):** when your platform offers structured
+multiple-choice questions, prefer them for the decision points — share scope
+(broad / focused / adjust), label choice, expiry/uses, final "build it?" — rather
+than stretching each decision across open conversational turns. Always include an
+escape option ("something else / let me explain"), and switch to free conversation
+whenever the patient wants more — and always for the deeper moments, above all the
+story interview (Step 4), which is the patient talking, not the patient choosing.
+
 Every script prints exactly one JSON object on stdout (progress and diagnostics go to
 stderr) and exits nonzero with a usage string on failure. `create-shl.ts` and
 `validate-bundle.ts` stdout shapes below are exact contracts; other examples are
