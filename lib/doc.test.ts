@@ -103,6 +103,26 @@ describe('doc engine geometry', () => {
     expect(text).toContain('Page 1 of 1');
   });
 
+  test('every style variant renders in both themes (a lone italic span must never kill a render)', async () => {
+    for (const t of [storyTheme, summaryTheme]) {
+      const out = join(dir, `styles-${t.name}.pdf`);
+      await renderDoc(
+        [page(t, [
+          para(t, [
+            { text: 'plain, ' },
+            { text: 'italic, ', italic: true },
+            { text: 'bold, ', bold: true },
+            { text: 'bold italic, ', bold: true, italic: true },
+            { text: 'CJK italic 王秀英', italic: true },
+          ]),
+        ], { key: 'p' })],
+        { title: 'style matrix' },
+        out,
+      );
+      expect(await pageText(out, 1)).toContain('bold italic');
+    }
+  });
+
   test('embedded fonts, no core-font fallback', async () => {
     const fonts = await $`pdffonts ${pdf}`.text();
     const dataLines = fonts.split('\n').slice(2).filter((l) => l.trim());

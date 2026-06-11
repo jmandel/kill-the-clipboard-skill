@@ -30,22 +30,31 @@ const font = (spec: string) => Bun.resolveSync(spec, import.meta.dir);
 // ---------------------------------------------------------------- fonts ----
 
 export function registerFonts() {
+  // Every weight gets BOTH styles: react-pdf's font store throws on any requested
+  // (weight, style) pair with no registered source — a single *italic* span in a
+  // document must never be able to kill a render.
   Font.register({
     family: "Source Serif 4",
     fonts: [
       { src: font("@expo-google-fonts/source-serif-4/400Regular/SourceSerif4_400Regular.ttf"), fontWeight: 400 },
       { src: font("@expo-google-fonts/source-serif-4/400Regular_Italic/SourceSerif4_400Regular_Italic.ttf"), fontWeight: 400, fontStyle: "italic" },
       { src: font("@expo-google-fonts/source-serif-4/600SemiBold/SourceSerif4_600SemiBold.ttf"), fontWeight: 600 },
+      { src: font("@expo-google-fonts/source-serif-4/600SemiBold_Italic/SourceSerif4_600SemiBold_Italic.ttf"), fontWeight: 600, fontStyle: "italic" },
       { src: font("@expo-google-fonts/source-serif-4/700Bold/SourceSerif4_700Bold.ttf"), fontWeight: 700 },
+      { src: font("@expo-google-fonts/source-serif-4/700Bold_Italic/SourceSerif4_700Bold_Italic.ttf"), fontWeight: 700, fontStyle: "italic" },
     ],
   });
   Font.register({
     family: "Inter",
     fonts: [
       { src: font("@expo-google-fonts/inter/400Regular/Inter_400Regular.ttf"), fontWeight: 400 },
+      { src: font("@expo-google-fonts/inter/400Regular_Italic/Inter_400Regular_Italic.ttf"), fontWeight: 400, fontStyle: "italic" },
       { src: font("@expo-google-fonts/inter/500Medium/Inter_500Medium.ttf"), fontWeight: 500 },
+      { src: font("@expo-google-fonts/inter/500Medium_Italic/Inter_500Medium_Italic.ttf"), fontWeight: 500, fontStyle: "italic" },
       { src: font("@expo-google-fonts/inter/600SemiBold/Inter_600SemiBold.ttf"), fontWeight: 600 },
+      { src: font("@expo-google-fonts/inter/600SemiBold_Italic/Inter_600SemiBold_Italic.ttf"), fontWeight: 600, fontStyle: "italic" },
       { src: font("@expo-google-fonts/inter/700Bold/Inter_700Bold.ttf"), fontWeight: 700 },
+      { src: font("@expo-google-fonts/inter/700Bold_Italic/Inter_700Bold_Italic.ttf"), fontWeight: 700, fontStyle: "italic" },
     ],
   });
   // CJK fallback: real exports carry unicode names/notes (e.g. 王秀英); react-pdf
