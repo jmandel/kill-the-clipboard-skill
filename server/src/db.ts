@@ -16,7 +16,7 @@ export interface LinkRow {
   id: string;
   mgmt_token_hash: string;
   flag: string;
-  label: string | null;
+  label_enc: string | null;
   exp: number;
   max_uses: number | null;
   uses: number;
@@ -59,7 +59,30 @@ export function openDb(path = ':memory:'): Database {
   db.exec('PRAGMA foreign_keys = ON');
   db.exec(schemaSql);
   db.exec('CREATE TABLE IF NOT EXISTS kv (k TEXT PRIMARY KEY, v BLOB NOT NULL)');
+  migrateLabelColumn(db);
   return db;
+}
+
+/**
+ * 2026-06-11 security hardening: labels became client-encrypted JWEs (label_enc).
+ * Databases created earlier have a plaintext `label` column — rename it, then NULL
+ * every value that isn't a compact JWE: the server holds no keys, so plaintext
+ * labels can't be migrated, only purged (owners relabel from the owner page).
+ */
+function migrateLabelColumn(db: Database): void {
+  const cols = db.query(`PRAGMA table_info(links)`).all() as { name: string }[];
+  if (cols.some((c) => c.name === 'label')) {
+    db.exec(`ALTER TABLE links RENAME COLUMN label TO label_enc`);
+  }
+  const purged = db
+    .query(
+      `UPDATE links SET label_enc = NULL
+       WHERE label_enc IS NOT NULL AND label_enc NOT LIKE '%.%.%.%.%' RETURNING id`,
+    )
+    .all().length;
+  if (purged > 0) {
+    console.error(`db: purged ${purged} pre-hardening plaintext label(s); owners can relabel (now encrypted)`);
+  }
 }
 
 /** Ticket-signing secret persisted across restarts so issued location URLs survive a deploy. */
@@ -95,7 +118,7 @@ export function insertLink(
     id: string;
     mgmtTokenHash: string;
     flag: string;
-    label: string | null;
+    labelEnc: string | null;
     exp: number;
     maxUses: number | null;
     passcodeHash: string | null;
@@ -104,10 +127,10 @@ export function insertLink(
   },
 ): void {
   db.query(
-    `INSERT INTO links (id, mgmt_token_hash, flag, label, exp, max_uses, uses, passcode_hash,
+    `INSERT INTO links (id, mgmt_token_hash, flag, label_enc, exp, max_uses, uses, passcode_hash,
                         passcode_attempts_remaining, active, created_at, updated_at)
      VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?, 1, ?, ?)`,
-  ).run(l.id, l.mgmtTokenHash, l.flag, l.label, l.exp, l.maxUses, l.passcodeHash, l.passcodeAttemptsRemaining, l.now, l.now);
+  ).run(l.id, l.mgmtTokenHash, l.flag, l.labelEnc, l.exp, l.maxUses, l.passcodeHash, l.passcodeAttemptsRemaining, l.now, l.now);
 }
 
 /**
@@ -228,16 +251,16 @@ export function updateLink(
     exp: number;
     maxUses: number | null;
     active: number;
-    label: string | null;
+    labelEnc: string | null;
     passcodeHash: string | null;
     passcodeAttemptsRemaining: number | null;
     now: number;
   },
 ): void {
   db.query(
-    `UPDATE links SET exp = ?, max_uses = ?, active = ?, label = ?, passcode_hash = ?,
+    `UPDATE links SET exp = ?, max_uses = ?, active = ?, label_enc = ?, passcode_hash = ?,
                       passcode_attempts_remaining = ?, updated_at = ? WHERE id = ?`,
-  ).run(v.exp, v.maxUses, v.active, v.label, v.passcodeHash, v.passcodeAttemptsRemaining, v.now, id);
+  ).run(v.exp, v.maxUses, v.active, v.labelEnc, v.passcodeHash, v.passcodeAttemptsRemaining, v.now, id);
 }
 
 /** Owner destroy: ciphertext gone immediately, link terminally inactive; audit tombstone remains. */

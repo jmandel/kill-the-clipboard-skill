@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS links (
   id TEXT PRIMARY KEY,                  -- 43-char base64url entropy; public data-plane path segment
   mgmt_token_hash TEXT NOT NULL UNIQUE, -- sha256(auth) hex; auth itself never stored
   flag TEXT NOT NULL DEFAULT 'U',
-  label TEXT,
+  label_enc TEXT,             -- label as a client-encrypted JWE; server-opaque (NULL = none)
   exp INTEGER NOT NULL,                 -- epoch seconds
   max_uses INTEGER,                     -- NULL = unlimited
   uses INTEGER NOT NULL DEFAULT 0,
