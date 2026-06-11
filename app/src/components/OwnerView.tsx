@@ -217,20 +217,9 @@ export function OwnerView({
               )}
             </div>
             <div className="url-preview">{shlink.slice(0, 56)}…</div>
-            {viewerUrl && (
-              <p className="row-hint" style={{ marginTop: -16, marginBottom: 24 }}>
-                Preview opens what a recipient sees ·{' '}
-                <a
-                  href={viewerUrl}
-                  target="_blank"
-                  rel="noopener"
-                  onClick={async (e) => { e.preventDefault(); if (await copyText(viewerUrl)) flashCopied('viewer'); }}
-                >
-                  {copied === 'viewer' ? 'Copied!' : 'copy a view-only page link'}
-                </a>{' '}
-                to send the QR without your controls
-              </p>
-            )}
+            <p className="row-hint" style={{ marginTop: -16, marginBottom: 24 }}>
+              Copy shares the link itself · Preview opens what a recipient sees
+            </p>
           </>
         )}
 

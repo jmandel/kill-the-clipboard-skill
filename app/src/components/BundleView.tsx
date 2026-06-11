@@ -50,8 +50,13 @@ function describe(r: any): { primary: string; secondary: string } | null {
       return { primary: cc(r.code), secondary: [r.status, when(r.performedDateTime) || when(r.performedPeriod?.start)].filter(Boolean).join(' · ') };
     case 'DiagnosticReport':
       return { primary: cc(r.code), secondary: [r.status, when(r.effectiveDateTime ?? r.issued)].filter(Boolean).join(' · ') };
-    default:
-      return null;
+    case 'Specimen':
+      return { primary: cc(r.type) || 'Specimen', secondary: when(r.collection?.collectedDateTime) };
+    default: {
+      // generic best-effort: any human-meaningful string beats a bare type name
+      const primary = cc(r.code) || r.description?.text || cc(r.description) || r.name?.[0]?.text || r.title || '';
+      return primary ? { primary, secondary: r.status ?? '' } : null;
+    }
   }
 }
 
@@ -64,6 +69,24 @@ const SECTION_TITLE: Record<string, string> = {
   AllergyIntolerance: 'Allergies', Immunization: 'Immunizations', Observation: 'Observations & results',
   Procedure: 'Procedures', DiagnosticReport: 'Reports',
 };
+
+/** The two patient-shared PDF kinds, recognized by LOINC, pin to the top of the list. */
+function docLoinc(d: any): string {
+  const codings = d?.type?.coding;
+  if (!Array.isArray(codings)) return '';
+  const c = codings.find((x: any) => x?.system === 'http://loinc.org' || x?.code);
+  return c?.code ?? '';
+}
+function docBadge(d: any): string | null {
+  const code = docLoinc(d);
+  if (code === '51855-5') return '★ Patient story';
+  if (code === '60591-5') return '☰ All shared records';
+  return null;
+}
+function docRank(d: any): number {
+  const code = docLoinc(d);
+  return code === '51855-5' ? 0 : code === '60591-5' ? 1 : 2;
+}
 
 function openDoc(doc: any) {
   const att = doc.content?.[0]?.attachment;
@@ -89,10 +112,12 @@ export function BundleView({ bundle }: { bundle: FhirBundle }) {
     byType.set(r.resourceType, list);
   }
   const order = [...SECTION_ORDER.filter((t) => byType.has(t)), ...[...byType.keys()].filter((t) => !SECTION_ORDER.includes(t))];
+  // a group where no resource describes itself is noise as rows — show it as a count
+  const collapsed = order.filter((t) => byType.get(t)!.every((r) => !describe(r)));
+  const expanded = order.filter((t) => !collapsed.includes(t));
 
   const name = patient?.name?.[0];
   const display = name?.text ?? [name?.given?.join(' '), name?.family].filter(Boolean).join(' ');
-  const pdfDocs = docs.filter((d: any) => d.content?.[0]?.attachment?.contentType === 'application/pdf' && d.content?.[0]?.attachment?.data);
 
   return (
     <div className="bundle-view">
@@ -106,11 +131,6 @@ export function BundleView({ bundle }: { bundle: FhirBundle }) {
       )}
 
       <div className="bundle-actions">
-        {pdfDocs.length > 1 && (
-          <button type="button" className="btn-mini" onClick={() => pdfDocs.forEach(openDoc)}>
-            Open all PDFs ({pdfDocs.length})
-          </button>
-        )}
         <button type="button" className="btn-mini" onClick={() => openBundleJson(bundle)}>
           Open FHIR bundle (JSON)
         </button>
@@ -120,12 +140,17 @@ export function BundleView({ bundle }: { bundle: FhirBundle }) {
         <>
           <p className="eyebrow-label">Documents</p>
           <ul className="res-list">
-            {docs.map((d: any, i) => {
+            {[...docs]
+              .sort((a: any, b: any) => docRank(a) - docRank(b))
+              .map((d: any, i) => {
               const att = d.content?.[0]?.attachment;
               return (
                 <li key={d.id ?? i} className="doc-row">
                   <span>
-                    <span className="res-primary">{cc(d.type) || 'Document'}</span>
+                    <span className="res-primary">
+                      {docBadge(d) && <span className="doc-pill">{docBadge(d)}</span>}
+                      {cc(d.type) || 'Document'}
+                    </span>
                     <span className="res-secondary">{[when(d.date), att?.contentType].filter(Boolean).join(' · ')}</span>
                   </span>
                   {att?.data ? (
@@ -140,7 +165,7 @@ export function BundleView({ bundle }: { bundle: FhirBundle }) {
         </>
       )}
 
-      {order.map((type) => (
+      {expanded.map((type) => (
         <div key={type}>
           <p className="eyebrow-label">{SECTION_TITLE[type] ?? type} ({byType.get(type)!.length})</p>
           <ul className="res-list">
@@ -156,6 +181,13 @@ export function BundleView({ bundle }: { bundle: FhirBundle }) {
           </ul>
         </div>
       ))}
+
+      {collapsed.length > 0 && (
+        <p className="doc-meta" style={{ marginTop: 12 }}>
+          Also included: {collapsed.map((t) => `${byType.get(t)!.length} × ${t}`).join(', ')} — full
+          detail in the FHIR bundle.
+        </p>
+      )}
     </div>
   );
 }

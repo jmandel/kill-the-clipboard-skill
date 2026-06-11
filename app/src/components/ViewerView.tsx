@@ -15,6 +15,7 @@ export function ViewerView({ payload }: { payload: ShlinkPayload }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [passcode, setPasscode] = useState('');
+  const [recipient, setRecipient] = useState('');
   const [needsPasscode, setNeedsPasscode] = useState(() => Boolean(payload.flag?.includes('P')));
 
   const { shlink, parseError } = useMemo(() => {
@@ -31,7 +32,7 @@ export function ViewerView({ payload }: { payload: ShlinkPayload }) {
     setBusy(true);
     setError(null);
     try {
-      setBundles(await fetchShlBundles(payload, 'Shared-link viewer page', passcode || undefined));
+      setBundles(await fetchShlBundles(payload, recipient.trim(), passcode || undefined));
     } catch (e) {
       if (e instanceof PasscodeRequiredError) {
         setNeedsPasscode(true);
@@ -64,6 +65,15 @@ export function ViewerView({ payload }: { payload: ShlinkPayload }) {
             )}
           </div>
 
+          {!bundles && (
+            <input
+              type="text"
+              className="passcode-input"
+              placeholder="Your name (the sharer sees who opened it)"
+              value={recipient}
+              onChange={(e) => setRecipient(e.target.value)}
+            />
+          )}
           {!bundles && needsPasscode && (
             <input
               type="password"
@@ -77,7 +87,7 @@ export function ViewerView({ payload }: { payload: ShlinkPayload }) {
             <button
               type="button"
               className="btn-block"
-              disabled={busy || expired || (needsPasscode && !passcode)}
+              disabled={busy || expired || !recipient.trim() || (needsPasscode && !passcode)}
               onClick={() => void openRecords()}
             >
               {busy ? 'Opening…' : 'Open shared records'}
@@ -85,8 +95,8 @@ export function ViewerView({ payload }: { payload: ShlinkPayload }) {
           )}
           {!bundles && (
             <p className="row-hint" style={{ marginBottom: 16 }}>
-              Opening counts as one use of the link; the person who shared it can see it in
-              their access log.
+              Opening counts as one use of the link; your name appears in the sharer's
+              access log.
             </p>
           )}
           {error && <p className="error-box">{error}</p>}

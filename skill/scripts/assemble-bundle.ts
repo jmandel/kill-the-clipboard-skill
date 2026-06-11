@@ -9,13 +9,16 @@
  *
  * Usage:
  *   assemble-bundle.ts --resources selected-resources.json [--story story.pdf]
- *                      [--rendered rendered.pdf] [--rendered-ids rendered-ids.json]
+ *                      [--rendered rendered.pdf] [--rendered-ids ids.json]
+ *                      [--no-rendered]
  *                      [--shared-date <ISO 8601>] -o bundle.json
  *
  * Options:
  *   --resources      JSON array of FHIR R4 resources; must contain exactly one Patient.
  *   --story          Patient Story PDF → DocumentReference typed LOINC 51855-5.
- *   --rendered       FHIR-Rendered PDF → DocumentReference typed LOINC 60591-5.
+ *   --rendered       Pre-made FHIR-Rendered PDF → DocumentReference LOINC 60591-5.
+ *                    WITHOUT this flag the summary is rendered AUTOMATICALLY from the
+ *                    selected resources (KTC SHOULD); --no-rendered opts out.
  *   --rendered-ids   Coverage manifest emitted by render-fhir-pdf.ts; cross-checked here
  *                    (gaps noted on stderr; validate-bundle.ts enforces).
  *   --shared-date    ISO 8601 instant for Bundle.timestamp and DocumentReference.date
@@ -28,7 +31,7 @@
 
 const USAGE =
   'usage: assemble-bundle.ts --resources selected-resources.json [--story story.pdf] ' +
-  '[--rendered rendered.pdf] [--rendered-ids rendered-ids.json] [--shared-date ISO] -o bundle.json';
+  '[--rendered rendered.pdf] [--rendered-ids ids.json] [--no-rendered] [--shared-date ISO] -o bundle.json';
 
 function usageFail(msg: string): never {
   console.error(`assemble-bundle: ${msg}\n${USAGE}`);
@@ -53,6 +56,7 @@ const FLAG_MAP: Record<string, string> = {
 function parseArgs(argv: string[]): Record<string, string> {
   const opts: Record<string, string> = {};
   for (let i = 0; i < argv.length; i++) {
+    if (argv[i] === '--no-rendered') { opts.noRendered = 'true'; continue; }
     const key = FLAG_MAP[argv[i]!];
     if (!key) usageFail(`unknown argument: ${argv[i]}`);
     const val = argv[i + 1];
@@ -153,6 +157,8 @@ function renderedIdSet(parsed: unknown): Set<string> {
 
 async function main() {
   const opts = parseArgs(process.argv.slice(2));
+  let autoRenderedIds: string[] | null = null;
+  let autoRenderedPages = 0;
 
   const parsed = await readJson(opts.resources!);
   if (!Array.isArray(parsed)) fail('--resources must be a JSON array of FHIR resources');
@@ -193,6 +199,7 @@ async function main() {
     if (Array.isArray(r.contained)) for (const c of r.contained) if (c && typeof c === 'object') stripProfile(c as AnyObj);
   }
   if (stripped > 0) console.error(`note: stripped meta.profile from ${stripped} resource(s)`);
+
 
   const entries = resources.map((resource) => ({ fullUrl: `urn:uuid:${crypto.randomUUID()}`, resource }));
   const patientUrn = entries.find((e) => e.resource === patient)!.fullUrl;
@@ -281,6 +288,40 @@ async function main() {
       }),
     });
   }
+  // The FHIR-Rendered summary is AUTOMATIC (KTC SHOULD): when --rendered isn't given
+  // and discrete resources exist, render it here via the same engine render-fhir-pdf
+  // uses. --no-rendered opts out; --rendered supplies a pre-made one.
+  if (!opts.rendered && !opts.noRendered) {
+    const discrete = resources.filter((r) => r.resourceType !== 'DocumentReference');
+    if (discrete.length > 0) {
+      const { registry } = await import('./lib/fhir-render/registry.ts');
+      const { renderFamiliesToPdf } = await import('./lib/fhir-render/harness.ts');
+      const { provenanceLine } = await import('../../lib/doc.tsx');
+      const autoOut = opts.output!.replace(/\.json$/i, '') + '.rendered.pdf';
+      const dob = typeof patient.birthDate === 'string' ? patient.birthDate : undefined;
+      const autoMeta: { label: string; value: string }[] = [];
+      if (patientDisplay) autoMeta.push({ label: 'Patient', value: patientDisplay });
+      if (dob) autoMeta.push({ label: 'DOB', value: dob });
+      autoMeta.push({ label: 'Shared', value: dateIso.slice(0, 10) });
+      console.error(`note: rendering FHIR summary automatically -> ${autoOut} (--no-rendered to skip)`);
+      const result = await renderFamiliesToPdf(registry, discrete, autoOut, {
+        title: patientDisplay ? `Health Summary — ${patientDisplay}` : 'Health Summary',
+        kicker: 'Patient-Shared Health Record',
+        meta: autoMeta,
+        callout: {
+          title: 'How this document was shared',
+          body: [
+            "This summary was prepared from the patient's own copy of their electronic health records and shared directly by the patient using a SMART Health Link.",
+            'It is a complete rendering of every record the patient selected: each resource appears in a section below (including “Other Records”), so nothing shared is omitted.',
+          ],
+        },
+        footerLeft: provenanceLine(dateIso.slice(0, 10)),
+      });
+      opts.rendered = autoOut;
+      autoRenderedIds = result.renderedIds;
+      autoRenderedPages = result.pages;
+    }
+  }
   if (opts.rendered) {
     const pdf = await readPdf(opts.rendered, 'rendered');
     docRefEntries.push({
@@ -298,6 +339,11 @@ async function main() {
     });
   }
 
+  if (autoRenderedIds && !opts.renderedIds) {
+    const idsOut = opts.output!.replace(/\.json$/i, '') + '.rendered-ids.json';
+    await Bun.write(idsOut, JSON.stringify(autoRenderedIds) + '\n');
+    opts.renderedIds = idsOut;
+  }
   if (opts.renderedIds) {
     const ids = renderedIdSet(await readJson(opts.renderedIds));
     const uncovered = resources.filter((r) => {
@@ -333,6 +379,9 @@ async function main() {
       entries: bundle.entry.length,
       docRefs: docRefEntries.length,
       output: opts.output,
+      ...(autoRenderedIds
+        ? { renderedPdf: opts.rendered, renderedIds: opts.renderedIds, renderedPages: autoRenderedPages }
+        : {}),
     }),
   );
 }

@@ -11,7 +11,8 @@ const key = b64url(crypto.getRandomValues(new Uint8Array(32)));
 const bundle = { resourceType: 'Bundle', type: 'collection', entry: [{ resource: { resourceType: 'Patient', id: 'p1' } }] };
 const jwe = await encryptJWE(utf8(JSON.stringify(bundle)), key, { cty: 'application/fhir+json', deflate: true });
 
-const server = Bun.serve({
+let base = '';
+const server: ReturnType<typeof Bun.serve> = Bun.serve({
   port: 0,
   routes: {
     '/u/file': (req) =>
@@ -33,7 +34,7 @@ const server = Bun.serve({
     '/u/gone': () => new Response(null, { status: 404 }),
   },
 });
-const base = `http://localhost:${server.port}`;
+base = `http://localhost:${server.port}`;
 afterAll(() => server.stop(true));
 
 const payload = (url: string, flag: string): ShlinkPayload => ({ url, key, flag, exp: Math.floor(Date.now() / 1000) + 3600 });

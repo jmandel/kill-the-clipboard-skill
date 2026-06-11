@@ -1,6 +1,6 @@
 ## Workflow
 
-Nine steps. Shipped scripts own everything conformance-critical (bundle structure,
+Eight steps. Shipped scripts own everything conformance-critical (bundle structure,
 DocumentReference construction, encryption, the server protocol); you own the
 conversation, the data selection, and the patient story. Don't narrate every step to
 the patient — run the deterministic parts quietly and surface only the decisions that
@@ -13,6 +13,27 @@ than stretching each decision across open conversational turns. Always include a
 escape option ("something else / let me explain"), and switch to free conversation
 whenever the patient wants more — and always for the deeper moments, above all the
 story interview (Step 4), which is the patient talking, not the patient choosing.
+In general: make reasonable guesses and state them ("I'm using the records in
+health-data/, exported June 8") — reserve questions for the share scope, sensitive
+content, and the final approval.
+
+**Who writes what, who runs what:**
+
+```
+YOU WRITE (per session, ad hoc)        YOU RUN (shipped, conformance-critical)
+───────────────────────────────        ─────────────────────────────────────────────
+select.ts — read the source files,     attachment-to-pdf.ts  note.rtf → note.pdf
+  filter to the agreed scope, set        (per carried-along document)
+  meta.source per resource, inline     md-to-pdf.ts          story.md → story.pdf
+  document bodies, emit                  (the Patient Story you drafted)
+  selected-resources.json              assemble-bundle.ts    selection + PDFs →
+                                         bundle.json (+ automatic summary PDF)
+That's the ONLY code you write.        validate-bundle.ts    bundle.json → pass/fail
+Everything else is running the         create-shl.ts         bundle.json → QR + links
+shipped tools in this order:           manage-shl.ts         status/log/re-arm/…
+
+select → attachment-to-pdf (each doc) → md-to-pdf (story) → assemble → validate → create
+```
 
 Every script prints exactly one JSON object on stdout (progress and diagnostics go to
 stderr) and exits nonzero with a usage string on failure. `create-shl.ts` and
@@ -25,8 +46,9 @@ scripts can override; an explicit URL argument wins).
 
 Inventory what's on disk: health-skillz output directories (typically
 `health-data/*.json`, one file per provider — the format is self-documenting, inspect
-it), FHIR bundles, NDJSON, raw resource JSON. Glob for likely candidates and confirm
-with the patient which records are theirs and current.
+it), FHIR bundles, NDJSON, raw resource JSON. Glob for likely candidates. If exactly
+one plausible source exists, use it and say so — don't ask; confirm only when sources
+genuinely conflict.
 
 If there's no local data:
 
@@ -80,6 +102,11 @@ inline, below. Include:
 - Every selected clinical resource, each with `resourceType` and `id`
 - Resources that selected resources reference, when available in the source
   (e.g. the Medication a MedicationRequest points to)
+- **`meta.source` on every resource, when you know the provenance** — the FHIR
+  endpoint each record came from, as a resource-specific URL when possible
+  (`https://fhir.example.org/R4/Condition/abc`), else the base URL. Sources can
+  differ per resource (multi-provider records) — that's why this is selection-script
+  work, not an assembler flag. Skip it only when provenance is genuinely unknown.
 
 **Including documents (notes, imaging reports, consults).** Documents ride as
 DocumentReferences whose content is **inline**: `content[].attachment = {contentType,
@@ -90,24 +117,23 @@ exports strip inline data into their `attachments[]` sidecar (look for
 `bestEffortPlaintext` and the original bytes there). So this is the ONE transform
 you're expected to perform:
 
-1. Find the document body you actually have locally — original bytes (PDF/RTF) if
-   available, otherwise extracted plaintext.
-2. **Prefer a PDF body.** PDF is the only attachment format the KTC spec guarantees
-   receivers can handle. Original PDF bytes: embed as-is. Anything else (extracted
-   plaintext, RTF text): render it to PDF with the skill's own tooling —
+1. Find the document body you actually have locally — PREFER the original bytes
+   (PDF, RTF, HTML) over extracted plaintext; the converter handles them natively.
+2. **Convert to a PDF body with `attachment-to-pdf.ts`** — one tool for every
+   pre-existing format, no markdown transit, line structure preserved. PDF is the
+   only attachment format the KTC spec guarantees receivers can handle:
 
    ```bash
-   bun <skill-dir>/scripts/md-to-pdf.ts note.md note.pdf --theme summary \
+   bun <skill-dir>/scripts/attachment-to-pdf.ts note.rtf note.pdf \
      --title "Neurology consult — Dr. Rivera" --date 2024-03-12
    ```
 
-   (plaintext is fine as input — unknown markdown constructs degrade to plain
-   paragraphs; glance at the result with `preview-pdf.ts` only if the source text was
-   messy). Embedding `text/plain` directly is
-   legal US Core but not guaranteed-supported — use PDF when in doubt.
-3. Rebuild `content` as a single attachment: `contentType` matching what you embed
-   (usually `application/pdf` after step 2), `data` base64-encoded; drop every
-   `url` entry.
+   Type comes from `--content-type`, extension, or content sniffing. PDF inputs pass
+   through byte-identical; RTF/HTML/text render line-faithfully. (md-to-pdf.ts is for
+   content YOU authored as markdown — the Patient Story — never for note bodies, whose
+   line structure markdown would reflow into run-on prose.)
+3. Rebuild `content` as a single attachment: `contentType: application/pdf`,
+   `data` base64-encoded; drop every `url` entry.
 4. Keep the rest of the DocumentReference **verbatim** — especially `type` and
    `category` codings (that's how the receiver knows what the note IS), date, and
    author display. Do NOT relabel provider-authored notes with the patient-story
@@ -150,44 +176,28 @@ show the patient their finished page (`preview-pdf.ts story.pdf` makes PNGs) but
 don't make it a gate, and don't inspect it yourself unless something was unusual
 about the content.
 
-### Step 5: Render the FHIR-Rendered PDF
-
-```bash
-bun <skill-dir>/scripts/render-fhir-pdf.ts --resources selected-resources.json \
-  -o rendered.pdf --ids-out rendered-ids.json
-```
-
-```json
-{"status":"rendered","output":"/abs/path/rendered.pdf","idsOut":"/abs/path/rendered-ids.json","pages":9,"sections":[{"key":"problems","count":14},{"key":"medications","count":9}],"fallbackCount":0}
-```
-
-This is the complete human-readable rendering of every selected resource — the spec
-requires it to cover all of them, and `rendered-ids.json` is the coverage manifest the
-validator cross-checks.
-
-**Don't page through the output by default.** The layout engine is regression-tested;
-a successful exit means clean pages. Inspect (with `preview-pdf.ts`) only on a
-signal: `fallbackCount > 0` (unrecognized types went through the generic fallback —
-complete but plain; glance at those pages), unusually messy source content, or
-anything surprising in the stdout summary. Otherwise move on.
-
-### Step 6: Assemble the bundle
+### Step 5: Assemble the bundle
 
 ```bash
 bun <skill-dir>/scripts/assemble-bundle.ts --resources selected-resources.json \
-  --story story.pdf --rendered rendered.pdf --rendered-ids rendered-ids.json \
-  -o bundle.json
+  --story story.pdf -o bundle.json
 ```
 
 ```json
-{"status":"assembled","entries":45,"docRefs":2,"output":"bundle.json"}
+{"status":"assembled","entries":46,"docRefs":2,"output":"bundle.json","renderedPdf":"bundle.rendered.pdf","renderedIds":"bundle.rendered-ids.json","renderedPages":9}
 ```
 
-Omit `--story` if the patient declined one. The script owns urn rewriting, reference
-fixup, and DocumentReference construction — **never hand-build or post-edit the
-bundle** (see bundle rules below).
+- Omit `--story` if the patient declined one.
+- **The FHIR-Rendered summary PDF is generated AUTOMATICALLY** — every discrete
+  resource rendered into a readable document and attached as its own DocumentReference
+  (the KTC SHOULD). You don't run anything for it, and the defaults are right;
+  override flags exist but you should almost never need them. A successful exit
+  means clean pages — inspect only on a surprise.
 
-### Step 7: Validate
+The script owns urn rewriting, reference fixup, and DocumentReference construction —
+**never hand-build or post-edit the bundle** (see bundle rules below).
+
+### Step 6: Validate
 
 **⚠️ CRITICAL: Always run `validate-bundle.ts` before `create-shl.ts`.** Never skip
 it, even when assembly "looked fine".
@@ -214,7 +224,7 @@ Accept them without deliberation — they only warrant attention when the dangli
 reference is to *clinical* content the patient meant to include (a Medication a
 selected MedicationRequest points to, a result a report needs).
 
-### Step 8: One approval, then create the link
+### Step 7: One approval, then create the link
 
 **⚠️ CRITICAL: get explicit approval before creating the link** — but make it ONE
 decision moment, not a series. Present a single recap that covers all three things,
@@ -268,7 +278,7 @@ locally, uploads ciphertext, and writes the secret-bearing artifacts to files �
 **stdout never contains the secrets, and neither should your messages** (see the
 secrets section).
 
-### Step 9: Hand off — one closing message
+### Step 8: Hand off — one closing message
 
 One move: present BOTH links to the patient, each named by its role so they can't be
 confused — the owner page as a labeled markdown link, the shareable shlink as code

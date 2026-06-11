@@ -202,13 +202,43 @@ describe('assemble-bundle.ts', () => {
     expect(rendered.content[0].attachment.data).toBe(Buffer.from(readFileSync(renderedPdf)).toString('base64'));
   });
 
-  test('assembles without PDFs: zero docRefs, resources only', async () => {
-    const out = join(dir, 'bundle-nopdf.json');
+  test('renders the FHIR summary AUTOMATICALLY when --rendered is absent', async () => {
+    const out = join(dir, 'bundle-auto.json');
     const r = run(ASSEMBLE, ['--resources', selectionPath, '-o', out]);
+    expect(r.code).toBe(0);
+    const j = JSON.parse(r.stdout);
+    expect(j.docRefs).toBe(1);
+    expect(j.renderedPdf).toContain('.rendered.pdf');
+    expect(j.renderedPages).toBeGreaterThan(0);
+    const bundle = JSON.parse(readFileSync(out, 'utf8'));
+    const doc = bundle.entry.find((e: any) => e.resource.id === 'doc-fhir-rendered');
+    expect(doc.resource.type.coding[0].code).toBe('60591-5');
+    expect(doc.resource.content[0].attachment.data.length).toBeGreaterThan(1000);
+  });
+
+  test('--no-rendered opts out: zero docRefs, resources only', async () => {
+    const out = join(dir, 'bundle-nopdf.json');
+    const r = run(ASSEMBLE, ['--resources', selectionPath, '--no-rendered', '-o', out]);
     expect(r.code).toBe(0);
     const j = JSON.parse(r.stdout);
     expect(j.docRefs).toBe(0);
     expect(j.entries).toBe(selection.length);
+  });
+
+  test('meta.source set by the selection script survives assembly verbatim', async () => {
+    const withSource = structuredClone(selection) as any[];
+    for (const r of withSource) r.meta = { ...(r.meta ?? {}), source: `https://fhir.example.org/R4/${r.resourceType}/${r.id}` };
+    const p = join(dir, 'with-source.json');
+    await Bun.write(p, JSON.stringify(withSource));
+    const out = join(dir, 'bundle-src.json');
+    const r = run(ASSEMBLE, ['--resources', p, '--no-rendered', '-o', out]);
+    expect(r.code).toBe(0);
+    const bundle = JSON.parse(readFileSync(out, 'utf8'));
+    for (const e of bundle.entry) {
+      const res = e.resource;
+      if (res.resourceType === 'DocumentReference') continue;
+      expect(res.meta.source).toBe(`https://fhir.example.org/R4/${res.resourceType}/${res.id}`);
+    }
   });
 
   test('rejects a selection with zero Patients', async () => {
