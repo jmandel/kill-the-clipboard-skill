@@ -270,17 +270,28 @@ secrets section).
 
 ### Step 9: Hand off — one closing message
 
-One move: read `owner-link.txt` and **present the owner page link to the patient** as
-a clickable link (plus `qr.png` if your platform shows or delivers files), with the
-what-happens-next woven into the same message — not a separate explanation step.
-Don't deliberate about it.
+One move: present BOTH links to the patient, each named by its role so they can't be
+confused — the owner page as a labeled markdown link, the shareable shlink as code
+text (visibly a different kind of thing) — with the what-happens-next woven into the
+same message. Plus `qr.png` if your platform shows or delivers files. Don't
+deliberate about it.
 
-> "You're set — here's your link page: [owner link]. Open it and keep it; it shows
+> "You're set!
+>
+> **[Your link setup & control page](owner link)** — keep this one private. It shows
 > the QR code to present at check-in, who's accessed your records, and buttons to
-> extend or kill the link. The QR is also saved at shl-out/qr.png if you'd rather
-> print it or save it to your phone's photos. At the clinic, they scan it and
-> everything you chose lands in your chart, labeled as coming from you — and if they
-> can't scan these yet, nothing's lost; you check in the usual way."
+> extend or kill the link.
+>
+> **To share:** show the QR from that page (also saved at shl-out/qr.png if you'd
+> rather print it or save it to your photos). If a clinic's online check-in form asks
+> for a SMART Health Link, paste this one: `shlink:/eyJ...`
+>
+> At the clinic, they scan it and everything you chose lands in your chart, labeled
+> as coming from you — and if they can't scan these yet, nothing's lost; you check
+> in the usual way."
+
+(The control page is the capability that manages the link; the `shlink:/...` string
+is the link itself — never swap their roles in the message.)
 
 **Preview (recommended):** offer to show the patient what a recipient sees —
 `viewer-link.txt` holds a viewer-prefixed copy of the link that opens a view-only
