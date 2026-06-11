@@ -113,7 +113,7 @@ for (const seed of seeds) {
 const CORS = {
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'GET, PATCH, DELETE, OPTIONS',
-  'access-control-allow-headers': 'content-type',
+  'access-control-allow-headers': 'authorization, content-type',
 };
 
 function json(body: unknown, status = 200): Response {
@@ -121,6 +121,10 @@ function json(body: unknown, status = 200): Response {
     status,
     headers: { 'content-type': 'application/json', ...CORS },
   });
+}
+
+function bearerOf(req: Request): string {
+  return req.headers.get('authorization')?.match(/^Bearer\s+(.+)$/i)?.[1]?.trim() ?? '';
 }
 
 function withState(auth: string, fn: (s: ManageState) => Response): Response {
@@ -146,15 +150,15 @@ Bun.serve({
       s.accessLog.unshift({ ts: iso(nowSec()), recipient: url.searchParams.get('recipient')!, action: 'direct', outcome: 'ok' });
       return new Response(jweById.get(req.params.id) ?? '', { status: 200, headers: { 'content-type': 'application/jose', ...CORS } });
     },
-    '/api/manage/:auth': {
+    '/api/manage': {
       OPTIONS: () => new Response(null, { status: 204, headers: CORS }),
       GET: (req) =>
-        withState(req.params.auth, (s) => {
+        withState(bearerOf(req), (s) => {
           s.live = computeLive(s);
           return json(s);
         }),
       PATCH: async (req) => {
-        const s = store.get(req.params.auth);
+        const s = store.get(bearerOf(req));
         if (!s) return json({ error: 'no such link' }, 404);
         if (s.purgedAt !== null) return json({ error: 'link destroyed' }, 410);
         const patch = (await req.json()) as ManagePatch;
@@ -166,7 +170,7 @@ Bun.serve({
         return json(s);
       },
       DELETE: (req) =>
-        withState(req.params.auth, (s) => {
+        withState(bearerOf(req), (s) => {
           s.active = false;
           s.purgedAt = iso(nowSec());
           s.files = [];

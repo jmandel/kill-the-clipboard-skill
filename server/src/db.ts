@@ -59,30 +59,7 @@ export function openDb(path = ':memory:'): Database {
   db.exec('PRAGMA foreign_keys = ON');
   db.exec(schemaSql);
   db.exec('CREATE TABLE IF NOT EXISTS kv (k TEXT PRIMARY KEY, v BLOB NOT NULL)');
-  migrateLabelColumn(db);
   return db;
-}
-
-/**
- * 2026-06-11 security hardening: labels became client-encrypted JWEs (label_enc).
- * Databases created earlier have a plaintext `label` column — rename it, then NULL
- * every value that isn't a compact JWE: the server holds no keys, so plaintext
- * labels can't be migrated, only purged (owners relabel from the owner page).
- */
-function migrateLabelColumn(db: Database): void {
-  const cols = db.query(`PRAGMA table_info(links)`).all() as { name: string }[];
-  if (cols.some((c) => c.name === 'label')) {
-    db.exec(`ALTER TABLE links RENAME COLUMN label TO label_enc`);
-  }
-  const purged = db
-    .query(
-      `UPDATE links SET label_enc = NULL
-       WHERE label_enc IS NOT NULL AND label_enc NOT LIKE '%.%.%.%.%' RETURNING id`,
-    )
-    .all().length;
-  if (purged > 0) {
-    console.error(`db: purged ${purged} pre-hardening plaintext label(s); owners can relabel (now encrypted)`);
-  }
 }
 
 /** Ticket-signing secret persisted across restarts so issued location URLs survive a deploy. */

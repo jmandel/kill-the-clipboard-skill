@@ -53,32 +53,3 @@ describe('zip container', () => {
   });
 });
 
-// --- label_enc migration (2026-06-11 hardening) -------------------------------------
-import { Database } from 'bun:sqlite';
-import { test as mtest, expect as mexpect } from 'bun:test';
-
-mtest('openDb migrates pre-hardening plaintext labels: rename + purge, JWEs survive', async () => {
-  const path = `/tmp/ktc-migrate-${crypto.randomUUID()}.sqlite`;
-  // build an OLD-shape database: plaintext `label` column
-  const old = new Database(path);
-  old.exec(`CREATE TABLE links (
-    id TEXT PRIMARY KEY, mgmt_token_hash TEXT NOT NULL UNIQUE, flag TEXT NOT NULL DEFAULT 'U',
-    label TEXT, exp INTEGER NOT NULL, max_uses INTEGER, uses INTEGER NOT NULL DEFAULT 0,
-    passcode_hash TEXT, passcode_attempts_remaining INTEGER, active INTEGER NOT NULL DEFAULT 1,
-    created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL, purged_at INTEGER)`);
-  old.exec(`INSERT INTO links (id, mgmt_token_hash, label, exp, created_at, updated_at) VALUES
-    ('a', 'h1', 'Joshua Mandel — concussion history', 1, 0, 0),
-    ('b', 'h2', 'e30.e30.e30.e30.e30', 1, 0, 0),
-    ('c', 'h3', NULL, 1, 0, 0)`);
-  old.close();
-
-  const { openDb } = await import('./db.ts');
-  const db = openDb(path);
-  const rows = db.query(`SELECT id, label_enc FROM links ORDER BY id`).all() as { id: string; label_enc: string | null }[];
-  mexpect(rows).toEqual([
-    { id: 'a', label_enc: null },                    // plaintext purged — server can't encrypt it
-    { id: 'b', label_enc: 'e30.e30.e30.e30.e30' },   // JWE-shaped value preserved
-    { id: 'c', label_enc: null },
-  ]);
-  db.close();
-});

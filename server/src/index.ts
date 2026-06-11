@@ -32,7 +32,7 @@ import { buildSkillZip } from './zip.ts';
 const CORS_HEADERS: Record<string, string> = {
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-  'access-control-allow-headers': 'content-type',
+  'access-control-allow-headers': 'authorization, content-type',
   'access-control-max-age': '86400',
 };
 
@@ -197,15 +197,12 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
       };
 
   // The control capability arrives in the Authorization header — never the URL path,
-  // where proxies/access logs retain it. (Path-form routes remain as deprecated aliases.)
-  const bearerAuth = (req: Request): string | null => {
+  // where proxies/access logs retain it.
+  const authOf = (req: Request): string => {
     const h = req.headers.get('authorization');
     const m = h?.match(/^Bearer\s+(.+)$/i);
-    return m?.[1]?.trim() || null;
+    return m?.[1]?.trim() ?? '';
   };
-  /** Header-borne capability, falling back to the deprecated path segment. */
-  const authOf = (req: Request & { params?: Record<string, string> }): string =>
-    bearerAuth(req) ?? (req as any).params?.auth ?? '';
 
   function manageState(link: LinkRow): ManageState {
     return {
@@ -368,8 +365,8 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
           } catch {
             return err('request body must be JSON', 400);
           }
-          const auth = bearerAuth(req) ?? body?.auth; // header preferred; body form is legacy
-          if (typeof auth !== 'string' || !AUTH_SHAPE.test(auth)) {
+          const auth = authOf(req);
+          if (!AUTH_SHAPE.test(auth)) {
             return err('auth must be 43-char base64url (Authorization: Bearer header)', 400);
           }
           const flag = body.flag === undefined ? 'U' : body.flag;
@@ -425,15 +422,9 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
         },
       },
 
-      // Header-first manage routes; ':auth' path forms are DEPRECATED aliases.
       '/api/manage': manageRoutes,
       '/api/manage/files': manageFilesRoutes,
       '/api/manage/files/:fileId': manageFileIdRoutes,
-      '/api/manage/:auth': manageRoutes,
-
-      '/api/manage/:auth/files': manageFilesRoutes,
-
-      '/api/manage/:auth/files/:fileId': manageFileIdRoutes,
     },
     fetch() {
       return notFound();

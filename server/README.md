@@ -35,17 +35,17 @@ For production, see `kill-the-clipboard.service` (install notes in the file head
 Liveness is derived, never stored: `active && now < exp && uses < maxUses && attempts > 0 && !purged`.
 Re-arm = `PATCH` flipping whichever condition failed.
 
-### Control plane (capability URL = the HKDF-derived `auth`; wrong auth is always 404, never 401)
+### Control plane (capability in `Authorization: Bearer <auth>` — never the URL; wrong auth is always 404, never 401)
 
 | Route | Behavior |
 |---|---|
-| `POST /api/links` | `CreateLinkRequest` → `{id, url}`. Validates 43-char base64url auth, flag (`L?P?U?`, U excludes P), `exp`, label ≤80. |
-| `GET /api/manage/{auth}` | Full `ManageState`: derived `live`, file metadata, complete access log. |
-| `PATCH /api/manage/{auth}` | `{exp?, maxUses?, active?, passcode?, label?}`. Setting a passcode resets the attempt budget. `active:false` = reversible pause. |
-| `POST /api/manage/{auth}/files` | Raw JWE body (≤25 MB), Content-Type header recorded → `{fileId}`. U-flag links: exactly one file. |
-| `PUT /api/manage/{auth}/files/{fileId}` | Replace ciphertext (client re-encrypted: same key, new IV). |
-| `DELETE /api/manage/{auth}/files/{fileId}` | Rejected for the last file of an active U-flag link. |
-| `DELETE /api/manage/{auth}` | Destroy: immediate ciphertext purge + terminal deactivation; tombstone + audit log remain. |
+| `POST /api/links` | `CreateLinkRequest` → `{id, url}`. Validates 43-char base64url auth (header), flag (`L?P?U?`, U excludes P), `exp`, `labelEnc` ≤2048 (client-encrypted JWE; server-opaque). |
+| `GET /api/manage` | Full `ManageState`: derived `live`, file metadata, complete access log. |
+| `PATCH /api/manage` | `{exp?, maxUses?, active?, passcode?, labelEnc?}`. Setting a passcode resets the attempt budget. `active:false` = reversible pause. |
+| `POST /api/manage/files` | Raw JWE body (≤25 MB), Content-Type header recorded → `{fileId}`. U-flag links: exactly one file. |
+| `PUT /api/manage/files/{fileId}` | Replace ciphertext (client re-encrypted: same key, new IV). |
+| `DELETE /api/manage/files/{fileId}` | Rejected for the last file of an active U-flag link. |
+| `DELETE /api/manage` | Destroy: immediate ciphertext purge + terminal deactivation; tombstone + audit log remain. |
 
 CORS is permissive on `/api/*` (third-party handoff pages) and harmless on the data plane.
 

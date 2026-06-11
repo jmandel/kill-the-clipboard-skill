@@ -203,10 +203,11 @@ GET  /shl/{id}/f/{fileId}?t=...   ticketed file fetch → JWE (application/jose)
 ### Control plane (capability via Authorization header)
 
 External-review hardening (2026-06-11):
-- The auth capability travels in `Authorization: Bearer <auth>` — never the URL path,
-  which proxies/access logs retain (the deployment's own fronting proxy demonstrated
-  the leak class). `/api/manage/{auth}` path forms remain as DEPRECATED aliases for
-  already-extracted skills.
+- The auth capability travels in `Authorization: Bearer <auth>` — never the URL path
+  or request body, which proxies/access logs retain (the deployment's own fronting
+  proxy demonstrated the leak class). This is the ONLY form: pre-hardening path/body
+  forms were removed outright (pre-1.0, DB wiped — simple and correct over
+  backwards compatible).
 - The label is stored CLIENT-ENCRYPTED (`labelEnc`: compact JWE under the link key,
   cty text/plain) — the server never learns the patient's name. The shlink payload's
   plaintext label (spec-required, receiver-facing) is unchanged: it's visible only to
@@ -214,17 +215,19 @@ External-review hardening (2026-06-11):
   timing, ciphertext sizes, access patterns, and audit-log recipient strings —
   inherent to hosting + the audit feature itself.
 
+All control-plane routes require `Authorization: Bearer <auth>`:
+
 ```
-POST  /api/links                  {authTokenHash—no: auth, flag?, exp?, maxUses?, passcode?, label?}
+POST  /api/links                  {flag?, exp, maxUses?, passcode?, labelEnc?}
                                   → {id, url}        (server stores sha256(auth))
-GET   /api/manage/{auth}          → {url, flag, label, exp, maxUses, uses, active, purgedAt?,
+GET   /api/manage                 → {url, flag, labelEnc, exp, maxUses, uses, active, purgedAt?,
                                      files:[{fileId, contentType, size, lastUpdated}],
                                      accessLog:[{ts, recipient, action, outcome}]}
-PATCH /api/manage/{auth}          {exp?, maxUses?, active?, passcode?, label?}
-POST  /api/manage/{auth}/files    JWE body, Content-Type header → {fileId}
-PUT   /api/manage/{auth}/files/{fileId}    replace ciphertext (client re-encrypts: same key, new IV)
-DELETE /api/manage/{auth}/files/{fileId}
-DELETE /api/manage/{auth}         purge + terminal deactivation
+PATCH /api/manage                 {exp?, maxUses?, active?, passcode?, labelEnc?}
+POST  /api/manage/files           JWE body, Content-Type header → {fileId}
+PUT   /api/manage/files/{fileId}  replace ciphertext (client re-encrypts: same key, new IV)
+DELETE /api/manage/files/{fileId}
+DELETE /api/manage                purge + terminal deactivation
 ```
 
 - U-flag links: exactly one file (reject 2nd POST; reject DELETE of last file while active).

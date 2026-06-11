@@ -64,8 +64,8 @@ async function createLink(
   const key = await deriveKey(m);
   const res = await fetch(`${ctx.base}/api/links`, {
     method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ auth, exp: epoch() + 86_400, ...opts }),
+    headers: { authorization: `Bearer ${auth}`, 'content-type': 'application/json' },
+    body: JSON.stringify({ exp: epoch() + 86_400, ...opts }),
   });
   expect(res.status).toBe(200);
   const body = (await res.json()) as CreateLinkResponse;
@@ -74,9 +74,9 @@ async function createLink(
 
 async function uploadFile(ctx: Ctx, link: MadeLink, plaintext = BUNDLE): Promise<{ fileId: string; jwe: string }> {
   const jwe = await encryptJWE(utf8(plaintext), link.key, { cty: 'application/fhir+json' });
-  const res = await fetch(`${ctx.base}/api/manage/${link.auth}/files`, {
+  const res = await fetch(`${ctx.base}/api/manage/files`, {
     method: 'POST',
-    headers: { 'content-type': 'application/fhir+json' },
+    headers: { authorization: `Bearer ${link.auth}`, 'content-type': 'application/fhir+json' },
     body: jwe,
   });
   expect(res.status).toBe(200);
@@ -92,15 +92,15 @@ const manifest = (ctx: Ctx, id: string, body: object) =>
   });
 
 const manage = async (ctx: Ctx, auth: string): Promise<ManageState> => {
-  const res = await fetch(`${ctx.base}/api/manage/${auth}`);
+  const res = await fetch(`${ctx.base}/api/manage`, { headers: { authorization: `Bearer ${auth}` } });
   expect(res.status).toBe(200);
   return (await res.json()) as ManageState;
 };
 
 const patchLink = (ctx: Ctx, auth: string, patch: object) =>
-  fetch(`${ctx.base}/api/manage/${auth}`, {
+  fetch(`${ctx.base}/api/manage`, {
     method: 'PATCH',
-    headers: { 'content-type': 'application/json' },
+    headers: { authorization: `Bearer ${auth}`, 'content-type': 'application/json' },
     body: JSON.stringify(patch),
   });
 
@@ -183,7 +183,7 @@ describe('404 matrix (each existing-link case audits outcome=inactive)', () => {
     const ctx = await makeServer();
     const link = await createLink(ctx);
     await uploadFile(ctx, link);
-    const del = await fetch(`${ctx.base}/api/manage/${link.auth}`, { method: 'DELETE' });
+    const del = await fetch(`${ctx.base}/api/manage`, { method: 'DELETE', headers: { authorization: `Bearer ${link.auth}` } });
     expect(del.status).toBe(200);
     await expectInactive404(ctx, link);
     const state = await manage(ctx, link.auth);
@@ -333,19 +333,19 @@ describe('U-flag file-count enforcement', () => {
     const link = await createLink(ctx);
     const { fileId, jwe } = await uploadFile(ctx, link);
 
-    const second = await fetch(`${ctx.base}/api/manage/${link.auth}/files`, {
+    const second = await fetch(`${ctx.base}/api/manage/files`, {
       method: 'POST',
-      headers: { 'content-type': 'application/fhir+json' },
+      headers: { authorization: `Bearer ${link.auth}`, 'content-type': 'application/fhir+json' },
       body: jwe,
     });
     expect(second.status).toBe(400);
 
-    const del = await fetch(`${ctx.base}/api/manage/${link.auth}/files/${fileId}`, { method: 'DELETE' });
+    const del = await fetch(`${ctx.base}/api/manage/files/${fileId}`, { headers: { authorization: `Bearer ${link.auth}` }, method: 'DELETE' });
     expect(del.status).toBe(400);
 
     // Paused link may drop its file
     await patchLink(ctx, link.auth, { active: false });
-    const delPaused = await fetch(`${ctx.base}/api/manage/${link.auth}/files/${fileId}`, { method: 'DELETE' });
+    const delPaused = await fetch(`${ctx.base}/api/manage/files/${fileId}`, { headers: { authorization: `Bearer ${link.auth}` }, method: 'DELETE' });
     expect(delPaused.status).toBe(204);
     expect((await manage(ctx, link.auth)).files).toHaveLength(0);
   });
@@ -356,9 +356,9 @@ describe('U-flag file-count enforcement', () => {
     const { fileId } = await uploadFile(ctx, link);
     const updated = JSON.stringify({ resourceType: 'Bundle', type: 'collection', entry: [{ note: 'v2' }] });
     const jwe2 = await encryptJWE(utf8(updated), link.key, { cty: 'application/fhir+json' });
-    const put = await fetch(`${ctx.base}/api/manage/${link.auth}/files/${fileId}`, {
+    const put = await fetch(`${ctx.base}/api/manage/files/${fileId}`, {
       method: 'PUT',
-      headers: { 'content-type': 'application/fhir+json' },
+      headers: { authorization: `Bearer ${link.auth}`, 'content-type': 'application/fhir+json' },
       body: jwe2,
     });
     expect(put.status).toBe(200);
@@ -442,31 +442,35 @@ describe('control plane validation + capability lookup', () => {
   test('create rejects bad auth, long label, invalid flags, U+P, missing exp', async () => {
     const ctx = await makeServer();
     const auth = await deriveAuth(generateMasterSecret());
-    const post = (body: object) =>
+    const post = (body: object, asAuth: string = auth) =>
       fetch(`${ctx.base}/api/links`, {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
+        headers: { authorization: `Bearer ${asAuth}`, 'content-type': 'application/json' },
         body: JSON.stringify(body),
       });
     const exp = epoch() + 3600;
-    expect((await post({ auth: 'tooshort', exp })).status).toBe(400);
-    expect((await post({ auth, exp, labelEnc: 'x'.repeat(2049) })).status).toBe(400); // blob bound
-    expect((await post({ auth: await deriveAuth(generateMasterSecret()), exp, labelEnc: 'eyJfake.jwe.blob' })).status).toBe(200); // opaque — server never inspects
-    expect((await post({ auth, exp, flag: 'X' })).status).toBe(400);
-    expect((await post({ auth, exp, flag: 'UP' })).status).toBe(400); // non-alphabetical
-    expect((await post({ auth, exp, flag: 'PU', passcode: 'p' })).status).toBe(400); // U excludes P
-    expect((await post({ auth, exp: undefined })).status).toBe(400);
-    expect((await post({ auth, exp, flag: 'P' })).status).toBe(400); // P without passcode
-    expect((await post({ auth, exp, passcode: 'p' })).status).toBe(400); // passcode without P
-    expect((await post({ auth, exp, flag: 'LU' })).status).toBe(200);
+    expect((await post({ exp }, 'tooshort')).status).toBe(400);
+    expect((await post({ exp }, '')).status).toBe(400); // header required
+    expect((await post({ exp, labelEnc: 'x'.repeat(2049) })).status).toBe(400); // blob bound
+    expect((await post({ exp, labelEnc: 'eyJfake.jwe.blob' }, await deriveAuth(generateMasterSecret()))).status).toBe(200); // opaque — server never inspects
+    expect((await post({ exp, flag: 'X' })).status).toBe(400);
+    expect((await post({ exp, flag: 'UP' })).status).toBe(400); // non-alphabetical
+    expect((await post({ exp, flag: 'PU', passcode: 'p' })).status).toBe(400); // U excludes P
+    expect((await post({ exp: undefined })).status).toBe(400);
+    expect((await post({ exp, flag: 'P' })).status).toBe(400); // P without passcode
+    expect((await post({ exp, passcode: 'p' })).status).toBe(400); // passcode without P
+    expect((await post({ exp, flag: 'LU' })).status).toBe(200);
   });
 
   test('duplicate auth registration → 409', async () => {
     const ctx = await makeServer();
     const auth = await deriveAuth(generateMasterSecret());
-    const body = JSON.stringify({ auth, exp: epoch() + 3600 });
     const post = () =>
-      fetch(`${ctx.base}/api/links`, { method: 'POST', headers: { 'content-type': 'application/json' }, body });
+      fetch(`${ctx.base}/api/links`, {
+        method: 'POST',
+        headers: { authorization: `Bearer ${auth}`, 'content-type': 'application/json' },
+        body: JSON.stringify({ exp: epoch() + 3600 }),
+      });
     expect((await post()).status).toBe(200);
     expect((await post()).status).toBe(409);
   });
@@ -475,8 +479,9 @@ describe('control plane validation + capability lookup', () => {
     const ctx = await makeServer();
     ctx.config.limits.maxFileBytes = 64;
     const link = await createLink(ctx);
-    const res = await fetch(`${ctx.base}/api/manage/${link.auth}/files`, {
+    const res = await fetch(`${ctx.base}/api/manage/files`, {
       method: 'POST',
+      headers: { authorization: `Bearer ${link.auth}` },
       body: 'x'.repeat(65),
     });
     expect(res.status).toBe(413);
@@ -488,7 +493,7 @@ describe('control plane validation + capability lookup', () => {
     expect(pre.status).toBe(204);
     expect(pre.headers.get('access-control-allow-origin')).toBe('*');
     const link = await createLink(ctx);
-    const res = await fetch(`${ctx.base}/api/manage/${link.auth}`);
+    const res = await fetch(`${ctx.base}/api/manage`, { headers: { authorization: `Bearer ${link.auth}` } });
     expect(res.headers.get('access-control-allow-origin')).toBe('*');
   });
 });

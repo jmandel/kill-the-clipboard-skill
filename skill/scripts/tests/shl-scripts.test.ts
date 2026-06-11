@@ -122,7 +122,7 @@ function startMockServer(): void {
 
       if (req.method === 'POST' && path === '/api/links') {
         const body = (await req.json()) as CreateLinkRequest;
-        const auth = bearer ?? body.auth;
+        const auth = bearer;
         if (!auth || !body.exp) return json({ error: 'auth (Authorization header) and exp required' }, 400);
         const link: MockLink = {
           id: randomToken(),

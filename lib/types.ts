@@ -4,12 +4,9 @@
 // --- Control plane --------------------------------------------------------------------
 
 // The control capability (auth = base64url HKDF(M, "ktc-shl/v1/auth")) travels in the
-// Authorization: Bearer header — NEVER in the URL path, where proxies and access logs
-// retain it. The server stores sha256(auth) only. (A deprecated path-form alias,
-// /api/manage/{auth}, remains for already-extracted skills.)
+// Authorization: Bearer header — NEVER in the URL path or body, where proxies and
+// access logs retain it. The server stores sha256(auth) only.
 export interface CreateLinkRequest {
-  /** DEPRECATED: legacy body-borne capability; prefer the Authorization header. */
-  auth?: string;
   /** Flag chars in alphabetical order. Default "U". */
   flag?: string;
   /** Epoch seconds. Required (KTC). */
