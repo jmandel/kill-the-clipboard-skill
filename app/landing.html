@@ -22,7 +22,6 @@
   --shadow-md:0 2px 4px rgba(17,22,29,.06),0 4px 8px rgba(17,22,29,.06);
 }
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
 body{margin:0;font-family:var(--font-sans);color:var(--gray-900);background:var(--gray-0);
   line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
 .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
@@ -37,7 +36,7 @@ code,.mono{font-family:var(--font-mono);font-size:.9em}
 nav{position:sticky;top:0;z-index:50;background:var(--gray-0);border-bottom:1px solid var(--gray-200);height:64px}
 nav .wrap{display:flex;align-items:center;gap:10px;height:64px}
 nav .word{font-weight:700;font-size:16px;color:var(--gray-900)}
-nav .links{margin-left:auto;display:flex;gap:24px;font-size:14px;font-weight:500}
+nav .links{margin-left:auto;display:flex;align-items:center;gap:24px;font-size:14px;font-weight:500}
 nav .links a{color:var(--gray-700);border-bottom:0}
 nav .links a:hover{color:var(--brand)}
 @media(max-width:720px){nav .links a:not(.cta){display:none}}
@@ -62,27 +61,6 @@ section{padding:72px 0}
 section h2{font-size:30px;font-weight:700;margin-bottom:10px}
 .section-lede{color:var(--gray-700);max-width:640px;margin-bottom:40px}
 
-/* steps */
-.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-@media(max-width:900px){.steps{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:560px){.steps{grid-template-columns:1fr}}
-.step{background:var(--gray-0);border:1px solid var(--gray-200);border-radius:8px;padding:22px;box-shadow:var(--shadow-sm)}
-.step .num{width:30px;height:30px;border-radius:50%;background:var(--brand);color:#fff;font-weight:700;font-size:15px;
-  display:flex;align-items:center;justify-content:center;margin-bottom:14px}
-.step h3{font-size:16.5px;font-weight:700;margin-bottom:8px}
-.step p{font-size:14px;color:var(--gray-700);margin:0}
-
-/* shared cards */
-.cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-@media(max-width:860px){.cards3{grid-template-columns:1fr}}
-.card{background:var(--gray-0);border:1px solid var(--gray-200);border-radius:8px;padding:26px;box-shadow:var(--shadow-sm);transition:box-shadow .2s}
-.card:hover{box-shadow:var(--shadow-md)}
-.card .tag{display:inline-block;font-family:var(--font-mono);font-size:11px;color:var(--gray-600);
-  background:var(--gray-50);border:1px solid var(--gray-200);border-radius:4px;padding:2px 8px;margin-bottom:14px}
-.card h3{font-size:18px;margin-bottom:10px}
-.card p{font-size:14.5px;color:var(--gray-700);margin:0}
-.bundle-note{font-size:13.5px;color:var(--gray-500);margin-top:22px}
-
 /* full-bleed blue privacy band */
 .privacy{background:var(--brand);color:#fff;padding:76px 0}
 .privacy h2{color:#fff}
@@ -94,18 +72,8 @@ section h2{font-size:30px;font-weight:700;margin-bottom:10px}
 .trust svg{flex:none}
 .trust p{font-size:14px;color:var(--brand-wash);margin:0}
 
-/* honest scope */
-.scope{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-@media(max-width:760px){.scope{grid-template-columns:1fr}}
-.scope .card h3{display:flex;align-items:center;gap:9px;font-size:17px}
-.scope ul{margin:14px 0 0;padding:0 0 0 2px;list-style:none}
-.scope li{font-size:14.5px;color:var(--gray-700);padding:7px 0 7px 26px;position:relative;border-top:1px solid var(--gray-100)}
-.scope li::before{content:'';position:absolute;left:4px;top:14px;width:7px;height:7px;border-radius:50%}
-.scope .yes li::before{background:var(--success)}
-.scope .not li::before{background:var(--gray-300)}
-.progress-line{font-size:14px;color:var(--gray-600);margin-top:24px;border-left:3px solid var(--warning);padding-left:14px}
-
 /* get started */
+.card{background:var(--gray-0);border:1px solid var(--gray-200);border-radius:8px;padding:26px;box-shadow:var(--shadow-sm)}
 .start{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media(max-width:860px){.start{grid-template-columns:1fr}}
 .start .card h3{font-size:19px;margin-bottom:4px}
@@ -149,8 +117,6 @@ footer .disclaimer{font-size:12.5px;color:var(--gray-500);margin-top:36px;max-wi
     <svg viewBox="59 -1 91 75" width="24" height="24" aria-hidden="true"><use href="#smart-mark"/></svg>
     <span class="word">kill-the-clipboard</span>
     <div class="links">
-      <a href="#how">How it works</a>
-      <a href="#shared">What's shared</a>
       <a href="#privacy">Privacy</a>
       <a href="https://github.com/jmandel/kill-the-clipboard-skill">GitHub</a>
       <a class="cta" href="#start">Get started</a>
@@ -163,129 +129,36 @@ footer .disclaimer{font-size:12.5px;color:var(--gray-500);margin-top:36px;max-wi
   <div class="wrap">
     <p class="eyebrow">SMART Health Links · Kill The Clipboard</p>
     <h1>Share your health record like a boarding pass.</h1>
-    <p class="lede">Every clinic asks for the same information — medications, allergies,
-      problems, immunizations — and almost none of them can get it from anywhere except you,
-      typed in fresh. This skill helps your AI agent assemble what matters, tell your story
-      in your own words, and hand it to the front desk as a QR code you control.</p>
+    <p class="lede">Every clinic asks for the same information, and almost none of them can
+      get it from anywhere except you. This skill helps your AI agent assemble what matters,
+      tell your story in your own words, and hand it to the front desk as a QR code you
+      control.</p>
     <a class="btn btn-primary" href="#start">Get the skill</a>
-    <a class="btn btn-ghost" href="#how">See how it works</a>
-    <p class="fine">Works with Claude Code, Claude.ai, and other agent runtimes with shell +
-      network access · Open source (MIT)</p>
+    <a class="btn btn-ghost" href="#privacy">How it protects you</a>
+    <p class="fine">One encrypted bundle: your structured records, your story as a PDF, and a
+      readable summary — conformant to the <a href="https://ktc-spec.github.io/">KTC profile</a>.
+      Works with Claude Code, Claude.ai, and other agent runtimes · Open source (MIT)</p>
   </div>
 </header>
-
-<section class="band-alt" id="how">
-  <div class="wrap">
-    <p class="eyebrow">How it works</p>
-    <h2>Four steps, no portal sign-in</h2>
-    <p class="section-lede">The same flow whether you prepare the night before or at the
-      front desk: you decide, your agent assembles, the clinic scans, your chart gets it.</p>
-    <div class="steps">
-      <div class="step"><div class="num">1</div><h3>You choose what to share</h3>
-        <p>Your agent walks you through it in plain language — problems, medications,
-        allergies, immunizations, recent results — plus the story you want your care team
-        to hear. You control every piece.</p></div>
-      <div class="step"><div class="num">2</div><h3>Your agent creates a secure link</h3>
-        <p>Everything is encrypted on your device and published as a SMART Health Link.
-        Treat the QR like a temporary key: it expires, allows limited uses, and you can
-        revoke it any time.</p></div>
-      <div class="step"><div class="num">3</div><h3>The clinic scans your QR</h3>
-        <p>Show it at check-in, or paste the link into a pre-visit form. No account, no
-        portal password, no retyping.</p></div>
-      <div class="step"><div class="num">4</div><h3>It lands in your chart</h3>
-        <p>Participating EHRs save your key clinical history and both PDFs to your chart,
-        labeled as patient-shared. A clinician may review before it joins the active
-        record — that's by design.</p></div>
-    </div>
-  </div>
-</section>
-
-<section id="shared">
-  <div class="wrap">
-    <p class="eyebrow">What gets shared</p>
-    <h2>One encrypted bundle, three kinds of content</h2>
-    <p class="section-lede">Conformant to the CMS health tech ecosystem's
-      <a href="https://ktc-spec.github.io/">Patient-Shared Health Documents</a> profile, so
-      receiving systems know exactly what to do with it.</p>
-    <div class="cards3">
-      <div class="card"><span class="tag">FHIR · US Core</span>
-        <h3>Structured records</h3>
-        <p>The data clinics retype today — problems, medications, allergies, immunizations —
-        plus anything else from your record you choose to include. Structured, so it can
-        appear in the same lists your care team already uses.</p></div>
-      <div class="card"><span class="tag">PDF · LOINC 51855-5</span>
-        <h3>Your story, in your words</h3>
-        <p>What you're most worried about. What's changed. What you want from this visit.
-        Your agent interviews you, drafts it, and nothing ships until you approve the text
-        word for word.</p></div>
-      <div class="card"><span class="tag">PDF · LOINC 60591-5</span>
-        <h3>A readable summary</h3>
-        <p>Every shared record rendered as a clean, human-readable document — so even a
-        clinic that can't ingest structured data yet gets the complete picture.</p></div>
-    </div>
-    <p class="bundle-note">Where do the records come from? Anything that produces FHIR JSON.
-      <a href="https://health-skillz.joshuamandel.com">health-skillz</a> is the recommended
-      companion — it connects to your patient portals and exports exactly what this skill
-      selects from.</p>
-  </div>
-</section>
 
 <section class="privacy" id="privacy">
   <div class="wrap">
     <h2>Private by architecture</h2>
-    <p class="section-lede">Not a policy promise — a design property. The hosting server is
-      structurally unable to read what it stores.</p>
+    <p class="section-lede">Not a policy promise — a design property.</p>
     <div class="trust">
       <div><h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         Encrypted on your device</h3>
-        <p>The encryption key is derived on your machine and travels only inside the link
-        you share. It is never sent to the server.</p></div>
+        <p>The key travels only inside the link you share — never to the server.</p></div>
       <div><h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
         The server stores only ciphertext</h3>
-        <p>Encrypted bytes, link settings, and an access log. No keys, no readable health
-        data, ever.</p></div>
+        <p>It is structurally unable to read what it hosts.</p></div>
       <div><h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
         Every access is logged</h3>
-        <p>Your link page shows who opened your records and when — named by the clinic that
-        fetched them.</p></div>
+        <p>Your link page shows who opened your records, and when.</p></div>
       <div><h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
         You hold the kill switch</h3>
-        <p>Pause, extend, or permanently revoke from your link page. Revoked means the data
-        is deleted, not just hidden.</p></div>
+        <p>Pause, extend, or revoke any time. Revoked means deleted.</p></div>
     </div>
-  </div>
-</section>
-
-<section class="band-alt" id="scope">
-  <div class="wrap">
-    <p class="eyebrow">Honest scope</p>
-    <h2>What this solves — and what it doesn't yet</h2>
-    <div class="scope">
-      <div class="card yes">
-        <h3>Helps with the questions every clinic repeats</h3>
-        <ul>
-          <li>Problems and health concerns</li>
-          <li>Medications</li>
-          <li>Allergies</li>
-          <li>Immunizations</li>
-          <li>Recent results you choose to include</li>
-          <li>Your story and context, in your own words</li>
-        </ul>
-      </div>
-      <div class="card not">
-        <h3>Doesn't replace, yet</h3>
-        <ul>
-          <li>Visit-specific questionnaires</li>
-          <li>Consent and billing forms</li>
-          <li>Clinic-specific intake questions</li>
-          <li>Specialty screeners</li>
-          <li>Insurance card capture (coming)</li>
-        </ul>
-      </div>
-    </div>
-    <p class="progress-line">This is progress, not the finish line. A future check-in
-      protocol could let clinics ask your app for exactly what they need — reviewed and
-      approved by you. The July 2026 milestone is a meaningful slice of the clipboard.</p>
   </div>
 </section>
 
@@ -300,7 +173,8 @@ footer .disclaimer{font-size:12.5px;color:var(--gray-500);margin-top:36px;max-wi
         <ol>
           <li><a href="/skill.zip">Download the agent skill (skill.zip)</a> — it comes
             pre-configured to use this server.</li>
-          <li>On Claude.ai: Settings → Capabilities → Skills → upload the zip.
+          <li>On Claude.ai: upload the zip at
+            <a href="https://claude.ai/settings/capabilities">claude.ai/settings/capabilities</a>.
             In Claude Code or another CLI agent: unzip it in your workspace.</li>
           <li>Then say:</li>
         </ol>
