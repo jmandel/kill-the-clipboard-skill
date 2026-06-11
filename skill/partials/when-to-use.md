@@ -6,7 +6,7 @@ Use it when the patient wants to:
 - Prepare for an upcoming visit ("my appointment is Thursday — can you get my records ready?")
 - Create a SMART Health Link or a QR code for their health data
 - Skip or speed up paper check-in forms ("kill the clipboard")
-- Hand a new provider their medication list, allergies, problems, and immunizations
+- Bring a new provider up to speed with whatever parts of their history matter
 - Tell their side of the story alongside the data (the Patient Story PDF)
 - Manage a link they already created: check who accessed it, extend it after it
   expired (re-arm), pause it, change its label, or destroy it

@@ -221,8 +221,9 @@ selected MedicationRequest points to, a result a report needs).
 
 First, two approvals — **⚠️ CRITICAL: get explicit approval of the story PDF and the
 share scope before creating the link.** Recap exactly what's in the bundle ("your
-problem list, 9 medications, 3 allergies, immunizations, last year's vitals, your
-story page, and a readable summary PDF") and wait for a clear yes.
+concussion-related problems, the 2 medications, 4 allergies, both imaging reports
+with full text, your story page, and a readable summary PDF") and wait for a clear
+yes.
 
 Second, craft the **label** with the patient — it's the most visible string the clinic
 sees, shown wherever the link lands. ≤80 characters; lead with the patient's name and
