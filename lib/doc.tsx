@@ -11,7 +11,6 @@
  * pinned exactly in package.json; lib/doc.test.ts contains a geometry regression test
  * that fails loudly if an upgrade breaks it. Do not "upgrade casually."
  */
-import path from "node:path";
 import React from "react";
 import {
   Document,
@@ -22,7 +21,11 @@ import {
   renderToFile,
 } from "@react-pdf/renderer";
 
-const FONT_DIR = path.join(import.meta.dir, "fonts");
+// Fonts come from pinned npm packages (@expo-google-fonts/*, exact versions in
+// package.json) — no binaries in the repo or the skill.zip; `bun install` provides
+// them with integrity from the lockfile. Resolved relative to THIS module so the
+// same code works in the repo and inside an extracted skill.zip.
+const font = (spec: string) => Bun.resolveSync(spec, import.meta.dir);
 
 // ---------------------------------------------------------------- fonts ----
 
@@ -30,19 +33,19 @@ export function registerFonts() {
   Font.register({
     family: "Source Serif 4",
     fonts: [
-      { src: path.join(FONT_DIR, "SourceSerif4-Regular.ttf"), fontWeight: 400 },
-      { src: path.join(FONT_DIR, "SourceSerif4-Italic.ttf"), fontWeight: 400, fontStyle: "italic" },
-      { src: path.join(FONT_DIR, "SourceSerif4-SemiBold.ttf"), fontWeight: 600 },
-      { src: path.join(FONT_DIR, "SourceSerif4-Bold.ttf"), fontWeight: 700 },
+      { src: font("@expo-google-fonts/source-serif-4/400Regular/SourceSerif4_400Regular.ttf"), fontWeight: 400 },
+      { src: font("@expo-google-fonts/source-serif-4/400Regular_Italic/SourceSerif4_400Regular_Italic.ttf"), fontWeight: 400, fontStyle: "italic" },
+      { src: font("@expo-google-fonts/source-serif-4/600SemiBold/SourceSerif4_600SemiBold.ttf"), fontWeight: 600 },
+      { src: font("@expo-google-fonts/source-serif-4/700Bold/SourceSerif4_700Bold.ttf"), fontWeight: 700 },
     ],
   });
   Font.register({
     family: "Inter",
     fonts: [
-      { src: path.join(FONT_DIR, "Inter-Regular.ttf"), fontWeight: 400 },
-      { src: path.join(FONT_DIR, "Inter-Medium.ttf"), fontWeight: 500 },
-      { src: path.join(FONT_DIR, "Inter-SemiBold.ttf"), fontWeight: 600 },
-      { src: path.join(FONT_DIR, "Inter-Bold.ttf"), fontWeight: 700 },
+      { src: font("@expo-google-fonts/inter/400Regular/Inter_400Regular.ttf"), fontWeight: 400 },
+      { src: font("@expo-google-fonts/inter/500Medium/Inter_500Medium.ttf"), fontWeight: 500 },
+      { src: font("@expo-google-fonts/inter/600SemiBold/Inter_600SemiBold.ttf"), fontWeight: 600 },
+      { src: font("@expo-google-fonts/inter/700Bold/Inter_700Bold.ttf"), fontWeight: 700 },
     ],
   });
   // CJK fallback: real exports carry unicode names/notes (e.g. 王秀英); react-pdf
@@ -51,7 +54,7 @@ export function registerFonts() {
   // glyph coverage, not CJK typography.
   // Every weight/style maps to the one file: CJK has no italic tradition, and the
   // resolver throws on any unregistered variant a component happens to request.
-  const notoSrc = path.join(FONT_DIR, 'NotoSansSC-Regular.otf');
+  const notoSrc = font("@expo-google-fonts/noto-sans-sc/400Regular/NotoSansSC_400Regular.ttf");
   Font.register({
     family: 'Noto Sans SC',
     fonts: ([400, 500, 600, 700] as const).flatMap((fontWeight) => [

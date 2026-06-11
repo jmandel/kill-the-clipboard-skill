@@ -9,6 +9,9 @@
     "server": "bun run server/src/index.ts"
   },
   "dependencies": {
+    "@expo-google-fonts/inter": "0.4.1",
+    "@expo-google-fonts/noto-sans-sc": "0.4.1",
+    "@expo-google-fonts/source-serif-4": "0.4.1",
     "@react-pdf/renderer": "4.5.1",
     "qrcode": "^1.5.4",
     "react": "19.2.7",

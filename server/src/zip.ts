@@ -3,7 +3,7 @@
 //   SKILL.md                       composed by skill/build-skill.ts (buildSkillMd(baseUrl))
 //   scripts/**                     skill/scripts, {{BASE_URL}} baked in
 //   scripts/lib/kernel/*.ts(x)     vendored repo /lib (zip is self-contained, no bun install of it)
-//   scripts/lib/kernel/fonts/*     embedded OFL fonts for lib/doc.tsx
+//   (fonts: not vendored — pinned @expo-google-fonts deps in the generated package.json)
 //   scripts/package.json           deps pinned to the exact root specifiers
 //   scripts/bun.lock               root lockfile copy
 // ZIP container is hand-rolled store-only (no compression dep; fonts dominate and are small).
@@ -14,7 +14,15 @@ import { fileURLToPath } from 'node:url';
 import { utf8 } from '../../lib/encoding.ts';
 
 const REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url));
-const PINNED_DEPS = ['@react-pdf/renderer', 'react', 'react-dom', 'qrcode'];
+const PINNED_DEPS = [
+  '@react-pdf/renderer',
+  'react',
+  'react-dom',
+  'qrcode',
+  '@expo-google-fonts/inter',
+  '@expo-google-fonts/source-serif-4',
+  '@expo-google-fonts/noto-sans-sc',
+];
 const TEXT_FILE = /\.(ts|tsx|md|json|txt|html|css)$/;
 // scripts/ sits 3 levels below repo root, so an import with depth+3 `../` segments
 // that lands in lib/ is a kernel import; the zip relocates the kernel to scripts/lib/kernel/
@@ -159,12 +167,8 @@ export async function buildSkillZip(baseUrl: string): Promise<Uint8Array> {
     if (!/\.(ts|tsx)$/.test(name) || /\.test\.(ts|tsx)$/.test(name)) continue;
     entries.push({ path: `scripts/lib/kernel/${name}`, data: new Uint8Array(readFileSync(join(libDir, name))) });
   }
-  const fontsDir = join(libDir, 'fonts');
-  if (existsSync(fontsDir)) {
-    for (const name of readdirSync(fontsDir)) {
-      entries.push({ path: `scripts/lib/kernel/fonts/${name}`, data: new Uint8Array(readFileSync(join(fontsDir, name))) });
-    }
-  }
+  // Fonts are NOT vendored: doc.tsx resolves them from the pinned @expo-google-fonts
+  // packages, which `bun install` provides via the generated package.json + lockfile.
 
   const rootPkg = JSON.parse(readFileSync(join(REPO_ROOT, 'package.json'), 'utf8')) as {
     dependencies?: Record<string, string>;
@@ -185,5 +189,6 @@ export async function buildSkillZip(baseUrl: string): Promise<Uint8Array> {
     entries.push({ path: 'scripts/bun.lock', data: new Uint8Array(readFileSync(rootLock)) });
   }
 
-  return buildZip(entries);
+  // claude.ai's skill upload requires a single top-level folder containing SKILL.md.
+  return buildZip(entries.map((e) => ({ ...e, path: `kill-the-clipboard/${e.path}` })));
 }
