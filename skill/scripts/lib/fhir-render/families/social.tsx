@@ -1,4 +1,4 @@
-// social — the Observation catch-all (DESIGN.md §7 row 8): every Observation that
+// social — the Observation catch-all (docs/DESIGN.md §7 row 8): every Observation that
 // vitals/labs didn't win (social-history, sdoh, survey, exam, smartdata, functional/
 // disability status, smoking, pregnancy, occupation, ADI documentation, …) plus
 // QuestionnaireResponse. Claim precedence makes the bare resourceType test correct here.

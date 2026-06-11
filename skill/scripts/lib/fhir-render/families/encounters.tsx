@@ -1,4 +1,4 @@
-// Encounters family: Encounter + Location (DESIGN.md §7). Encounters render as one
+// Encounters family: Encounter + Location (docs/DESIGN.md §7). Encounters render as one
 // collection table, most-recent-first; Location resources render as compact facility
 // rows below (and enrich encounter location cells when references resolve in-family).
 // Location is claimed here, ahead of `supporting` in registry order, because the

@@ -1,4 +1,4 @@
-// Stateless location-URL tickets (DESIGN.md §4): HMAC-SHA256(serverSecret, linkId|fileId|exp).
+// Stateless location-URL tickets (docs/DESIGN.md §4): HMAC-SHA256(serverSecret, linkId|fileId|exp).
 // No server-side ticket state — the secret lives in the kv table, so tickets survive restarts.
 // TTL well under the spec's 1-hour cap on manifest location URLs.
 

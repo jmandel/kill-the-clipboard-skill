@@ -1,4 +1,4 @@
-// Geometry regression tests for lib/doc.tsx (DESIGN.md decision 19).
+// Geometry regression tests for lib/doc.tsx (docs/DESIGN.md decision 19).
 //
 // The repeating-table-header behavior is undocumented emergent behavior of the PINNED
 // @react-pdf/renderer version. If any of these fail after a dependency change, the

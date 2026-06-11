@@ -1,4 +1,4 @@
-// The family-renderer contract (DESIGN.md §7). See README.md in this directory for the
+// The family-renderer contract (docs/DESIGN.md §7). See README.md in this directory for the
 // full semantics every family module must honor; registry.ts fixes claim/display order.
 import type * as React from "react";
 import type { Theme } from "./engine.ts";

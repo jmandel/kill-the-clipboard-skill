@@ -29,15 +29,15 @@
 import { existsSync, mkdirSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import QRCode from 'qrcode';
-import { generateMasterSecret, deriveAuth, deriveKey } from '../../../lib/hkdf.ts';
-import { encryptJWE } from '../../../lib/jwe.ts';
-import { buildShlink, buildOwnerLink, buildViewerLink } from '../../../lib/shlink.ts';
+import { generateMasterSecret, deriveAuth, deriveKey } from '../../lib/hkdf.ts';
+import { encryptJWE } from '../../lib/jwe.ts';
+import { buildShlink, buildOwnerLink, buildViewerLink } from '../../lib/shlink.ts';
 import type {
   AddFileResponse,
   CreateLinkRequest,
   CreateLinkResponse,
   CreateShlOutput,
-} from '../../../lib/types.ts';
+} from '../../lib/types.ts';
 import { expectOk, fetchRetry, resolveServerUrl } from './_resolve-server.ts';
 
 const USAGE = `Usage: create-shl.ts --bundle bundle.json --label "..." [--exp-hours 24] [--max-uses 5] [--flag U] [--server URL] -o <outdir>`;
@@ -135,7 +135,7 @@ async function main(): Promise<void> {
 
   const shlink = buildShlink({ url, key, exp, flag, label });
   const ownerLink = buildOwnerLink(server, masterSecret);
-  // Viewer-prefixed form (DESIGN.md decision 11): a preview/share artifact ONLY —
+  // Viewer-prefixed form (docs/DESIGN.md decision 11): a preview/share artifact ONLY —
   // the QR and copy-link always carry the bare shlink.
   const viewerLink = buildViewerLink(server, shlink);
 

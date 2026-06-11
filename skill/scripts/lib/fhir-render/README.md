@@ -1,6 +1,6 @@
 # fhir-render — family renderer contract
 
-This directory is the FHIR→PDF renderer framework (DESIGN.md §7). The `render-fhir-pdf.ts`
+This directory is the FHIR→PDF renderer framework (docs/DESIGN.md §7). The `render-fhir-pdf.ts`
 CLI partitions resources across **family renderers** and assembles one summary-theme PDF.
 Each family is one module in `families/`, currently a stub. **A family agent replaces its
 own `families/<key>.tsx` wholesale and adds `families/<key>.test.tsx` next to it. Nothing

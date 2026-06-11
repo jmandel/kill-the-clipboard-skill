@@ -1,7 +1,7 @@
 # US Core synthetic fixture corpus — style guide
 
 Purpose: breadth-spanning sample instances for every US Core resource type so the FHIR→PDF
-renderer is provably good across the space of what can occur (DESIGN.md §10). Breadth, not
+renderer is provably good across the space of what can occur (docs/DESIGN.md §10). Breadth, not
 depth: a small set per type that collectively exercises every must-support element, every
 realistic choice-type variant, and the representation edge cases.
 

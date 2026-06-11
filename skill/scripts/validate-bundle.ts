@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * validate-bundle.ts — PatientSharedBundle conformance checker (DESIGN.md §8).
+ * validate-bundle.ts — PatientSharedBundle conformance checker (docs/DESIGN.md §8).
  *
  * Usage:
  *   validate-bundle.ts <bundle.json> [--rendered-ids rendered-ids.json] [--shl-payload payload.json]
@@ -26,7 +26,7 @@
  *   rendered-coverage-unverified reference-unresolved reference-external
  */
 
-import type { ValidateOutput } from '../../../lib/types.ts';
+import type { ValidateOutput } from '../../lib/types.ts';
 
 const USAGE = 'usage: validate-bundle.ts <bundle.json> [--rendered-ids rendered-ids.json] [--shl-payload payload.json]';
 

@@ -1,4 +1,4 @@
-// Retention sweeper (DESIGN.md §4, decision 14): ciphertext is purged purgeAfterDays after
+// Retention sweeper (docs/DESIGN.md §4, decision 14): ciphertext is purged purgeAfterDays after
 // the link's exp; the link row + audit log remain as an honest tombstone (purged_at set).
 // Re-arm works until purge; after purge the owner must re-upload (which clears the tombstone).
 

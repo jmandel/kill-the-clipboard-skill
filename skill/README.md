@@ -5,8 +5,8 @@
 1. `header.md` — frontmatter (`name: kill-the-clipboard` + trigger description) and intro
 2. `when-to-use.md` — triggers and phase-1 scope boundaries
 3. `background.md` — KTC explainer for the agent (receiver persistence obligations, PAMI, the two PDF kinds, 2026 staging, link lifecycle)
-4. `workflow.md` — Steps 1–10 (DESIGN.md §6) with exact commands and stdout shapes
-5. `bundle-rules.md` — PatientSharedBundle / DocumentReference rules (DESIGN.md §5, distilled)
+4. `workflow.md` — Steps 1–10 (docs/DESIGN.md §6) with exact commands and stdout shapes
+5. `bundle-rules.md` — PatientSharedBundle / DocumentReference rules (docs/DESIGN.md §5, distilled)
 6. `secrets.md` — file-not-stdout conventions and the per-platform handoff matrix
 7. `script-reference.md` — script table (the build test cross-checks these names against `kill-the-clipboard/scripts/`)
 

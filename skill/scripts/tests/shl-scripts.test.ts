@@ -5,17 +5,17 @@ import { afterAll, beforeAll, describe, expect, test } from 'bun:test';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { b64url } from '../../../../lib/encoding.ts';
-import { authHash, deriveAuth, deriveKey } from '../../../../lib/hkdf.ts';
-import { decryptJWE } from '../../../../lib/jwe.ts';
-import { parseFragment, parseShlink } from '../../../../lib/shlink.ts';
+import { b64url } from '../../../lib/encoding.ts';
+import { authHash, deriveAuth, deriveKey } from '../../../lib/hkdf.ts';
+import { decryptJWE } from '../../../lib/jwe.ts';
+import { parseFragment, parseShlink } from '../../../lib/shlink.ts';
 import type {
   AccessEntry,
   CreateLinkRequest,
   CreateShlOutput,
   ManagePatch,
   ManageState,
-} from '../../../../lib/types.ts';
+} from '../../../lib/types.ts';
 import { normalizeBaseUrl, resolveServerUrl } from '../_resolve-server.ts';
 
 const SCRIPTS_DIR = join(import.meta.dir, '..');

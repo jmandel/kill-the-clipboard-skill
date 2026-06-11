@@ -70,7 +70,7 @@ export function OwnerView({
     return () => { cancelled = true; };
   }, [client, masterSecret]);
 
-  // QR/shlink ALWAYS reconstructed from current state (DESIGN.md §3) so label/exp
+  // QR/shlink ALWAYS reconstructed from current state (docs/DESIGN.md §3) so label/exp
   // edits and re-arms propagate without anything being stored.
   useEffect(() => {
     if (!state) return;

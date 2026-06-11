@@ -83,7 +83,7 @@ into a `PatientSharedBundle`, encrypted client-side, and hosted as a U-flag SHL.
     needed pattern files. Rejected: pdfmake (0.3 API churn with SILENT no-ops + stale LLM
     training data — worst failure mode for AI-maintained code, despite best vendorability);
     Typst (superb output/speed but 52 MB per-platform native blob; remains the swap
-    candidate behind the lib/doc.ts interface). Bake-off artifacts: bakeoff/*/, each with
+    candidate behind the lib/doc.ts interface). Bake-off artifacts: docs/bakeoff/*/, each with
     NOTES.md, PDFs, PNGs; the react-pdf builder prototype (doc.tsx, 696 LOC) seeds the real
     lib/doc.ts implementation.
 

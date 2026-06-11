@@ -1,4 +1,4 @@
-// Tests for md-to-pdf.ts + preview-pdf.ts (DESIGN.md decisions 17/18/19).
+// Tests for md-to-pdf.ts + preview-pdf.ts (docs/DESIGN.md decisions 17/18/19).
 //
 // Dialect tests assert parser → component-call structure without rendering; render tests
 // follow the lib/doc.test.ts geometry approach (pdfinfo/pdftotext assertions, never pixels);
@@ -16,7 +16,7 @@ import { type Block, compileMarkdown, parseInline } from '../md-to-pdf.ts';
 const SCRIPTS = join(import.meta.dir, '..');
 const MD_TO_PDF = join(SCRIPTS, 'md-to-pdf.ts');
 const PREVIEW = join(SCRIPTS, 'preview-pdf.ts');
-const STORY_MD = join(SCRIPTS, '../../../bakeoff/content/story.md');
+const STORY_MD = join(SCRIPTS, '../../docs/bakeoff/content/story.md');
 
 const dir = mkdtempSync(join(tmpdir(), 'ktc-md-test-'));
 afterAll(() => rmSync(dir, { recursive: true, force: true }));

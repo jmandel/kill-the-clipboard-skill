@@ -1,4 +1,4 @@
-// DESIGN.md §9 server matrix: in-memory sqlite + ephemeral port, real HTTP through Bun.serve.
+// docs/DESIGN.md §9 server matrix: in-memory sqlite + ephemeral port, real HTTP through Bun.serve.
 
 import { afterEach, describe, expect, test } from 'bun:test';
 import { existsSync } from 'node:fs';

@@ -1,5 +1,5 @@
 // Generic completeness renderer — the "Other records" safety net behind every family
-// (DESIGN.md §7 last row). Anything no family claims is flattened to a key-path/value
+// (docs/DESIGN.md §7 last row). Anything no family claims is flattened to a key-path/value
 // table, one table per resourceType group, one header row + leaf rows per instance.
 // This module is the completeness guarantee for the FHIR-Rendered PDF SHALL: it must
 // render literally anything (alien types, null, scalars) and must NEVER throw.

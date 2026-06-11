@@ -71,5 +71,5 @@ that makes a purged link servable again.
 bun test server/src/
 ```
 
-In-memory SQLite + ephemeral ports; covers the DESIGN.md §9 server matrix including the
+In-memory SQLite + ephemeral ports; covers the docs/DESIGN.md §9 server matrix including the
 parallel passcode-guess race and end-to-end encrypt/decrypt through `lib/jwe.ts`.

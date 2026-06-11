@@ -66,8 +66,8 @@ inside the `shlink:/` payload the patient shares.
 | `skill/` | The agent skill: `SKILL.md` (composed from `partials/`) plus Bun scripts — `assemble-bundle`, `validate-bundle`, `render-fhir-pdf` (15 US Core family renderers + fallback), `md-to-pdf`, `preview-pdf`, `create-shl`, `manage-shl` |
 | `tests/fixtures/uscore/` | Synthetic US Core 9.0.0 breadth corpus: ~140 instances across 16 families, every must-support element and choice-type variant covered, audited (`COVERAGE-REPORT.md`) |
 | `tests/fixtures/real-world/` | A real Epic/UnityPoint export, PII-masked by a reproducible script and adversarially audited (`SANITIZATION.md`) |
-| `bakeoff/` | The PDF-engine bake-off (pdfmake vs react-pdf vs Typst) that picked the document engine — kept as a decision record |
-| `DESIGN.md` | The full design record: 19+ numbered, settled decisions with rationale |
+| `docs/bakeoff/` | The PDF-engine bake-off (pdfmake vs react-pdf vs Typst) that picked the document engine — kept as a decision record |
+| `docs/DESIGN.md` | The full design record: 19+ numbered, settled decisions with rationale |
 
 ## Run it
 
@@ -118,7 +118,7 @@ the kind of per-provider FHIR bundles this skill selects from.
 
 See `CLAUDE.md` (binding for human and AI contributors): frozen kernel, secrets never
 on stdout, hostile-input FHIR handling, test tiers. The design history and every
-settled decision live in `DESIGN.md`.
+settled decision live in `docs/DESIGN.md`.
 
 ## License
 

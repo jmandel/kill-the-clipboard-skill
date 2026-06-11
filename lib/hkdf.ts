@@ -1,4 +1,4 @@
-// Capability derivation (DESIGN.md §3).
+// Capability derivation (docs/DESIGN.md §3).
 //
 // One 32-byte owner master secret M. Two one-way derivations:
 //   auth = HKDF-SHA256(M, info="ktc-shl/v1/auth")  → control capability, registered with server

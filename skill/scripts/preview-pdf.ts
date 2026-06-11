@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * preview-pdf.ts — rasterize a PDF to PNGs for visual verification (DESIGN.md decision 18:
+ * preview-pdf.ts — rasterize a PDF to PNGs for visual verification (docs/DESIGN.md decision 18:
  * "render with pdftoppm and inspect before declaring done").
  *
  * Usage:

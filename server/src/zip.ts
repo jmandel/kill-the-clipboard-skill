@@ -1,7 +1,7 @@
-// skill.zip builder (DESIGN.md §2): composed per-request so {{BASE_URL}} always reflects the
+// skill.zip builder (docs/DESIGN.md §2): composed per-request so {{BASE_URL}} always reflects the
 // serving config. Zip layout:
 //   SKILL.md                       composed by skill/build-skill.ts (buildSkillMd(baseUrl))
-//   scripts/**                     skill/kill-the-clipboard/scripts, {{BASE_URL}} baked in
+//   scripts/**                     skill/scripts, {{BASE_URL}} baked in
 //   scripts/lib/kernel/*.ts(x)     vendored repo /lib (zip is self-contained, no bun install of it)
 //   scripts/lib/kernel/fonts/*     embedded OFL fonts for lib/doc.tsx
 //   scripts/package.json           deps pinned to the exact root specifiers
@@ -18,7 +18,7 @@ const PINNED_DEPS = ['@react-pdf/renderer', 'react', 'react-dom', 'qrcode'];
 const TEXT_FILE = /\.(ts|tsx|md|json|txt|html|css)$/;
 // scripts/ sits 3 levels below repo root, so an import with depth+3 `../` segments
 // that lands in lib/ is a kernel import; the zip relocates the kernel to scripts/lib/kernel/
-const SCRIPTS_DEPTH_TO_ROOT = 3;
+const SCRIPTS_DEPTH_TO_ROOT = 2;
 const KERNEL_IMPORT = /(['"])((?:\.\.\/)+)lib\/([A-Za-z0-9._-]+\.tsx?)\1/g;
 
 export function rewriteKernelImports(source: string, relPath: string): string {
@@ -140,7 +140,7 @@ export async function buildSkillZip(baseUrl: string): Promise<Uint8Array> {
   const skillMd: string = await mod.buildSkillMd(baseUrl);
   const entries: ZipEntry[] = [{ path: 'SKILL.md', data: utf8(skillMd) }];
 
-  const scriptsDir = join(REPO_ROOT, 'skill', 'kill-the-clipboard', 'scripts');
+  const scriptsDir = join(REPO_ROOT, 'skill', 'scripts');
   for (const file of walk(scriptsDir)) {
     const rel = relative(scriptsDir, file).split(sep).join('/');
     // kernel + manifest are regenerated below; anything checked in under those names is stale

@@ -1,5 +1,5 @@
 // Family registry — the single source of truth for BOTH section display order and claim
-// precedence (DESIGN.md §7 reading order). The first family in this order whose claims()
+// precedence (docs/DESIGN.md §7 reading order). The first family in this order whose claims()
 // returns true wins a resource; fallback is last and claims everything, so every input
 // resource is guaranteed a renderer. Family agents replace their families/<key>.tsx stub
 // wholesale but never edit this file.

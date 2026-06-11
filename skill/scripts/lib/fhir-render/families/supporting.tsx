@@ -1,5 +1,5 @@
 // Supporting family: Practitioner, PractitionerRole, Organization, Location,
-// RelatedPerson, Provenance (DESIGN.md §7). Reference material, late order: one compact
+// RelatedPerson, Provenance (docs/DESIGN.md §7). Reference material, late order: one compact
 // care-team table (one row per instance, grouped by kind — never dropped), then
 // Provenance as one-line source rows. Location is normally won by `encounters` (earlier
 // in registry order); it is still claimed and rendered here so the family is complete

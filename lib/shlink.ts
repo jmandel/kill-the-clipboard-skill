@@ -1,4 +1,4 @@
-// SHLink payload construction/parsing (base spec) + owner-link fragments (DESIGN.md §3).
+// SHLink payload construction/parsing (base spec) + owner-link fragments (docs/DESIGN.md §3).
 
 import { b64url, b64urlDecode, utf8, utf8Decode } from './encoding.ts';
 

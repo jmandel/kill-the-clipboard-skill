@@ -10,8 +10,8 @@ import { describe, expect, test } from 'bun:test';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { amplify, loadFamilyFixtures, pdfText, renderFamiliesToPdf } from '../../skill/kill-the-clipboard/scripts/lib/fhir-render/harness.ts';
-import { registry } from '../../skill/kill-the-clipboard/scripts/lib/fhir-render/registry.ts';
+import { amplify, loadFamilyFixtures, pdfText, renderFamiliesToPdf } from '../../skill/scripts/lib/fhir-render/harness.ts';
+import { registry } from '../../skill/scripts/lib/fhir-render/registry.ts';
 
 const enabled = process.env.RUN_VOLUME === '1';
 

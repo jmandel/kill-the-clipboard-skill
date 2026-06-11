@@ -1,5 +1,5 @@
 /**
- * doc.tsx — semantic document builder on top of @react-pdf/renderer (DESIGN.md decisions 18/19).
+ * doc.tsx — semantic document builder on top of @react-pdf/renderer (docs/DESIGN.md decisions 18/19).
  *
  * Theme-aware semantic components: title, section, para, pullQuote, callout, kvPanel,
  * bulletList, table, badge, pageFooter, page, renderDoc. Callers (renderer modules,

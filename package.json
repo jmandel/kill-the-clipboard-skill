@@ -4,9 +4,8 @@
   "type": "module",
   "scripts": {
     "test": "bun test",
-    "test:render": "RUN_RENDER=1 bun test skill/kill-the-clipboard/scripts/lib/fhir-render skill/kill-the-clipboard/scripts/tests/md-to-pdf.test.ts",
+    "test:render": "RUN_RENDER=1 bun test skill/scripts/lib/fhir-render skill/scripts/tests/md-to-pdf.test.ts",
     "test:all": "RUN_RENDER=1 RUN_VOLUME=1 bun test",
-    "test:par": "RUN_RENDER=1 bash scripts/test-parallel.sh",
     "server": "bun run server/src/index.ts"
   },
   "dependencies": {

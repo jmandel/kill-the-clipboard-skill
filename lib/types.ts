@@ -1,4 +1,4 @@
-// Shared API + protocol types (DESIGN.md §4). FROZEN during parallel build:
+// Shared API + protocol types (docs/DESIGN.md §4). FROZEN during parallel build:
 // interface changes route through the orchestrator, never made unilaterally by a unit.
 
 // --- Control plane --------------------------------------------------------------------

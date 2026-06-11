@@ -1,6 +1,6 @@
 # kill-the-clipboard — conventions (binding for every contributor, human or agent)
 
-Read DESIGN.md before any work; its decisions log (§1) is settled — do not re-litigate.
+Read docs/DESIGN.md before any work; its decisions log (§1) is settled — do not re-litigate.
 
 ## Hard rules
 
@@ -52,7 +52,7 @@ Read DESIGN.md before any work; its decisions log (§1) is settled — do not re
 - PDF outputs are verified visually: render with `pdftoppm -png -r 120` and inspect
   before declaring done. "It compiled" is not "it renders correctly."
 - Fixtures: `tests/fixtures/uscore/` (synthetic breadth corpus — see STYLE.md) and the
-  real-world UnityPoint export (path in DESIGN.md; never commit it — real PHI).
+  real-world UnityPoint export (path in docs/DESIGN.md; never commit it — real PHI).
 
 ## Spec invariants worth re-reading before touching related code
 

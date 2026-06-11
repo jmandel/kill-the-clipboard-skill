@@ -1,4 +1,4 @@
-// End-to-end tests for assemble-bundle.ts + validate-bundle.ts (DESIGN.md §5, §8).
+// End-to-end tests for assemble-bundle.ts + validate-bundle.ts (docs/DESIGN.md §5, §8).
 //
 // Positive path: a selection composed from the breadth corpus (constant patient + PAMI
 // spread + documents family + supporting closure) plus real tiny PDFs rendered through
@@ -10,10 +10,10 @@ import { beforeAll, describe, expect, test } from 'bun:test';
 import { mkdtempSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { page, para, renderDoc, section, storyTheme, summaryTheme } from '../../../../lib/doc.tsx';
+import { page, para, renderDoc, section, storyTheme, summaryTheme } from '../../../lib/doc.tsx';
 
-const REPO = join(import.meta.dir, '../../../..');
-const SCRIPTS = join(REPO, 'skill/kill-the-clipboard/scripts');
+const REPO = join(import.meta.dir, '../../..');
+const SCRIPTS = join(REPO, 'skill/scripts');
 const CORPUS = join(REPO, 'tests/fixtures/uscore');
 const INVALID = join(REPO, 'tests/fixtures/invalid');
 const ASSEMBLE = join(SCRIPTS, 'assemble-bundle.ts');

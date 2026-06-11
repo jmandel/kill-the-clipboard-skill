@@ -1,4 +1,4 @@
-// Control-plane client (DESIGN.md §4). Same-origin by default; &api= fragment param
+// Control-plane client (docs/DESIGN.md §4). Same-origin by default; &api= fragment param
 // overrides. The auth capability rides in the path, never in logs or error text.
 
 import type { ApiError, ManagePatch, ManageState } from '../../../lib/types.ts';

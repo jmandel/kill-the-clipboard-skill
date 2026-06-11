@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * md-to-pdf.ts — markdown adapter onto the lib/doc.tsx semantic builder (DESIGN.md 17/18/19).
+ * md-to-pdf.ts — markdown adapter onto the lib/doc.tsx semantic builder (docs/DESIGN.md 17/18/19).
  *
  * The layout engine owns ALL layout; this file is parsing + component mapping only.
  *
@@ -55,7 +55,7 @@ import {
   summaryTheme,
   table,
   title as titleBlock,
-} from '../../../lib/doc.tsx';
+} from '../../lib/doc.tsx';
 
 const USAGE =
   'Usage: md-to-pdf.ts <input.md> [output.pdf] [--theme story|summary] [--title T] ' +

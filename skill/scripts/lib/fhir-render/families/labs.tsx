@@ -1,4 +1,4 @@
-// labs family — Laboratory & Clinical Results (DESIGN.md §7, contract ../README.md).
+// labs family — Laboratory & Clinical Results (docs/DESIGN.md §7, contract ../README.md).
 // One results table: DiagnosticReports are bold grouping rows with their member
 // Observations indented beneath (result entries that don't resolve to a shared resource
 // still get a display-only row, so the report reads complete); standalone Observations

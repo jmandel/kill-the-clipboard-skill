@@ -27,10 +27,10 @@
 
 import { statSync } from 'node:fs';
 import { join } from 'node:path';
-import { deriveAuth, deriveKey } from '../../../lib/hkdf.ts';
-import { encryptJWE } from '../../../lib/jwe.ts';
-import { parseFragment } from '../../../lib/shlink.ts';
-import type { ManagePatch, ManageState } from '../../../lib/types.ts';
+import { deriveAuth, deriveKey } from '../../lib/hkdf.ts';
+import { encryptJWE } from '../../lib/jwe.ts';
+import { parseFragment } from '../../lib/shlink.ts';
+import type { ManagePatch, ManageState } from '../../lib/types.ts';
 import { expectOk, fetchRetry, resolveServerUrl } from './_resolve-server.ts';
 
 const USAGE = `Usage: manage-shl.ts <outdir|owner-link.txt> <verb> [options] [--server URL]

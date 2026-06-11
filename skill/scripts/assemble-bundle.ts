@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * assemble-bundle.ts — build a conformant PatientSharedBundle (KTC profile, DESIGN.md §5)
+ * assemble-bundle.ts — build a conformant PatientSharedBundle (KTC profile, docs/DESIGN.md §5)
  * from selected FHIR R4 resources plus optional Patient Story / FHIR-Rendered PDFs.
  *
  * This script OWNS bundle conformance: urn:uuid fullUrls, intra-bundle reference

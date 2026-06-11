@@ -33,7 +33,7 @@ export function routeFragment(rawHash: string): Route {
   }
 }
 
-// --- Status derivation (DESIGN.md §4: liveness is derived, never stored) --------------
+// --- Status derivation (docs/DESIGN.md §4: liveness is derived, never stored) --------------
 
 export type LinkStatus = 'live' | 'paused' | 'expired' | 'exhausted' | 'destroyed';
 
@@ -62,7 +62,7 @@ export const STATUS_TEXT: Record<LinkStatus, { title: string; detail: string }> 
   },
 };
 
-// --- Payload / QR reconstruction (DESIGN.md §3: always rebuilt, never stored) ----------
+// --- Payload / QR reconstruction (docs/DESIGN.md §3: always rebuilt, never stored) ----------
 
 export async function authForSecret(masterSecret: Uint8Array): Promise<string> {
   return deriveAuth(masterSecret);

@@ -111,7 +111,7 @@ export async function renderFamiliesToPdf(
   return { renderedIds, sections, pages: await countPages(outPdf), fallbackCount: fbBucket.length };
 }
 
-const FIXTURES_ROOT = path.join(import.meta.dir, "../../../../../tests/fixtures/uscore");
+const FIXTURES_ROOT = path.join(import.meta.dir, "../../../../tests/fixtures/uscore");
 
 /** Load every fixture instance in tests/fixtures/uscore/<dir> (coverage.json excluded). */
 export function loadFamilyFixtures(familyDirName: string): any[] {
