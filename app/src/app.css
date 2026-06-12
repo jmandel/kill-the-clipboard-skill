@@ -359,12 +359,28 @@ select, input[type='text'] {
   background: var(--surface-alt); color: var(--fg-2);
   border: 1px solid var(--border); border-radius: var(--radius-lg);
 }
+/* Bottom-sheet is a phone idiom; on anything taller it strands the dialog at the
+   viewport's bottom edge, far from the button that opened it — center it instead. */
+@media (min-width: 520px) {
+  .sheet-backdrop { align-items: center; padding: 24px; }
+  .sheet { border-radius: 20px; padding-bottom: 28px; }
+  .sheet-handle { display: none; }
+}
 
 /* ---- misc ----------------------------------------------------------------------- */
 .error-box {
   background: var(--danger-wash);
   border: 1px solid rgba(229, 68, 59, 0.4);
   color: var(--danger);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+.notice-box {
+  background: var(--warning-wash);
+  border: 1px solid rgba(240, 150, 35, 0.45);
+  color: #8a5a10;
   border-radius: var(--radius-md);
   padding: 12px 14px;
   font-size: 14px;

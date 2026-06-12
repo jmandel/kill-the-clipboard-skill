@@ -112,6 +112,20 @@ export function viewerLinkFor(pageOrigin: string, payload: ShlinkPayload): strin
   return buildViewerLink(pageOrigin, buildShlink(payload));
 }
 
+/**
+ * Why a link would STILL be down after resuming — pause masks expiry/exhaustion in
+ * deriveStatus, and a resume that doesn't restore service reads as "resume is broken"
+ * (the data plane's privacy-preserving 404 can't say why). Field-tested failure mode.
+ */
+export function blockedBeyondPause(
+  s: Pick<ManageState, 'exp' | 'maxUses' | 'uses'>,
+  nowSec: number = Math.floor(Date.now() / 1000),
+): 'expired' | 'exhausted' | null {
+  if (nowSec >= s.exp) return 'expired';
+  if (s.maxUses !== null && s.uses >= s.maxUses) return 'exhausted';
+  return null;
+}
+
 // --- Re-arm ----------------------------------------------------------------------------
 
 export const DEFAULT_REARM_HOURS = 24;

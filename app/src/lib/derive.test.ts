@@ -4,6 +4,7 @@ import { deriveAuth, deriveKey } from '../../../lib/hkdf.ts';
 import { buildShlink, parseShlink } from '../../../lib/shlink.ts';
 import {
   authForSecret,
+  blockedBeyondPause,
   deriveStatus,
   formatCountdown,
   payloadToShlink,
@@ -149,6 +150,23 @@ describe('re-arm patch construction', () => {
     expect(deriveStatus(stale, now)).toBe('expired');
     const p = rearmPatch(stale, 24, 5, now);
     expect(deriveStatus({ ...stale, exp: p.exp!, maxUses: p.maxUses! }, now)).toBe('live');
+  });
+});
+
+describe('blockedBeyondPause', () => {
+  // Field-tested failure mode: a paused link that ALSO hit its use limit stays 404
+  // after resume, and the viewer can't say why — the owner page must name the blocker.
+  const now = 1_000_000;
+  test('exhaustion hides behind pause', () => {
+    expect(blockedBeyondPause({ exp: now + 3600, maxUses: 5, uses: 5 }, now)).toBe('exhausted');
+  });
+  test('expiry hides behind pause (and wins over exhaustion)', () => {
+    expect(blockedBeyondPause({ exp: now - 1, maxUses: 5, uses: 2 }, now)).toBe('expired');
+    expect(blockedBeyondPause({ exp: now - 1, maxUses: 5, uses: 5 }, now)).toBe('expired');
+  });
+  test('nothing else blocking → resume restores service', () => {
+    expect(blockedBeyondPause({ exp: now + 3600, maxUses: 5, uses: 4 }, now)).toBeNull();
+    expect(blockedBeyondPause({ exp: now + 3600, maxUses: null, uses: 999 }, now)).toBeNull();
   });
 });
 

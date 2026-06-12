@@ -7,6 +7,8 @@ import { BundleView } from './BundleView.tsx';
 import { Icon, Shell, StatusPill } from './Chrome.tsx';
 import { QrCard } from './QrCard.tsx';
 
+const RECIPIENT_KEY = 'ktc-recipient-name';
+
 export function ViewerView({ payload }: { payload: ShlinkPayload }) {
   const [now] = useState(() => Math.floor(Date.now() / 1000));
   const [copied, setCopied] = useState(false);
@@ -15,7 +17,15 @@ export function ViewerView({ payload }: { payload: ShlinkPayload }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [passcode, setPasscode] = useState('');
-  const [recipient, setRecipient] = useState('');
+  // Remember the recipient's own name (NOT a secret — decision 13's no-localStorage
+  // rule is about the link key) so a returning recipient just hits Enter.
+  const [recipient, setRecipient] = useState(() => {
+    try {
+      return localStorage.getItem(RECIPIENT_KEY) ?? '';
+    } catch {
+      return '';
+    }
+  });
   const [needsPasscode, setNeedsPasscode] = useState(() => Boolean(payload.flag?.includes('P')));
 
   // Re-shares from this page carry the viewer-prefixed form (decision 11): any phone
@@ -35,6 +45,9 @@ export function ViewerView({ payload }: { payload: ShlinkPayload }) {
     setError(null);
     try {
       setBundles(await fetchShlBundles(payload, recipient.trim(), passcode || undefined));
+      try {
+        localStorage.setItem(RECIPIENT_KEY, recipient.trim());
+      } catch {}
     } catch (e) {
       if (e instanceof PasscodeRequiredError) {
         setNeedsPasscode(true);
@@ -68,32 +81,38 @@ export function ViewerView({ payload }: { payload: ShlinkPayload }) {
           </div>
 
           {!bundles && (
-            <input
-              type="text"
-              className="passcode-input"
-              placeholder="Your name (the sharer sees who opened it)"
-              value={recipient}
-              onChange={(e) => setRecipient(e.target.value)}
-            />
-          )}
-          {!bundles && needsPasscode && (
-            <input
-              type="password"
-              className="passcode-input"
-              placeholder="Passcode for this link"
-              value={passcode}
-              onChange={(e) => setPasscode(e.target.value)}
-            />
-          )}
-          {!bundles && (
-            <button
-              type="button"
-              className="btn-block"
-              disabled={busy || expired || !recipient.trim() || (needsPasscode && !passcode)}
-              onClick={() => void openRecords()}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!busy && !expired && recipient.trim() && !(needsPasscode && !passcode)) void openRecords();
+              }}
             >
-              {busy ? 'Opening…' : 'Open shared records'}
-            </button>
+              <input
+                type="text"
+                className="passcode-input"
+                placeholder="Your name (the sharer sees who opened it)"
+                value={recipient}
+                autoFocus
+                onFocus={(e) => e.target.select()}
+                onChange={(e) => setRecipient(e.target.value)}
+              />
+              {needsPasscode && (
+                <input
+                  type="password"
+                  className="passcode-input"
+                  placeholder="Passcode for this link"
+                  value={passcode}
+                  onChange={(e) => setPasscode(e.target.value)}
+                />
+              )}
+              <button
+                type="submit"
+                className="btn-block"
+                disabled={busy || expired || !recipient.trim() || (needsPasscode && !passcode)}
+              >
+                {busy ? 'Opening…' : 'Open shared records'}
+              </button>
+            </form>
           )}
           {!bundles && (
             <p className="row-hint" style={{ marginBottom: 16 }}>

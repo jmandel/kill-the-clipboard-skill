@@ -76,7 +76,8 @@ async function loadOwnerSecret(
   if (hashIdx === -1) throw new Error(`not an owner link (no fragment): ${path}`);
   const parsed = parseFragment(ownerLink.slice(hashIdx + 1));
   if (parsed.mode !== 'owner') throw new Error(`not an owner link (viewer shlink found): ${path}`);
-  const linkOrigin = ownerLink.slice(0, hashIdx).replace(/\/s$/, '');
+  // Owner links live at /m (with /s as legacy alias); strip the page route to get the API base.
+  const linkOrigin = ownerLink.slice(0, hashIdx).replace(/\/[msv]$/, '');
   return { masterSecret: parsed.masterSecret, linkOrigin, ownerLink };
 }
 

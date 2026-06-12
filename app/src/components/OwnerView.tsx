@@ -3,6 +3,7 @@ import type { ManagePatch, ManageState } from '../../../lib/types.ts';
 import { ManageApi } from '../lib/api.ts';
 import {
   authForSecret,
+  blockedBeyondPause,
   decryptLabel,
   encryptLabel,
   DEFAULT_REARM_HOURS,
@@ -42,6 +43,7 @@ export function OwnerView({
   const [shlink, setShlink] = useState<string | null>(null);
   const [label, setLabel] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   const [bookmarkable, setBookmarkable] = useState(false);
@@ -101,19 +103,22 @@ export function OwnerView({
 
   const status: LinkStatus | null = state ? deriveStatus(state, now) : null;
 
-  const run = async (fn: () => Promise<ManageState>) => {
+  const run = async (fn: () => Promise<ManageState>, after?: (s: ManageState) => string | null) => {
     setBusy(true);
     setError(null);
+    setNotice(null);
     try {
-      setState(await fn());
+      const s = await fn();
+      setState(s);
+      if (after) setNotice(after(s));
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Action failed');
     } finally {
       setBusy(false);
     }
   };
-  const applyPatch = (patch: ManagePatch) => {
-    if (auth) void run(() => client.patch(auth, patch));
+  const applyPatch = (patch: ManagePatch, after?: (s: ManageState) => string | null) => {
+    if (auth) void run(() => client.patch(auth, patch), after);
   };
 
   const flashCopied = (which: string) => {
@@ -165,6 +170,7 @@ export function OwnerView({
 
       <Shell title="My Health Link" pill={<StatusPill status={status} />}>
         {error && <p className="error-box">{error}</p>}
+        {notice && <p className="notice-box">{notice}</p>}
 
         <div className="link-head">
           {editingLabel ? (
@@ -316,13 +322,30 @@ export function OwnerView({
                 type="button"
                 className="btn-outline"
                 disabled={busy}
-                onClick={() => applyPatch({ active: status !== 'paused' ? false : true })}
+                onClick={() =>
+                  applyPatch({ active: status !== 'paused' ? false : true }, (s) => {
+                    // A resume that doesn't restore service reads as "resume is broken"
+                    // (the viewer's 404 can't say why) — name the real blocker here.
+                    if (status !== 'paused') return null;
+                    const blocked = blockedBeyondPause(s, now);
+                    if (blocked === null) return null;
+                    return `Resumed — but the link is still not serving: ${
+                      blocked === 'expired' ? 'it has expired' : 'its use limit is reached'
+                    }. Re-arm to restore access.`;
+                  })
+                }
               >
                 {status === 'paused' ? Icon.play : Icon.pause}
                 {status === 'paused' ? 'Resume' : 'Pause'}
               </button>
               <div className="row-hint">
-                {status === 'paused' ? 'Lets people open the link again' : 'Temporarily blocks access; resume any time'}
+                {status !== 'paused'
+                  ? 'Temporarily blocks access; resume any time'
+                  : blockedBeyondPause(state, now) === null
+                    ? 'Lets people open the link again'
+                    : `Resume alone won't restore access — the link is also ${
+                        blockedBeyondPause(state, now) === 'expired' ? 'expired' : 'at its use limit'
+                      }; re-arm too`}
               </div>
             </div>
           )}

@@ -68,17 +68,29 @@ what's actually in their records and the visit they're preparing for, make a con
 recommendation, and ask whether they'd like to share broadly or focus:
 
 > "I can share anything from your records — you decide what the clinic sees. For
-> your [neurology visit], I'd suggest a solid clinical summary — problems,
+> your [cardiology visit], I'd suggest a solid clinical summary — problems,
 > medications, allergies, immunizations, recent vitals and labs — and then go
-> deeper on what matters for this visit: [the imaging reports and consult notes
-> from your head injury]. Want to share broadly like that, focus just on
-> [the concussion history], or adjust?"
+> deeper on what matters for this visit: [the echo reports and consult notes
+> from your arrhythmia workup]. Want to share broadly like that, focus just on
+> [the heart-rhythm history], or adjust?"
 
-The general steer: **good clinical-summary content as the base, then depth where the
-visit calls for it** — clinical notes you have on hand, a richer history of labs or
-vitals when the trend matters, prior imaging or consults for the presenting problem.
-Tailor the recommendation to what the records actually contain; never offer content
-that isn't there.
+**Always include the safety-critical core: allergies, current medications, and
+active/relevant problems — in every share, regardless of focus, unless the patient
+specifically asks to leave something out.** A clinic acting on a "focused" share
+without the allergy list or med list can prescribe into an interaction or
+contraindication it had no way to see. So even when the patient picks "focus just on
+the heart-rhythm history," the focused share still carries allergies + current meds +
+the problems relevant to the visit; treat that as the floor you inform about ("I'm
+including your allergies and current medications — clinics need those for safe
+prescribing"), not a question. If the patient asks to drop one of these, honor it —
+it's their share — but confirm explicitly rather than inferring it from a focus
+choice.
+
+The general steer beyond that core: **good clinical-summary content as the base,
+then depth where the visit calls for it** — clinical notes you have on hand, a
+richer history of labs or vitals when the trend matters, prior imaging or consults
+for the presenting problem. Tailor the recommendation to what the records actually
+contain; never offer content that isn't there.
 
 While scoping, also **offer to help the patient tell their own story** (Step 4) —
 what they're worried about, what they want from the visit — alongside the records.
@@ -241,8 +253,8 @@ selected MedicationRequest points to, a result a report needs).
 decision moment, not a series. Present a single recap that covers all three things,
 then ask once (a structured question with options works well here):
 
-> "Here's what your share will contain: your concussion-related problems, the 2
-> medications, 4 allergies, both imaging reports with full text, your story page,
+> "Here's what your share will contain: your heart-rhythm-related problems, the 2
+> medications, 4 allergies, both echo reports with full text, your story page,
 > and a readable summary PDF. The link works for 24 hours or 5 scans — if your visit
 > slips, re-arming takes one command. I'd label it **Josh Mandel — visit summary for
 > June 12** (it's the most visible text the front desk sees). Build it? [Yes, build
@@ -250,13 +262,13 @@ then ask once (a structured question with options works well here):
 
 The label is ≤80 characters; lead with the patient's name and say what/when:
 
-- `Josh Mandel — visit summary for June 12`
+- `Avery Quinn — visit summary for June 12`
 - `Maria Quintana — new patient intake, Lakeside Family Medicine`
 - `Sam Lee — med list + allergies for ortho consult`
 
 ```bash
 bun <skill-dir>/scripts/create-shl.ts --bundle bundle.json \
-  --label "Josh Mandel — visit summary for June 12" -o ./shl-out/
+  --label "Avery Quinn — visit summary for June 12" -o ./shl-out/
 ```
 
 Defaults: `--exp-hours 24`, `--max-uses 5` (`--max-uses unlimited` to lift the cap),
@@ -272,7 +284,7 @@ link. Exact stdout contract:
 {
   "status": "created",
   "id": "…",
-  "label": "Josh Mandel — visit summary for June 12",
+  "label": "Avery Quinn — visit summary for June 12",
   "flag": "U",
   "exp": 1781234567,
   "maxUses": 5,
@@ -339,7 +351,7 @@ bun <skill-dir>/scripts/manage-shl.ts ./shl-out log
 bun <skill-dir>/scripts/manage-shl.ts ./shl-out re-arm --exp-hours 24 --max-uses 5
 bun <skill-dir>/scripts/manage-shl.ts ./shl-out pause
 bun <skill-dir>/scripts/manage-shl.ts ./shl-out resume
-bun <skill-dir>/scripts/manage-shl.ts ./shl-out relabel "Josh Mandel — records for Dr. Chen"
+bun <skill-dir>/scripts/manage-shl.ts ./shl-out relabel "Avery Quinn — records for Dr. Chen"
 bun <skill-dir>/scripts/manage-shl.ts ./shl-out replace --bundle new-bundle.json
 bun <skill-dir>/scripts/manage-shl.ts ./shl-out destroy --yes
 ```
@@ -352,7 +364,7 @@ patient first. `status` emits the link state (id, label, exp, uses/maxUses, acti
 link again" is one `status` call), e.g.:
 
 ```json
-{"id":"…","url":"…","flag":"U","label":"Josh Mandel — visit summary for June 12","exp":1781234567,"maxUses":5,"uses":1,"active":true,"live":true,"purgedAt":null,"passcodeAttemptsRemaining":null,"createdAt":"2026-06-10T16:00:00Z","files":[{"fileId":"…","contentType":"application/fhir+json","size":187234,"lastUpdated":"2026-06-10T16:00:00Z"}],"ownerLink":"https://…/m#…"}
+{"id":"…","url":"…","flag":"U","label":"Avery Quinn — visit summary for June 12","exp":1781234567,"maxUses":5,"uses":1,"active":true,"live":true,"purgedAt":null,"passcodeAttemptsRemaining":null,"createdAt":"2026-06-10T16:00:00Z","files":[{"fileId":"…","contentType":"application/fhir+json","size":187234,"lastUpdated":"2026-06-10T16:00:00Z"}],"ownerLink":"https://…/m#…"}
 ```
 
 - **Re-arm vs pause vs destroy** (patient-meaningful distinctions): *re-arm* revives

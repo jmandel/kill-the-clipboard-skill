@@ -496,6 +496,14 @@ describe('manage-shl', () => {
     expect(JSON.parse(r.out).id).toBe(link.id);
   });
 
+  test('without --server, resolves the API base from the /m owner link origin', async () => {
+    // No --server and no baked config.json → the owner link's origin is the fallback;
+    // the /m page route must be stripped (regression: only legacy /s was).
+    const r = await runScript(MANAGE, [outDir, 'status']);
+    expect(r.code).toBe(0);
+    expect(JSON.parse(r.out).id).toBe(link.id);
+  });
+
   test('log: shows the data-plane access with recipient', async () => {
     expect((await fetchDataPlane(link.id)).status).toBe(200);
     const r = await manage(['log']);
