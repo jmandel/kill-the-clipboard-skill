@@ -283,7 +283,9 @@ bun <skill-dir>/scripts/create-shl.ts --bundle bundle.json \
 
 Defaults: `--exp-hours 24`, `--max-uses 5` (`--max-uses unlimited` to lift the cap),
 `--flag U` — deliberately forgiving-but-bounded; they're mentioned in the recap above,
-never asked about separately. The share link defaults to the viewer-prefixed form
+never asked about separately. (`--exp-hours never` exists for standing/personal
+shares the patient manages themselves — it drops KTC conformance, so clinic check-in
+links keep a real expiry.) The share link defaults to the viewer-prefixed form
 (`https://…/v#shlink:/…`) — any phone camera scans it, and SHL-aware scanners extract
 the embedded `shlink:/` per spec; pass `--bare` ONLY if the patient or their clinic
 specifically needs the raw `shlink:/` URI. The `-o` directory must be new or empty —

@@ -39,7 +39,7 @@ interface MockLink {
   authHash: string;
   flag: string;
   label: string | null;
-  exp: number;
+  exp: number | null;
   maxUses: number | null;
   uses: number;
   active: boolean;
@@ -62,7 +62,7 @@ function randomToken(): string {
 function isLive(l: MockLink): boolean {
   return (
     l.active &&
-    now() < l.exp &&
+    (l.exp === null || now() < l.exp) &&
     (l.maxUses === null || l.uses < l.maxUses) &&
     l.purgedAt === null &&
     l.files.length > 0
@@ -125,7 +125,7 @@ function startMockServer(): void {
       if (req.method === 'POST' && path === '/api/links') {
         const body = (await req.json()) as CreateLinkRequest;
         const auth = bearer;
-        if (!auth || !body.exp) return json({ error: 'auth (Authorization header) and exp required' }, 400);
+        if (!auth || !('exp' in body)) return json({ error: 'auth (Authorization header) and exp required' }, 400);
         const link: MockLink = {
           id: randomToken(),
           authHash: await authHash(auth),
@@ -372,7 +372,7 @@ describe('create-shl', () => {
     const payload = parseShlink(shlinkText);
     expect(payload.url).toBe(`${baseUrl}/shl/${out.id}`);
     expect(payload.url.length).toBeLessThanOrEqual(128);
-    expect(payload.exp).toBe(out.exp);
+    expect(payload.exp).toBe(out.exp!);
     expect(payload.flag).toBe('U');
     expect(payload.label).toBe(out.label!);
 
@@ -447,6 +447,21 @@ describe('create-shl', () => {
 
     const qr = readFileSync(out.artifacts.qrPng);
     expect(qr.equals(await QRCode.toBuffer(bareShlink, { errorCorrectionLevel: 'M' }))).toBeTrue();
+  });
+
+  test('--exp-hours never: payload omits exp, handoff says until-revoked, exp null end to end', async () => {
+    const { out } = await createLink('never', ['--exp-hours', 'never']);
+    expect(out.exp).toBeNull();
+    const payload = parseShlink(readFileSync(out.artifacts.shlink, 'utf8').trim());
+    expect('exp' in payload).toBeFalse();
+    expect(out.handoffMarkdown).toContain('until');
+    expect(out.handoffMarkdown).toContain('revoke');
+    expect(out.handoffMarkdown).toContain('5 opens');
+    const meta = JSON.parse(readFileSync(out.artifacts.meta, 'utf8'));
+    expect(meta.exp).toBeNull();
+    expect(meta.expIso).toBeNull();
+    // the link serves: never-expired on the mock data plane
+    expect((await fetchDataPlane(out.id)).status).toBe(200);
   });
 
   test('refuses to overwrite a non-empty outdir', async () => {
@@ -540,12 +555,22 @@ describe('manage-shl', () => {
     expect(r.code).toBe(0);
     const o = JSON.parse(r.out);
     expect(o.status).toBe('re-armed');
-    expect(o.exp).toBeGreaterThan(link.exp);
+    expect(o.exp).toBeGreaterThan(link.exp!);
     expect(o.expIso).toBe(new Date(o.exp * 1000).toISOString());
     expect(o.maxUses).toBe(o.uses + 7);
     expect(o.live).toBeTrue();
     expect(o.reminder).toContain('QR');
     expect(o.reminder.toLowerCase()).toContain('exp');
+  });
+
+  test('re-arm --exp-hours never removes the expiration', async () => {
+    const r = await manage(['re-arm', '--exp-hours', 'never', '--max-uses', '3']);
+    expect(r.code).toBe(0);
+    const o = JSON.parse(r.out);
+    expect(o.status).toBe('re-armed');
+    expect(o.exp).toBeNull();
+    expect(o.expIso).toBeNull();
+    expect(o.live).toBeTrue();
   });
 
   test('pause: data plane 404s; resume: serving again', async () => {

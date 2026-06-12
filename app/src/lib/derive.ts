@@ -44,7 +44,7 @@ export function deriveStatus(
 ): LinkStatus {
   if (s.purgedAt !== null) return 'destroyed';
   if (!s.active) return 'paused';
-  if (nowSec >= s.exp) return 'expired';
+  if (s.exp !== null && nowSec >= s.exp) return 'expired';
   if (s.maxUses !== null && s.uses >= s.maxUses) return 'exhausted';
   return 'live';
 }
@@ -78,7 +78,8 @@ export async function rebuildPayload(
   return {
     url: state.url,
     key,
-    exp: state.exp,
+    // Never-expiring links omit exp per the base SHL spec (it's a staleness hint)
+    ...(state.exp !== null ? { exp: state.exp } : {}),
     flag: state.flag,
     ...(label != null && label !== '' ? { label } : {}),
   };
@@ -121,7 +122,7 @@ export function blockedBeyondPause(
   s: Pick<ManageState, 'exp' | 'maxUses' | 'uses'>,
   nowSec: number = Math.floor(Date.now() / 1000),
 ): 'expired' | 'exhausted' | null {
-  if (nowSec >= s.exp) return 'expired';
+  if (s.exp !== null && nowSec >= s.exp) return 'expired';
   if (s.maxUses !== null && s.uses >= s.maxUses) return 'exhausted';
   return null;
 }
@@ -133,14 +134,15 @@ export const DEFAULT_USE_ALLOWANCE = 5;
 
 // ManagePatch has no `uses` reset, so un-exhausting means raising maxUses: the new cap is
 // current uses + a fresh allowance. Harmless if the server also resets uses (cap is a max).
+// hours: null = remove the expiration entirely (never expires).
 export function rearmPatch(
   state: Pick<ManageState, 'uses' | 'maxUses'>,
-  hours: number = DEFAULT_REARM_HOURS,
+  hours: number | null = DEFAULT_REARM_HOURS,
   allowance: number | null = DEFAULT_USE_ALLOWANCE,
   nowSec: number = Math.floor(Date.now() / 1000),
 ): ManagePatch {
   return {
-    exp: nowSec + Math.round(hours * 3600),
+    exp: hours === null ? null : nowSec + Math.round(hours * 3600),
     maxUses: allowance === null ? null : state.uses + allowance,
   };
 }

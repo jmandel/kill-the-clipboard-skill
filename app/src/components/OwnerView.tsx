@@ -20,12 +20,13 @@ import { AccessLog } from './AccessLog.tsx';
 import { Icon, Sheet, Shell, StatusPill, ToggleRow } from './Chrome.tsx';
 import { QrCard } from './QrCard.tsx';
 
-const REARM_CHOICES = [
+const REARM_CHOICES: { hours: number | null; text: string }[] = [
   { hours: 1, text: '1 hour' },
   { hours: 4, text: '4 hours' },
   { hours: 24, text: '24 hours' },
   { hours: 72, text: '3 days' },
   { hours: 168, text: '1 week' },
+  { hours: null, text: 'no expiration' },
 ];
 
 export function OwnerView({
@@ -50,7 +51,7 @@ export function OwnerView({
   const [bareFormat, setBareFormat] = useState(false);
   const [editingLabel, setEditingLabel] = useState(false);
   const [labelDraft, setLabelDraft] = useState('');
-  const [rearmHours, setRearmHours] = useState(DEFAULT_REARM_HOURS);
+  const [rearmHours, setRearmHours] = useState<number | null>(DEFAULT_REARM_HOURS);
   const [modal, setModal] = useState<'rearm' | 'destroy' | null>(null);
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
 
@@ -166,7 +167,11 @@ export function OwnerView({
       {modal === 'rearm' && (
         <Sheet
           title="Re-arm this link?"
-          body={`Extends the expiration by ${REARM_CHOICES.find((c) => c.hours === rearmHours)?.text ?? `${rearmHours}h`} and resets the use allowance. The URL stays the same; the QR on this page refreshes automatically.`}
+          body={
+            rearmHours === null
+              ? 'Removes the expiration — the link stays live until you pause or revoke it — and resets the use allowance. The URL stays the same; the QR on this page refreshes automatically.'
+              : `Extends the expiration by ${REARM_CHOICES.find((c) => c.hours === rearmHours)?.text ?? `${rearmHours}h`} and resets the use allowance. The URL stays the same; the QR on this page refreshes automatically.`
+          }
           confirmLabel="Re-arm link"
           onConfirm={() => { setModal(null); applyPatch(rearmPatch(state, rearmHours, maxUses === null ? null : undefined, now)); }}
           onCancel={() => setModal(null)}
@@ -210,12 +215,17 @@ export function OwnerView({
           ) : (
             <p className="link-label">{label ?? 'SMART Health Link'}</p>
           )}
-          {live && (
+          {live && state.exp !== null && (
             <div className="link-sub">
               Expires in <strong>{formatCountdown(state.exp, now)}</strong> · {formatExp(state.exp)}
             </div>
           )}
-          {status === 'expired' && <div className="link-sub">Expired {formatExp(state.exp)} — re-arm to share again</div>}
+          {live && state.exp === null && (
+            <div className="link-sub">Never expires — pause or revoke to end access</div>
+          )}
+          {status === 'expired' && state.exp !== null && (
+            <div className="link-sub">Expired {formatExp(state.exp)} — re-arm to share again</div>
+          )}
           {status === 'exhausted' && <div className="link-sub">Use limit reached — re-arm to allow more access</div>}
           {status === 'paused' && <div className="link-sub">Paused — no one can open it until you resume</div>}
           {destroyed && (
@@ -321,9 +331,13 @@ export function OwnerView({
               </button>
               <div className="rearm-picker">
                 <span>extend for</span>
-                <select value={rearmHours} disabled={busy} onChange={(e) => setRearmHours(Number(e.target.value))}>
+                <select
+                  value={rearmHours ?? 'never'}
+                  disabled={busy}
+                  onChange={(e) => setRearmHours(e.target.value === 'never' ? null : Number(e.target.value))}
+                >
                   {REARM_CHOICES.map((c) => (
-                    <option key={c.hours} value={c.hours}>{c.text}</option>
+                    <option key={c.text} value={c.hours ?? 'never'}>{c.text}</option>
                   ))}
                 </select>
               </div>

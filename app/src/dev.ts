@@ -23,7 +23,7 @@ const store = new Map<string, ManageState>();
 function computeLive(s: ManageState): boolean {
   return (
     s.active &&
-    nowSec() < s.exp &&
+    (s.exp === null || nowSec() < s.exp) &&
     (s.maxUses === null || s.uses < s.maxUses) &&
     s.purgedAt === null
   );
@@ -105,7 +105,7 @@ for (const seed of seeds) {
 
   lines.push(`  ${seed.name.padEnd(10)} owner:  ${buildOwnerLink(base, m)}`);
   if (seed.name === 'live') {
-    const shlink = buildShlink({ url: state.url, key, exp: state.exp, flag: state.flag, label: plainLabel });
+    const shlink = buildShlink({ url: state.url, key, ...(state.exp !== null ? { exp: state.exp } : {}), flag: state.flag, label: plainLabel });
     lines.push(`  ${''.padEnd(10)} viewer: ${buildViewerLink(base, shlink)}`);
   }
 }

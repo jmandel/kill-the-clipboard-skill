@@ -9,8 +9,8 @@
 export interface CreateLinkRequest {
   /** Flag chars in alphabetical order. Default "U". */
   flag?: string;
-  /** Epoch seconds. Required (KTC). */
-  exp: number;
+  /** Epoch seconds; null = never expires (base SHL). KTC-profile links keep a finite exp. */
+  exp: number | null;
   /** null/undefined = unlimited. */
   maxUses?: number | null;
   /** Only meaningful with P flag. */
@@ -53,7 +53,8 @@ export interface ManageState {
   flag: string;
   /** JWE-encrypted label (see CreateLinkRequest.labelEnc); null when none was set. */
   labelEnc: string | null;
-  exp: number;
+  /** Epoch seconds; null = never expires. */
+  exp: number | null;
   maxUses: number | null;
   uses: number;
   active: boolean;
@@ -67,7 +68,8 @@ export interface ManageState {
 }
 
 export interface ManagePatch {
-  exp?: number;
+  /** Epoch seconds; explicit null = never expires. */
+  exp?: number | null;
   maxUses?: number | null;
   active?: boolean;
   /** Set/replace passcode (P-flag links); null clears nothing — passcode removal not supported. */
@@ -117,7 +119,8 @@ export interface CreateShlOutput {
   id: string;
   label: string | null;
   flag: string;
-  exp: number;
+  /** Epoch seconds; null = never expires (created with --exp-hours never). */
+  exp: number | null;
   maxUses: number | null;
   files: { contentType: string; size: number }[];
   /** The complete closing chat message — owner page as a markdown link, share link

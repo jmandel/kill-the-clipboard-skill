@@ -8,7 +8,10 @@
 // Options:
 //   --bundle <path>     Validated PatientSharedBundle JSON (encrypted byte-for-byte as-is)
 //   --label <text>      Receiver-facing label, <=80 chars (required; craft with the patient)
-//   --exp-hours <n>     Link lifetime from now (default 24; KTC requires exp)
+//   --exp-hours <n>     Link lifetime from now (default 24), or "never" for a link
+//                       that lives until revoked. NOTE: "never" omits exp from the
+//                       payload — valid base SHL, but NOT KTC-conformant (KTC requires
+//                       exp); keep a finite expiry for clinic check-in links.
 //   --max-uses <n>      Use budget (default 5); "unlimited" for no cap
 //   --flag <flags>      SHL flags, alphabetical (default "U"; KTC requires U)
 //   --bare              QR + handoff carry the bare shlink:/ URI instead of the
@@ -98,8 +101,13 @@ async function main(): Promise<void> {
   if (args.length > 0) throw new Error(`unrecognized arguments: ${args.join(' ')}`);
   if (label.length > 80) throw new Error(`label exceeds 80 chars (${label.length})`);
 
-  const expHours = Number(expHoursRaw);
-  if (!Number.isFinite(expHours) || expHours <= 0) throw new Error(`invalid --exp-hours: ${expHoursRaw}`);
+  let expHours: number | null;
+  if (expHoursRaw === 'never') {
+    expHours = null;
+  } else {
+    expHours = Number(expHoursRaw);
+    if (!Number.isFinite(expHours) || expHours <= 0) throw new Error(`invalid --exp-hours: ${expHoursRaw}`);
+  }
   let maxUses: number | null;
   if (maxUsesRaw === 'unlimited' || maxUsesRaw === 'none') {
     maxUses = null;
@@ -128,7 +136,7 @@ async function main(): Promise<void> {
   const masterSecret = generateMasterSecret();
   const auth = await deriveAuth(masterSecret);
   const key = await deriveKey(masterSecret);
-  const exp = Math.floor(Date.now() / 1000 + expHours * 3600);
+  const exp = expHours === null ? null : Math.floor(Date.now() / 1000 + expHours * 3600);
 
   progress(`-> registering link with ${server} ...`);
   // The capability rides the Authorization header (never the URL path, which proxies
@@ -161,7 +169,8 @@ async function main(): Promise<void> {
   const { fileId } = (await fileRes.json()) as AddFileResponse;
   if (!fileId) throw new Error('server did not return a fileId');
 
-  const shlink = buildShlink({ url, key, exp, flag, label });
+  // Never-expiring links omit exp from the payload (base SHL; exp is a staleness hint)
+  const shlink = buildShlink({ url, key, ...(exp !== null ? { exp } : {}), flag, label });
   const ownerLink = buildOwnerLink(server, masterSecret);
   // Viewer-prefixed form (docs/DESIGN.md decision 11): the DEFAULT share/QR form —
   // any phone camera resolves it, and SHL-aware scanners extract the embedded
@@ -190,7 +199,7 @@ async function main(): Promise<void> {
     label,
     flag,
     exp,
-    expIso: new Date(exp * 1000).toISOString(),
+    expIso: exp === null ? null : new Date(exp * 1000).toISOString(),
     maxUses,
     server,
     file: { contentType: BUNDLE_CONTENT_TYPE, size: jweSize },
@@ -224,20 +233,27 @@ function buildHandoff(args: {
   ownerLink: string;
   shareLink: string;
   bare: boolean;
-  exp: number;
+  exp: number | null;
   maxUses: number | null;
 }): string {
-  const expText = new Date(args.exp * 1000).toLocaleString('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  });
+  const expText =
+    args.exp === null
+      ? null
+      : new Date(args.exp * 1000).toLocaleString('en-US', {
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+        });
   const lifetime =
-    args.maxUses === null
-      ? `The link works until ${expText}.`
-      : `The link works until ${expText} or ${args.maxUses} opens, whichever comes first.`;
+    expText === null
+      ? args.maxUses === null
+        ? 'The link works until you revoke it from your control page.'
+        : `The link works for ${args.maxUses} opens, or until you revoke it from your control page.`
+      : args.maxUses === null
+        ? `The link works until ${expText}.`
+        : `The link works until ${expText} or ${args.maxUses} opens, whichever comes first.`;
   const scanNote = args.bare
     ? ' (bare SHL format — needs an SHL-aware scanner)'
     : ' — any phone camera can scan it';

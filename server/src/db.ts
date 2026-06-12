@@ -17,7 +17,7 @@ export interface LinkRow {
   mgmt_token_hash: string;
   flag: string;
   label_enc: string | null;
-  exp: number;
+  exp: number | null; // NULL = never expires
   max_uses: number | null;
   uses: number;
   passcode_hash: string | null;
@@ -59,7 +59,31 @@ export function openDb(path = ':memory:'): Database {
   db.exec('PRAGMA foreign_keys = ON');
   db.exec(schemaSql);
   db.exec('CREATE TABLE IF NOT EXISTS kv (k TEXT PRIMARY KEY, v BLOB NOT NULL)');
+  migrateExpNullable(db);
   return db;
+}
+
+/**
+ * One-time in-place migration (2026-06-12): `links.exp` gained NULL = never-expires.
+ * SQLite can't drop NOT NULL, so pre-existing databases get a table rebuild that
+ * preserves every row; the new DDL is taken from schema.sql so there is one source
+ * of truth. No-op for databases already in the new shape.
+ */
+function migrateExpNullable(db: Database): void {
+  const col = db
+    .query(`SELECT "notnull" AS nn FROM pragma_table_info('links') WHERE name = 'exp'`)
+    .get() as { nn: number } | null;
+  if (col?.nn !== 1) return;
+  const linksDdl = schemaSql.match(/CREATE TABLE IF NOT EXISTS links \([\s\S]*?\n\);/)?.[0];
+  if (!linksDdl) throw new Error('schema.sql: links DDL not found for migration');
+  db.exec('PRAGMA foreign_keys = OFF');
+  db.transaction(() => {
+    db.exec(linksDdl.replace('CREATE TABLE IF NOT EXISTS links', 'CREATE TABLE links_migrated'));
+    db.exec('INSERT INTO links_migrated SELECT * FROM links');
+    db.exec('DROP TABLE links');
+    db.exec('ALTER TABLE links_migrated RENAME TO links');
+  })();
+  db.exec('PRAGMA foreign_keys = ON');
 }
 
 /** Ticket-signing secret persisted across restarts so issued location URLs survive a deploy. */
@@ -74,7 +98,7 @@ export function getServerSecret(db: Database): Uint8Array {
 export function isLive(link: LinkRow, now: number): boolean {
   return (
     link.active === 1 &&
-    now < link.exp &&
+    (link.exp === null || now < link.exp) &&
     (link.max_uses === null || link.uses < link.max_uses) &&
     (link.passcode_attempts_remaining === null || link.passcode_attempts_remaining > 0) &&
     link.purged_at === null
@@ -96,7 +120,7 @@ export function insertLink(
     mgmtTokenHash: string;
     flag: string;
     labelEnc: string | null;
-    exp: number;
+    exp: number | null;
     maxUses: number | null;
     passcodeHash: string | null;
     passcodeAttemptsRemaining: number | null;
@@ -118,7 +142,7 @@ export function consumeUse(db: Database, id: string, now: number): boolean {
   const res = db
     .query(
       `UPDATE links SET uses = uses + 1, updated_at = ?2
-       WHERE id = ?1 AND active = 1 AND exp > ?2
+       WHERE id = ?1 AND active = 1 AND (exp IS NULL OR exp > ?2)
          AND (max_uses IS NULL OR uses < max_uses)
          AND (passcode_attempts_remaining IS NULL OR passcode_attempts_remaining > 0)
          AND purged_at IS NULL`,
@@ -225,7 +249,7 @@ export function updateLink(
   db: Database,
   id: string,
   v: {
-    exp: number;
+    exp: number | null;
     maxUses: number | null;
     active: number;
     labelEnc: string | null;

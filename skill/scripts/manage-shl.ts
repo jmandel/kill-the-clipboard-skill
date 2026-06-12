@@ -9,7 +9,10 @@
 //   log                          Access log entries
 //   re-arm [--exp-hours 24] [--max-uses 5]
 //                                Extend exp to now+N hours and grant N MORE uses
-//                                (server maxUses is set to uses + N)
+//                                (server maxUses is set to uses + N).
+//                                --exp-hours never removes the expiration entirely
+//                                (link lives until revoked; payload then omits exp —
+//                                base SHL, not KTC-conformant)
 //   pause | resume               Reversibly disable / re-enable serving
 //   relabel <text>               Replace the label (<=80 chars)
 //   replace --bundle new.json [--zip]
@@ -161,21 +164,26 @@ async function main(): Promise<void> {
       break;
     }
     case 're-arm': {
-      const expHours = Number(expHoursRaw ?? '24');
-      if (!Number.isFinite(expHours) || expHours <= 0) throw new Error(`invalid --exp-hours: ${expHoursRaw}`);
+      let expHours: number | null;
+      if (expHoursRaw === 'never') {
+        expHours = null; // removes the expiration: link lives until revoked
+      } else {
+        expHours = Number(expHoursRaw ?? '24');
+        if (!Number.isFinite(expHours) || expHours <= 0) throw new Error(`invalid --exp-hours: ${expHoursRaw}`);
+      }
       const moreUses = Number(maxUsesRaw ?? '5');
       if (!Number.isInteger(moreUses) || moreUses < 1) throw new Error(`invalid --max-uses: ${maxUsesRaw}`);
       const before = await getState(ctx);
-      const exp = Math.floor(Date.now() / 1000 + expHours * 3600);
+      const exp = expHours === null ? null : Math.floor(Date.now() / 1000 + expHours * 3600);
       const maxUses = before.uses + moreUses;
-      progress(`-> extending exp to +${expHours}h, granting ${moreUses} more uses ...`);
+      progress(`-> ${expHours === null ? 'removing exp (never expires)' : `extending exp to +${expHours}h`}, granting ${moreUses} more uses ...`);
       await patchState(ctx, { exp, maxUses });
       const after = await getState(ctx);
       emit({
         status: 're-armed',
         id: after.id,
         exp: after.exp,
-        expIso: new Date(after.exp * 1000).toISOString(),
+        expIso: after.exp === null ? null : new Date(after.exp * 1000).toISOString(),
         maxUses: after.maxUses,
         uses: after.uses,
         live: after.live,

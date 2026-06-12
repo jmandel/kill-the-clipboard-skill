@@ -153,6 +153,31 @@ describe('re-arm patch construction', () => {
   });
 });
 
+describe('never-expires (exp null)', () => {
+  const now = 1_000_000;
+  test('deriveStatus: null exp never reads as expired', () => {
+    expect(deriveStatus({ active: true, exp: null, maxUses: null, uses: 99, purgedAt: null }, now)).toBe('live');
+    expect(deriveStatus({ active: true, exp: null, maxUses: 5, uses: 5, purgedAt: null }, now)).toBe('exhausted');
+    expect(deriveStatus({ active: false, exp: null, maxUses: null, uses: 0, purgedAt: null }, now)).toBe('paused');
+  });
+  test('blockedBeyondPause: null exp can still be use-blocked, never expiry-blocked', () => {
+    expect(blockedBeyondPause({ exp: null, maxUses: null, uses: 99 }, now)).toBeNull();
+    expect(blockedBeyondPause({ exp: null, maxUses: 5, uses: 5 }, now)).toBe('exhausted');
+  });
+  test('rearmPatch: hours null removes the expiration', () => {
+    const p = rearmPatch({ uses: 3, maxUses: 5 }, null, 5, now);
+    expect(p.exp).toBeNull();
+    expect(p.maxUses).toBe(8);
+  });
+  test('rebuildPayload omits exp for never-expiring links', async () => {
+    const m = new Uint8Array(32).fill(7);
+    const p = await rebuildPayload(m, { url: 'https://x.test/shl/abc', exp: null, flag: 'U' }, null);
+    expect('exp' in p).toBeFalse();
+    const p2 = await rebuildPayload(m, { url: 'https://x.test/shl/abc', exp: 123, flag: 'U' }, null);
+    expect(p2.exp).toBe(123);
+  });
+});
+
 describe('blockedBeyondPause', () => {
   // Field-tested failure mode: a paused link that ALSO hit its use limit stays 404
   // after resume, and the viewer can't say why — the owner page must name the blocker.

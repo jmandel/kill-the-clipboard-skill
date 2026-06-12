@@ -1,6 +1,6 @@
 -- kill-the-clipboard server schema (DESIGN.md §4).
 -- Liveness is DERIVED, never stored:
---   live = active AND now < exp AND (max_uses IS NULL OR uses < max_uses)
+--   live = active AND (exp IS NULL OR now < exp) AND (max_uses IS NULL OR uses < max_uses)
 --          AND (passcode_attempts_remaining IS NULL OR passcode_attempts_remaining > 0)
 --          AND purged_at IS NULL
 -- Any false → data plane responds 404 (spec).
@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS links (
   mgmt_token_hash TEXT NOT NULL UNIQUE, -- sha256(auth) hex; auth itself never stored
   flag TEXT NOT NULL DEFAULT 'U',
   label_enc TEXT,             -- label as a client-encrypted JWE; server-opaque (NULL = none)
-  exp INTEGER NOT NULL,                 -- epoch seconds
+  exp INTEGER,                          -- epoch seconds; NULL = never expires (symmetric with max_uses)
   max_uses INTEGER,                     -- NULL = unlimited
   uses INTEGER NOT NULL DEFAULT 0,
   passcode_hash TEXT,                   -- Bun.password (argon2id); NULL unless P flag

@@ -165,8 +165,8 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
           } catch {
             return err('request body must be JSON', 400);
           }
-          if ('exp' in patch && (!Number.isInteger(patch.exp) || patch.exp! <= 0)) {
-            return err('exp must be epoch seconds', 400);
+          if ('exp' in patch && patch.exp !== null && (!Number.isInteger(patch.exp) || patch.exp! <= 0)) {
+            return err('exp must be epoch seconds, or null for never-expires', 400);
           }
           if ('maxUses' in patch && patch.maxUses !== null && (!Number.isInteger(patch.maxUses) || patch.maxUses! < 1)) {
             return err('maxUses must be a positive integer or null', 400);
@@ -189,7 +189,8 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
               ? await Bun.password.hash(patch.passcode, { algorithm: 'argon2id' })
               : link.passcode_hash;
           store.updateLink(db, link.id, {
-            exp: patch.exp ?? link.exp,
+            // `?? link.exp` would swallow an explicit null — never-expires is a real value here
+            exp: 'exp' in patch ? (patch.exp ?? null) : link.exp,
             maxUses: 'maxUses' in patch ? (patch.maxUses ?? null) : link.max_uses,
             active: 'active' in patch ? (patch.active ? 1 : 0) : link.active,
             labelEnc: 'labelEnc' in patch ? patch.labelEnc! : link.label_enc,
@@ -450,8 +451,8 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
           if (typeof flag !== 'string' || !validFlag(flag)) {
             return err('flag must be an alphabetical subset of L,P,U; U and P cannot combine', 400);
           }
-          if (!Number.isInteger(body.exp) || body.exp <= 0) {
-            return err('exp (epoch seconds) is required', 400);
+          if (!('exp' in body) || (body.exp !== null && (!Number.isInteger(body.exp) || body.exp <= 0))) {
+            return err('exp is required: epoch seconds, or null for never-expires', 400);
           }
           const maxUses = body.maxUses ?? null;
           if (maxUses !== null && (!Number.isInteger(maxUses) || maxUses < 1)) {

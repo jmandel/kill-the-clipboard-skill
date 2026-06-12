@@ -57,7 +57,7 @@ interface MadeLink {
 
 async function createLink(
   ctx: Ctx,
-  opts: { flag?: string; exp?: number; maxUses?: number | null; passcode?: string; label?: string } = {},
+  opts: { flag?: string; exp?: number | null; maxUses?: number | null; passcode?: string; label?: string } = {},
 ): Promise<MadeLink> {
   const m = generateMasterSecret();
   const auth = await deriveAuth(m);
@@ -418,6 +418,44 @@ describe('audit log', () => {
       ['manifest', 'ok', 'Clinic Kiosk'],
       ['file', 'ok', ''],
     ]);
+  });
+});
+
+describe('never-expiring links (exp: null)', () => {
+  test('create with exp null → live, serves, and the sweeper never purges it', async () => {
+    const ctx = await makeServer();
+    const link = await createLink(ctx, { exp: null });
+    await uploadFile(ctx, link);
+
+    const state = await manage(ctx, link.auth);
+    expect(state.exp).toBeNull();
+    expect(state.live).toBeTrue();
+    expect((await fetch(`${link.url}?recipient=Forever`)).status).toBe(200);
+    expect(sweep(ctx.db, 30)).toBe(0);
+  });
+
+  test('PATCH exp: null removes an existing expiration (and is not swallowed as a default)', async () => {
+    const ctx = await makeServer();
+    const link = await createLink(ctx); // finite exp
+    await uploadFile(ctx, link);
+    expect((await patchLink(ctx, link.auth, { exp: null })).status).toBe(200);
+    const state = await manage(ctx, link.auth);
+    expect(state.exp).toBeNull();
+    expect(state.live).toBeTrue();
+  });
+
+  test('exp must still be present: missing key rejected, null accepted, junk rejected', async () => {
+    const ctx = await makeServer();
+    const auth = await deriveAuth(generateMasterSecret());
+    const post = (body: object) =>
+      fetch(`${ctx.base}/api/links`, {
+        method: 'POST',
+        headers: { authorization: `Bearer ${auth}`, 'content-type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+    expect((await post({})).status).toBe(400);
+    expect((await post({ exp: 'soon' })).status).toBe(400);
+    expect((await post({ exp: null })).status).toBe(200);
   });
 });
 

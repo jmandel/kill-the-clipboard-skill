@@ -41,7 +41,7 @@ Re-arm = `PATCH` flipping whichever condition failed.
 |---|---|
 | `POST /api/links` | `CreateLinkRequest` → `{id, url}`. Validates 43-char base64url auth (header), flag (`L?P?U?`, U excludes P), `exp`, `labelEnc` ≤2048 (client-encrypted JWE; server-opaque). |
 | `GET /api/manage` | Full `ManageState`: derived `live`, file metadata, complete access log. |
-| `PATCH /api/manage` | `{exp?, maxUses?, active?, passcode?, labelEnc?}`. Setting a passcode resets the attempt budget. `active:false` = reversible pause. |
+| `PATCH /api/manage` | `{exp?, maxUses?, active?, passcode?, labelEnc?}`. `exp: null` = never expires (symmetric with `maxUses: null`; exempt from the retention sweeper — destroy is the retention event). Setting a passcode resets the attempt budget. `active:false` = reversible pause. |
 | `GET /api/manage/events` | Signal-only SSE: an empty `change` event on every access/mutation; the client re-fetches via `GET /api/manage`. Same Bearer gate and 404 behavior; the stream carries no link data. |
 | `POST /api/manage/files` | Raw JWE body (≤25 MB), Content-Type header recorded → `{fileId}`. U-flag links: exactly one file. |
 | `PUT /api/manage/files/{fileId}` | Replace ciphertext (client re-encrypted: same key, new IV). |
