@@ -30,19 +30,27 @@ into a `PatientSharedBundle`, encrypted client-side, and hosted as a U-flag SHL.
 7. `check-access` / `revoke` fold into one `manage-shl.ts` verb script.
 8. **No App Attestation** (optional in spec; we're not in the CMS trusted-app library).
 9. **Insurance card photo→CARIN transcription: phase 2/3.** Phase 1 is USCDI/US Core structured content.
-10. **No arbitrary patient content** in phase 1; agent helps patient choose structured data + existing documents (notes from FHIR payloads — RTF/PDF/etc. — as generically coded DocumentReferences if patient insists). **Validator enforces inline attachments (`attachment.data`, never `url`)** — location-based attachments are unreachable in this scheme.
+10. **No arbitrary patient content** in phase 1; agent helps patient choose structured data + existing documents (notes from FHIR payloads — RTF/PDF/etc. — as generically coded DocumentReferences if patient insists). **Validator enforces inline attachments (`attachment.data`, never `url`)** — location-based attachments are unreachable in this scheme. AMENDED 2026-06-12: carried-along documents keep their **source format** — PDF/HTML/RTF/text ride as original bytes with their original contentType, never transcoded to PDF (the attachment-to-pdf.ts converter is retired; its text extraction degraded note formatting). The viewer renders all four in-browser; the validator warns (`attachment-content-type`) on anything outside the renderable set. **Rendered-attachment security invariant**: attachment bytes are untrusted and a blob URL inherits the viewer's origin, so rendered attachments NEVER execute as a top-level document — HTML/SVG/images/text open inside a `sandbox=""` iframe shell (no scripts, opaque origin); RTF is converted to fully-escaped HTML by our own in-app renderer (app/src/lib/rtf.ts) and framed the same way; PDF is the one direct open (the browser's native PDF viewer is origin-isolated, and sandboxed iframes don't reliably instantiate it). Unrenderable types get a download, not an open.
 11. **Viewer prefix: supported** (amended 2026-06-10, twice). The handoff page's viewer
     mode (`/v#shlink:/...`) IS a viewer-prefix target; create-shl emits `viewer-link.txt`.
-    QR display and copy-link DEFAULT to the bare shlink because that's what KTC clinic
-    scanners expect at check-in — a flow preference, NOT a security rule; the prefixed
-    form carries the identical shlink and is fine (often better) to share wherever a
-    human clicks rather than scans. The management UI offers **"Preview as recipient"**
+    The management UI offers **"Preview as recipient"**
     (opens the prefixed viewer link in a new tab — functional self-test + patient
     empathy). Amended again 2026-06-10: the viewer page now RENDERS the shared content
     in-browser (fetches via U-flag or the full manifest flow incl. passcodes, decrypts
     with the link key, type-aware resource sections, documents open in new tabs via
     blob URLs, raw FHIR bundle openable as JSON). Routes split: /m manage, /v view,
     /s legacy alias. A richer server-hosted viewer experience remains future polish.
+    AMENDED 2026-06-12: the default FLIPPED — QR and copy/share links now carry the
+    **viewer-prefixed form everywhere** (create-shl QR + handoff, owner page, viewer
+    page re-share): any phone camera resolves it, and SHL-aware scanners extract the
+    embedded `shlink:/` substring per spec, so the prefixed form is strictly more
+    scannable. Bare `shlink:/` is opt-in for scanners that can't handle the prefix
+    (`--bare` on create-shl; "Use bare SHL format" toggle on the owner page);
+    `shlink.txt` still always holds the bare URI. Handoff guidance changed with it:
+    the agent's closing message leads with the owner page (where the live QR lives)
+    and never renders/attaches its own QR image; create-shl stdout carries a
+    `nextStep` field restating this at the moment of handoff, because script source
+    comments are invisible to the consuming agent.
 12. Label crafting is a first-class agent task (≤80 chars, e.g. "Josh Mandel — visit summary for June 12") — it's the most visible receiver-facing string.
 13. Handoff page: `history.replaceState` strips the fragment on load; **no localStorage by default**; explicit "Make this page bookmarkable" toggle restores the fragment. Re-manage by re-opening from the agent.
 14. **Confirmed**: per-file ciphertext cap 25 MB; ciphertext purge 30 days after exp (tombstone + audit log remain).
@@ -90,6 +98,23 @@ into a `PatientSharedBundle`, encrypted client-side, and hosted as a U-flag SHL.
     candidate behind the lib/doc.ts interface). Bake-off artifacts: docs/bakeoff/*/, each with
     NOTES.md, PDFs, PNGs; the react-pdf builder prototype (doc.tsx, 696 LOC) seeds the real
     lib/doc.ts implementation.
+20. **Multi-source Patient merge (2026-06-12).** Multi-provider exports carry one
+    Patient per source; the bundle carries exactly one. The merge is agent work in the
+    selection script (judgment + patient review, not conformance): base = the source
+    Patient with the most complete / most recently updated demographics; each field
+    filled with the most up-to-date non-empty value across sources, identifiers may be
+    unioned — every value verbatim from some source Patient, nothing invented. The
+    patient REVIEWS the merged demographics before assembly whenever a merge happened.
+    Deterministic assist in assemble-bundle.ts — rewriting patient references is
+    normalization, not content editing (every reference gets rewritten to urn form
+    anyway), and a dangling patient reference would unmoor clinical content from the
+    subject: (a) any unresolved `Patient/<id>` reference is rewritten to the single
+    Patient entry urn (safe by the one-Patient invariant — other-person references
+    use RelatedPerson/Practitioner types, not Patient); (b) each source file's
+    pre-assigned `urn:uuid:` patient reference is rewritten too — a lone foreign urn
+    wherever it sits, or, with several sources, any foreign urn appearing ONLY in
+    subject/patient positions. Provenance survives in `meta.source` per resource and
+    the merged Patient's unioned identifiers, not in per-source patient stubs.
 
 ---
 
@@ -297,6 +322,11 @@ QR display + copy-as-URL via the handoff page.
   - **LOINC 51855-5** "Patient Note" → **Patient Story PDF** (patient's own words; SHOULD NOT restate discrete clinical facts)
   - **LOINC 60591-5** "Patient summary Document" → **FHIR-Rendered PDF** (SHALL be a complete readable rendering of EVERY non-DocumentReference resource in the bundle; SHOULD be included whenever discrete resources are present)
 
+Carried-along documents (patient-included DocumentReferences outside the two PDF kinds):
+inline `data` like everything else, but in their **source format** — original bytes,
+original `contentType` (decision 10 amendment); only the two profile PDFs must be
+`application/pdf`.
+
 SHL payload for KTC: `{url, key, exp (required), flag:"U", label≤80}`; no P, no L, no manifest.
 
 ---
@@ -419,7 +449,8 @@ non-base64 data); **any attachment anywhere in the bundle using `url` instead of
 create-shl. Warnings: `meta.profile` present; missing PATAST; FHIR-Rendered PDF present but
 `rendered-ids.json` doesn't cover every non-DocumentReference resource (error if ids file
 provided); Patient missing name/birthDate/gender; discrete resources present but no
-FHIR-Rendered PDF (profile SHOULD).
+FHIR-Rendered PDF (profile SHOULD); attachment `contentType` outside the
+viewer-renderable set (pdf/html/rtf/text/image — receivers may only be able to download).
 
 ---
 

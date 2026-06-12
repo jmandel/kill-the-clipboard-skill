@@ -120,10 +120,14 @@ export interface CreateShlOutput {
   exp: number;
   maxUses: number | null;
   files: { contentType: string; size: number }[];
-  /** The complete closing chat message — owner page as a markdown link, shlink as
-   * inline code, lifetime filled in. The agent pastes this verbatim; composing it
-   * by hand is the documented failure mode. */
+  /** The complete closing chat message — owner page as a markdown link, share link
+   * (viewer-prefixed by default; bare with --bare) as inline code, lifetime filled
+   * in. The agent pastes this verbatim; composing it by hand is the documented
+   * failure mode. */
   handoffMarkdown: string;
+  /** Instruction to the consuming agent, restated IN the output because script
+   * source comments are never reliably read at the moment of handoff. */
+  nextStep: string;
   /** Paths to artifacts written to disk. `handoff` is the durable copy of
    * `handoffMarkdown`; `ownerLink`/`shlink` files are what manage-shl.ts reads. */
   artifacts: { ownerLink: string; shlink: string; viewerLink: string; qrPng: string; meta: string; handoff: string };

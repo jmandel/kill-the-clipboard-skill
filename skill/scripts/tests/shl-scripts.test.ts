@@ -5,6 +5,7 @@ import { afterAll, beforeAll, describe, expect, test } from 'bun:test';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import QRCode from 'qrcode';
 import { b64url } from '../../../lib/encoding.ts';
 import { authHash, deriveAuth, deriveKey } from '../../../lib/hkdf.ts';
 import { decryptJWE } from '../../../lib/jwe.ts';
@@ -318,7 +319,7 @@ describe('create-shl', () => {
     const { out, outDir } = await createLink('rt');
 
     expect(out.status).toBe('created');
-    expect(Object.keys(out).sort()).toEqual(['artifacts', 'exp', 'files', 'flag', 'handoffMarkdown', 'id', 'label', 'maxUses', 'status']);
+    expect(Object.keys(out).sort()).toEqual(['artifacts', 'exp', 'files', 'flag', 'handoffMarkdown', 'id', 'label', 'maxUses', 'nextStep', 'status']);
     expect(out.flag).toBe('U');
     expect(out.maxUses).toBe(5);
     expect(out.label).toBe('Casey Tester — visit summary');
@@ -335,21 +336,29 @@ describe('create-shl', () => {
     expect(out.artifacts.handoff.endsWith('handoff.md')).toBeTrue();
 
     // handoffMarkdown is the verbatim closing message: owner page as a markdown link,
-    // shlink as inline code, lifetime filled in. Pasteable as-is; handoff.md = same text.
+    // the VIEWER-PREFIXED share link as inline code (decision 11: any phone camera
+    // scans it), lifetime filled in. Pasteable as-is; handoff.md = same text. The QR
+    // lives on the owner page — the handoff never points at qr.png.
     const ownerLinkText = readFileSync(out.artifacts.ownerLink, 'utf8').trim();
+    const viewerText = readFileSync(out.artifacts.viewerLink, 'utf8').trim();
     expect(out.handoffMarkdown).toContain(`**[Your link setup & control page](${ownerLinkText})**`);
-    expect(out.handoffMarkdown).toContain(`\`${readFileSync(out.artifacts.shlink, 'utf8').trim()}\``);
-    expect(out.handoffMarkdown).toContain(out.artifacts.qrPng);
+    expect(out.handoffMarkdown).toContain(`\`${viewerText}\``);
+    expect(out.handoffMarkdown).not.toContain('qr.png');
     expect(out.handoffMarkdown).toContain('5 opens');
     expect(readFileSync(out.artifacts.handoff, 'utf8')).toBe(out.handoffMarkdown);
 
+    // nextStep restates the handoff rule in the output the agent actually reads.
+    expect(out.nextStep).toContain('verbatim');
+    expect(out.nextStep).toContain('QR');
+
     // Viewer-prefixed form (decision 11): page URL + '#' + the exact bare shlink.
-    const viewerText = readFileSync(out.artifacts.viewerLink, 'utf8').trim();
     expect(viewerText).toBe(`${baseUrl}/v#${readFileSync(out.artifacts.shlink, 'utf8').trim()}`);
 
+    // The QR encodes the viewer-prefixed share link (byte-compare against a fresh
+    // render of the same string — node-qrcode PNG output is deterministic).
     const qr = readFileSync(out.artifacts.qrPng);
     expect(qr.subarray(0, 4)).toEqual(Buffer.from([0x89, 0x50, 0x4e, 0x47]));
-    expect(qr.length).toBeGreaterThan(500);
+    expect(qr.equals(await QRCode.toBuffer(viewerText, { errorCorrectionLevel: 'M' }))).toBeTrue();
 
     const meta = JSON.parse(readFileSync(out.artifacts.meta, 'utf8'));
     expect(meta.id).toBe(out.id);
@@ -407,6 +416,19 @@ describe('create-shl', () => {
     // The bare master secret appears ONLY embedded in the owner link, never on its own.
     const stripped = (raw.out + raw.err).replaceAll(ownerLink, '');
     expect(stripped).not.toContain(b64url(m));
+  });
+
+  test('--bare opts the QR and handoff into the raw shlink:/ form', async () => {
+    const { out } = await createLink('bare', ['--bare']);
+    const bareShlink = readFileSync(out.artifacts.shlink, 'utf8').trim();
+    const viewerText = readFileSync(out.artifacts.viewerLink, 'utf8').trim();
+
+    expect(out.handoffMarkdown).toContain(`\`${bareShlink}\``);
+    expect(out.handoffMarkdown).not.toContain(viewerText);
+    expect(out.handoffMarkdown).toContain('SHL-aware');
+
+    const qr = readFileSync(out.artifacts.qrPng);
+    expect(qr.equals(await QRCode.toBuffer(bareShlink, { errorCorrectionLevel: 'M' }))).toBeTrue();
   });
 
   test('refuses to overwrite a non-empty outdir', async () => {

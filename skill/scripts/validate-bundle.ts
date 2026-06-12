@@ -24,6 +24,7 @@
  * Warning codes:
  *   meta-profile docref-pataast patient-demographics rendered-missing
  *   rendered-coverage-unverified reference-unresolved reference-external
+ *   attachment-content-type
  */
 
 import type { ValidateOutput } from '../../lib/types.ts';
@@ -41,6 +42,11 @@ type Finding = { code: string; path: string; message: string };
 const URN_UUID = /^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const RELATIVE_REF = /^[A-Za-z]+\/[A-Za-z0-9.\-]{1,64}$/;
 const BASE64 = /^[A-Za-z0-9+/]+={0,2}$/;
+// Formats SHL viewers render in-browser (source formats are preserved, not transcoded).
+const VIEWABLE_TYPES = new Set([
+  'application/pdf', 'text/html', 'application/xhtml+xml', 'text/plain',
+  'application/rtf', 'text/rtf', 'application/x-rtf',
+]);
 const PS_CATEGORY_SYSTEM = 'https://cms.gov/fhir/CodeSystem/patient-shared-category';
 const KTC_TYPES = new Set(['51855-5', '60591-5']);
 
@@ -191,6 +197,14 @@ async function main() {
         }
         if (typeof o.data !== 'string' || o.data.length === 0) {
           err('attachment-no-data', p, 'attachment must carry inline base64 data');
+        }
+        const ct = o.contentType.toLowerCase().split(';')[0]!.trim();
+        if (!VIEWABLE_TYPES.has(ct) && !ct.startsWith('image/')) {
+          warn(
+            'attachment-content-type',
+            `${p}.contentType`,
+            `"${o.contentType}" has no in-browser rendering in SHL viewers — receivers may only be able to download it`,
+          );
         }
       }
 

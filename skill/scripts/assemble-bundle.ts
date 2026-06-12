@@ -14,7 +14,10 @@
  *                      [--shared-date <ISO 8601>] -o bundle.json
  *
  * Options:
- *   --resources      JSON array of FHIR R4 resources; must contain exactly one Patient.
+ *   --resources      JSON array of FHIR R4 resources; must contain exactly one Patient
+ *                    (multi-source exports merge to one upstream — workflow Step 3;
+ *                    leftover Patient/<other-id> references are rewritten here to the
+ *                    single Patient entry).
  *   --story          Patient Story PDF → DocumentReference typed LOINC 51855-5.
  *   --rendered       Pre-made FHIR-Rendered PDF → DocumentReference LOINC 60591-5.
  *                    WITHOUT this flag the summary is rendered AUTOMATICALLY from the
@@ -171,7 +174,12 @@ async function main() {
 
   const patients = resources.filter((r) => r.resourceType === 'Patient');
   if (patients.length !== 1) {
-    fail(`selection must contain exactly one Patient resource (found ${patients.length})`);
+    fail(
+      `selection must contain exactly one Patient resource (found ${patients.length})` +
+        (patients.length > 1
+          ? ' — multi-source exports must be merged into one Patient first, with the patient reviewing the merged demographics (see the workflow Step 3 merge guidance)'
+          : ''),
+    );
   }
   const patient = patients[0]!;
 
@@ -215,28 +223,46 @@ async function main() {
   }
 
   // Inputs may already use urn-form patient references (the fixture-corpus / prior-bundle
-  // convention of one pre-assigned patient urn). With exactly one foreign urn and exactly
-  // one Patient that mapping is unambiguous; anything else is left for the validator.
-  const foreignUrns = new Set<string>();
-  for (const e of entries) {
-    walkObjects(e.resource, (o) => {
-      if (typeof o.reference === 'string' && o.reference.startsWith('urn:uuid:')) foreignUrns.add(o.reference);
-    });
-  }
+  // convention of one pre-assigned patient urn PER SOURCE FILE). Key-aware walk:
+  // whether a urn ever appears outside subject/patient positions decides its mapping.
+  const foreignUrns = new Map<string, { subjectPos: number; otherPos: number }>();
+  const collectUrns = (node: unknown, key: string): void => {
+    if (Array.isArray(node)) {
+      for (const v of node) collectUrns(v, key);
+      return;
+    }
+    if (!node || typeof node !== 'object') return;
+    const o = node as AnyObj;
+    if (typeof o.reference === 'string' && o.reference.startsWith('urn:uuid:')) {
+      const c = foreignUrns.get(o.reference) ?? { subjectPos: 0, otherPos: 0 };
+      if (key === 'subject' || key === 'patient') c.subjectPos++;
+      else c.otherPos++;
+      foreignUrns.set(o.reference, c);
+    }
+    for (const [k, v] of Object.entries(o)) collectUrns(v, k);
+  };
+  for (const e of entries) collectUrns(e.resource, '');
+
+  // A lone foreign urn maps to the Patient wherever it sits; with several sources,
+  // any urn used ONLY in subject/patient positions can only mean the patient (the
+  // bundle holds exactly one). Anything else is left for the validator.
   const urnAlias = new Map<string, string>();
-  if (foreignUrns.size === 1) {
-    const only = [...foreignUrns][0]!;
-    urnAlias.set(only, patientUrn);
-    console.error(`note: input references use pre-assigned urn ${only}; rewriting to the Patient entry urn`);
-  } else if (foreignUrns.size > 1) {
+  for (const [urn, c] of foreignUrns) {
+    if (foreignUrns.size === 1 || (c.subjectPos > 0 && c.otherPos === 0)) {
+      urnAlias.set(urn, patientUrn);
+      console.error(`note: input references use pre-assigned urn ${urn}; rewriting to the Patient entry urn`);
+    }
+  }
+  if (foreignUrns.size > urnAlias.size) {
     console.error(
-      `note: ${foreignUrns.size} distinct urn:uuid references in input cannot be mapped to bundle entries; ` +
-        'validate-bundle.ts will flag them as dangling',
+      `note: ${foreignUrns.size - urnAlias.size} distinct urn:uuid reference(s) in input cannot be mapped ` +
+        'to bundle entries; validate-bundle.ts will flag them as dangling',
     );
   }
 
   let rewritten = 0;
   let unresolved = 0;
+  let patientAliased = 0;
   for (const e of entries) {
     walkObjects(e.resource, (o) => {
       const ref = o.reference;
@@ -253,12 +279,23 @@ async function main() {
       if (target) {
         o.reference = target;
         rewritten++;
+      } else if (ref.startsWith('Patient/') && RELATIVE_REF.test(ref)) {
+        // Single-patient bundle: a Patient/<id> reference under any other source's id
+        // can only mean the subject — multi-source merges keep one Patient, and every
+        // source's resources must land on it.
+        o.reference = patientUrn;
+        patientAliased++;
       } else if (RELATIVE_REF.test(ref)) {
         unresolved++;
       }
     });
   }
   console.error(`note: rewrote ${rewritten} intra-bundle reference(s) to entry urns`);
+  if (patientAliased > 0) {
+    console.error(
+      `note: rewrote ${patientAliased} Patient reference(s) under other source ids to the bundle Patient entry`,
+    );
+  }
   if (unresolved > 0) {
     console.error(`note: ${unresolved} relative reference(s) point at resources not in the selection; left untouched`);
   }

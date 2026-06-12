@@ -18,11 +18,13 @@ export function ViewerView({ payload }: { payload: ShlinkPayload }) {
   const [recipient, setRecipient] = useState('');
   const [needsPasscode, setNeedsPasscode] = useState(() => Boolean(payload.flag?.includes('P')));
 
-  const { shlink, parseError } = useMemo(() => {
+  // Re-shares from this page carry the viewer-prefixed form (decision 11): any phone
+  // camera resolves it, and SHL-aware scanners extract the embedded shlink:/.
+  const { shareUrl, parseError } = useMemo(() => {
     try {
-      return { shlink: payloadToShlink(payload), parseError: null };
+      return { shareUrl: `${location.origin}/v#${payloadToShlink(payload)}`, parseError: null };
     } catch (e) {
-      return { shlink: null, parseError: e instanceof Error ? e.message : 'Invalid link payload' };
+      return { shareUrl: null, parseError: e instanceof Error ? e.message : 'Invalid link payload' };
     }
   }, [payload]);
 
@@ -114,7 +116,7 @@ export function ViewerView({ payload }: { payload: ShlinkPayload }) {
               type="button"
               className={`btn-block secondary grow${copied ? ' copied' : ''}`}
               onClick={async () => {
-                if (await copyText(shlink!)) {
+                if (await copyText(shareUrl!)) {
                   setCopied(true);
                   setTimeout(() => setCopied(false), 2500);
                 }
@@ -126,12 +128,12 @@ export function ViewerView({ payload }: { payload: ShlinkPayload }) {
               type="button"
               className="btn-block secondary"
               aria-label="Share"
-              onClick={() => void shareOrCopy({ title: payload.label ?? 'SMART Health Link', url: shlink! })}
+              onClick={() => void shareOrCopy({ title: payload.label ?? 'SMART Health Link', url: shareUrl! })}
             >
               {Icon.share}
             </button>
           </div>
-          {showQr && <QrCard shlink={shlink!} dimmed={expired} />}
+          {showQr && <QrCard value={shareUrl!} dimmed={expired} />}
         </>
       )}
     </Shell>

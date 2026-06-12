@@ -126,5 +126,11 @@
     "warnings": [
       "reference-external"
     ]
+  },
+  "warn-attachment-content-type.json": {
+    "errors": [],
+    "warnings": [
+      "attachment-content-type"
+    ]
   }
 }

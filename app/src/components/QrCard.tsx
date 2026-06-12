@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { qrDataUrl } from '../lib/qr.ts';
 
-export function QrCard({ shlink, dimmed }: { shlink: string; dimmed?: boolean }) {
+export function QrCard({ value, dimmed }: { value: string; dimmed?: boolean }) {
   const [src, setSrc] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
@@ -9,12 +9,12 @@ export function QrCard({ shlink, dimmed }: { shlink: string; dimmed?: boolean })
     let cancelled = false;
     setSrc(null);
     setErr(null);
-    qrDataUrl(shlink).then(
+    qrDataUrl(value).then(
       (url) => { if (!cancelled) setSrc(url); },
       (e) => { if (!cancelled) setErr(e instanceof Error ? e.message : 'QR generation failed'); },
     );
     return () => { cancelled = true; };
-  }, [shlink]);
+  }, [value]);
 
   return (
     <div className={`qr-card${dimmed ? ' qr-dimmed' : ''}`}>

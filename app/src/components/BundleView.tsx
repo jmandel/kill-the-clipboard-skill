@@ -1,11 +1,13 @@
 // Render a decrypted PatientSharedBundle for a recipient, with the same type-aware
 // approach as the skill's FHIR->PDF renderer (an alternate React renderer): readable
 // sections for discrete resources, document titles with open-in-new-tab buttons
-// (browser blob URLs — no filesystem round-trip), and an open-the-FHIR action for
-// the raw bundle. All input is hostile (real exports are messy).
+// (sandboxed blob documents — see openAttachment.ts for the security invariant),
+// and an open-the-FHIR action for the raw bundle. All input is hostile (real
+// exports are messy).
 
 import type { FhirBundle, FhirResource } from '../lib/fetchShl.ts';
 import { b64ToBlobUrl } from '../lib/fetchShl.ts';
+import { attachmentOpenUrl, downloadName, openModeFor } from '../lib/openAttachment.ts';
 
 const cc = (v: any): string =>
   v?.text ?? v?.coding?.[0]?.display ?? (v?.coding?.[0]?.code ? `${v.coding[0].system?.split('/').pop() ?? 'code'} ${v.coding[0].code}` : '');
@@ -88,10 +90,24 @@ function docRank(d: any): number {
   return code === '51855-5' ? 0 : code === '60591-5' ? 1 : 2;
 }
 
+function docTitle(doc: any): string {
+  return doc.content?.[0]?.attachment?.title || cc(doc.type) || 'Document';
+}
+
 function openDoc(doc: any) {
   const att = doc.content?.[0]?.attachment;
+  const mode = openModeFor(att?.contentType);
+  if (!att?.data || !mode) return;
+  window.open(attachmentOpenUrl(att.data, att.contentType, mode, docTitle(doc)), '_blank', 'noopener');
+}
+
+function downloadDoc(doc: any) {
+  const att = doc.content?.[0]?.attachment;
   if (!att?.data) return;
-  window.open(b64ToBlobUrl(att.data, att.contentType ?? 'application/octet-stream'), '_blank', 'noopener');
+  const a = document.createElement('a');
+  a.href = b64ToBlobUrl(att.data, att.contentType ?? 'application/octet-stream');
+  a.download = downloadName(docTitle(doc), att.contentType);
+  a.click();
 }
 
 function openBundleJson(bundle: FhirBundle) {
@@ -153,8 +169,10 @@ export function BundleView({ bundle }: { bundle: FhirBundle }) {
                     </span>
                     <span className="res-secondary">{[when(d.date), att?.contentType].filter(Boolean).join(' · ')}</span>
                   </span>
-                  {att?.data ? (
+                  {att?.data && openModeFor(att.contentType) ? (
                     <button type="button" className="btn-mini" onClick={() => openDoc(d)}>Open ↗</button>
+                  ) : att?.data ? (
+                    <button type="button" className="btn-mini" onClick={() => downloadDoc(d)}>Download</button>
                   ) : (
                     <span className="res-secondary">(no content)</span>
                   )}

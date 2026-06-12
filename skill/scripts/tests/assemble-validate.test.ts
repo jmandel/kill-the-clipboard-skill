@@ -155,6 +155,37 @@ describe('assemble-bundle.ts', () => {
     expect(byId('obs-synth-relref')!.resource.subject.reference).toBe(patientEntry().fullUrl);
   });
 
+  test('multi-source merge: every source\'s patient references land on the single Patient entry', async () => {
+    // After a multi-source merge the selection keeps ONE Patient (the base), but each
+    // provider's resources still reference their own source's patient — as a relative
+    // Patient/<id>, or as that source file's pre-assigned urn. All of them must land
+    // on the merged Patient entry; dangling patient refs would unmoor the content.
+    const urnA = 'urn:uuid:aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+    const urnB = 'urn:uuid:bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
+    const sel = [
+      fixture('patient/patient-constant.json'),
+      { resourceType: 'Observation', id: 'obs-a-urn', status: 'final', code: { text: 'A urn probe' }, subject: { reference: urnA }, valueString: 'x' },
+      { resourceType: 'Immunization', id: 'imm-a-urn', status: 'completed', vaccineCode: { text: 'Flu' }, patient: { reference: urnA }, occurrenceDateTime: '2025-10-01' },
+      { resourceType: 'Observation', id: 'obs-b-urn', status: 'final', code: { text: 'B urn probe' }, subject: { reference: urnB }, valueString: 'y' },
+      { resourceType: 'Observation', id: 'obs-b-rel', status: 'final', code: { text: 'B relative probe' }, subject: { reference: 'Patient/eXk9PqW2-provider-b-id' }, valueString: 'z' },
+    ];
+    const p = join(dir, 'multi-source.json');
+    const out = join(dir, 'multi-source-bundle.json');
+    await Bun.write(p, JSON.stringify(sel));
+    const r = run(ASSEMBLE, ['--resources', p, '--no-rendered', '-o', out]);
+    expect(r.code).toBe(0);
+    expect(r.stderr).toContain('Patient reference(s) under other source ids');
+
+    const b = JSON.parse(readFileSync(out, 'utf8'));
+    const patUrn = b.entry.find((e: any) => e.resource.resourceType === 'Patient').fullUrl;
+    const res = (id: string) => b.entry.find((e: any) => e.resource.id === id).resource;
+    expect(res('obs-a-urn').subject.reference).toBe(patUrn);
+    expect(res('imm-a-urn').patient.reference).toBe(patUrn);
+    expect(res('obs-b-urn').subject.reference).toBe(patUrn);
+    expect(res('obs-b-rel').subject.reference).toBe(patUrn);
+    for (const stale of [urnA, urnB, 'provider-b-id']) expect(JSON.stringify(b)).not.toContain(stale);
+  });
+
   test('Type/id references between selected resources are rewritten to entry urns', () => {
     const metforminUrn = byId('medication-metformin-er')!.fullUrl;
     const onhold = byId('medicationrequest-onhold-plan-external')!.resource;

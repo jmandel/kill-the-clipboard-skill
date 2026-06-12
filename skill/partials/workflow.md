@@ -22,17 +22,15 @@ content, and the final approval.
 ```
 YOU WRITE (per session, ad hoc)        YOU RUN (shipped, conformance-critical)
 ───────────────────────────────        ─────────────────────────────────────────────
-select.ts — read the source files,     attachment-to-pdf.ts  note.rtf → note.pdf
-  filter to the agreed scope, set        (per carried-along document)
-  meta.source per resource, inline     md-to-pdf.ts          story.md → story.pdf
-  document bodies, emit                  (the Patient Story you drafted)
-  selected-resources.json              assemble-bundle.ts    selection + PDFs →
-                                         bundle.json (+ automatic summary PDF)
-That's the ONLY code you write.        validate-bundle.ts    bundle.json → pass/fail
-Everything else is running the         create-shl.ts         bundle.json → QR + links
-shipped tools in this order:           manage-shl.ts         status/log/re-arm/…
-
-select → attachment-to-pdf (each doc) → md-to-pdf (story) → assemble → validate → create
+select.ts — read the source files,     md-to-pdf.ts          story.md → story.pdf
+  filter to the agreed scope, set        (the Patient Story you drafted)
+  meta.source per resource, inline     assemble-bundle.ts    selection + story PDF →
+  document bodies (original bytes,       bundle.json (+ automatic summary PDF)
+  original formats), emit              validate-bundle.ts    bundle.json → pass/fail
+  selected-resources.json              create-shl.ts         bundle.json → links
+That's the ONLY code you write.        manage-shl.ts         status/log/re-arm/…
+Everything else is running the
+shipped tools in this order:           select → md-to-pdf (story) → assemble → validate → create
 ```
 
 Every script prints exactly one JSON object on stdout (progress and diagnostics go to
@@ -113,33 +111,49 @@ DocumentReferences whose content is **inline**: `content[].attachment = {content
 data: <base64>}`. Real exports almost never arrive that way — portal FHIR uses
 `attachment.url` pointing at a Binary on the source server (unreachable from an
 encrypted bundle; the validator rejects any `url` attachment), and health-skillz
-exports strip inline data into their `attachments[]` sidecar (look for
-`bestEffortPlaintext` and the original bytes there). So this is the ONE transform
+exports strip inline data into their `attachments[]` sidecar (look for the original
+bytes there; `bestEffortPlaintext` is a last resort). So this is the ONE transform
 you're expected to perform:
 
-1. Find the document body you actually have locally — PREFER the original bytes
-   (PDF, RTF, HTML) over extracted plaintext; the converter handles them natively.
-2. **Convert to a PDF body with `attachment-to-pdf.ts`** — one tool for every
-   pre-existing format, no markdown transit, line structure preserved. PDF is the
-   only attachment format the KTC spec guarantees receivers can handle:
-
-   ```bash
-   bun <skill-dir>/scripts/attachment-to-pdf.ts note.rtf note.pdf \
-     --title "Neurology consult — Dr. Rivera" --date 2024-03-12
-   ```
-
-   Type comes from `--content-type`, extension, or content sniffing. PDF inputs pass
-   through byte-identical; RTF/HTML/text render line-faithfully. (md-to-pdf.ts is for
-   content YOU authored as markdown — the Patient Story — never for note bodies,
-   whose line structure markdown would reflow into run-on prose.)
-3. Rebuild `content` as a single attachment: `contentType: application/pdf`,
-   `data` base64-encoded; drop every `url` entry.
-4. Keep the rest of the DocumentReference **verbatim** — especially `type` and
+1. Find the document body you actually have locally — the ORIGINAL bytes (PDF, RTF,
+   HTML, plain text), not extracted/derived text, whenever they exist.
+2. **Keep the source format — never transcode.** Rebuild `content` as a single
+   attachment: `data` = base64 of the original bytes, `contentType` = the source's
+   own content type (from the export metadata; if missing, sniff the bytes — `%PDF`
+   → `application/pdf`, `{\rtf` → `application/rtf`, an HTML tag → `text/html`,
+   else `text/plain`); drop every `url` entry. SHL viewers render all four formats
+   in-browser; converting to PDF loses formatting and is exactly the kind of
+   content edit this workflow forbids. Anything outside those formats (DICOM, DOCX,
+   …) still rides inline, but receivers may only be able to download it — the
+   validator warns; tell the patient.
+3. Keep the rest of the DocumentReference **verbatim** — especially `type` and
    `category` codings (that's how the receiver knows what the note IS), date, and
    author display. Do NOT relabel provider-authored notes with the patient-story
    type or patient-asserted security labels: re-sharing doesn't change authorship.
    If you have no local body at all, the document can't ride along — say so rather
    than including an empty shell.
+
+(md-to-pdf.ts is for content YOU authored as markdown — the Patient Story — never
+for note bodies.)
+
+**More than one Patient resource (multi-source exports).** The bundle carries exactly
+one Patient, so when sources disagree you build the merged one in your selection
+script — the second (and last) sanctioned transform:
+
+- Start from the source Patient with the most complete, most recently updated
+  demographics (`meta.lastUpdated` when present, else the export date).
+- Fill each demographic field (name, birthDate, gender, address, telecom) with the
+  most up-to-date non-empty value across sources; identifiers may be unioned (keep
+  each identifier's `system`). Every value must come **verbatim from some source
+  Patient** — merging selects between sources, it never invents.
+- Keep the base Patient's `id`, and leave every other resource's patient references
+  **untouched** — `assemble-bundle.ts` lands them all on the single Patient entry
+  automatically, whether they're relative (`Patient/<any-source-id>`) or each source
+  file's pre-assigned `urn:uuid:` (rewritten when the urn appears only in
+  subject/patient positions). Nothing dangles; nothing for your script to rewrite.
+- **Show the patient the merged demographics before assembling** — name, DOB,
+  address, phone — and ask which is current wherever sources conflict. This review
+  is required whenever you merged; a clinic will match the chart on these fields.
 
 Treat the FHIR as hostile: optional-chain everything, never assume `display` strings
 or `text` exist, tolerate unknown categories and extension noise. Real exports are
@@ -247,9 +261,12 @@ bun <skill-dir>/scripts/create-shl.ts --bundle bundle.json \
 
 Defaults: `--exp-hours 24`, `--max-uses 5` (`--max-uses unlimited` to lift the cap),
 `--flag U` — deliberately forgiving-but-bounded; they're mentioned in the recap above,
-never asked about separately. The `-o` directory must be new or empty — the script
-never overwrites a previous link's artifacts; use a fresh directory per link. Exact
-stdout contract:
+never asked about separately. The share link defaults to the viewer-prefixed form
+(`https://…/v#shlink:/…`) — any phone camera scans it, and SHL-aware scanners extract
+the embedded `shlink:/` per spec; pass `--bare` ONLY if the patient or their clinic
+specifically needs the raw `shlink:/` URI. The `-o` directory must be new or empty —
+the script never overwrites a previous link's artifacts; use a fresh directory per
+link. Exact stdout contract:
 
 ```json
 {
@@ -261,6 +278,7 @@ stdout contract:
   "maxUses": 5,
   "files": [{"contentType": "application/fhir+json", "size": 187234}],
   "handoffMarkdown": "You're set!\n\n**[Your link setup & control page](https://…/m#…)** — keep this one private. …",
+  "nextStep": "Paste handoffMarkdown verbatim as the body of your closing chat message. …",
   "artifacts": {
     "ownerLink": "/abs/path/shl-out/owner-link.txt",
     "shlink": "/abs/path/shl-out/shlink.txt",
@@ -274,38 +292,42 @@ stdout contract:
 
 The script generates the key material, registers the link, encrypts the bundle
 locally, uploads ciphertext, and writes the artifacts to files. `handoffMarkdown` is
-your closing message, ready to paste (Step 8); `handoff.md` is its durable copy.
+your closing message, ready to paste (Step 8); `handoff.md` is its durable copy;
+`nextStep` restates the handoff rule at the moment you need it.
 
 ### Step 8: Hand off — paste handoffMarkdown
 
 Your closing message is already written: the create output's `handoffMarkdown` holds
 the hand-off text with both links named by role — the owner page as a labeled
-markdown link, the shareable shlink as code text — and the expiry/use figures filled
+markdown link, the shareable link as code text — and the expiry/use figures filled
 in. Paste it **verbatim** as the body of your final message; you may add to it (the
-patient's name, a platform note), but don't reconstruct it. Also deliver `qr.png` if
-your platform shows or delivers files. (`handoff.md` in the output directory is the
-same text if you need it again later.)
+patient's name, a platform note), but don't reconstruct it. (`handoff.md` in the
+output directory is the same text if you need it again later.)
 
 **The one requirement that survives every platform habit: both links appear in your
-message TEXT — the owner page as a clickable markdown link, the shlink as inline
-code.** The owner page is the patient's control surface and the shlink is the thing
-they'll paste into a check-in form; a path to `owner-link.txt` or a file attachment is
-not a handoff — the patient should click, not open files. If your platform pushes you
-toward "send files with a short caption," resist: the files are supplementary, the
-message text carries the links.
+message TEXT — the owner page as a clickable markdown link, the share link as inline
+code.** The owner page is the patient's control surface and the share link is the
+thing they'll paste into a check-in form; a path to `owner-link.txt` or a file
+attachment is not a handoff — the patient should click, not open files. If your
+platform pushes you toward "send files with a short caption," resist: the message
+text carries the links.
 
-(The control page is the capability that manages the link; the `shlink:/...` string
-is the link itself — never swap their roles in the message.)
+**The QR lives on the owner page — don't render, display, or attach one yourself.**
+The patient opens their control page and shows the QR there; it stays current through
+re-arms and relabels, which any image you produce would not. (`qr.png` exists in the
+output directory only for the patient who explicitly asks for a printable file.)
 
-**Preview (recommended):** offer to show the patient what a recipient sees —
-`viewer-link.txt` holds a viewer-prefixed copy of the link that opens a view-only
-page (QR + label + expiry, no controls); the owner page's "Preview as recipient"
-button opens the same thing. It's also the right link to give a family member who
-should be able to *show* the QR but not manage it, and it's fine to share with anyone —
-it carries the same shlink, and SHL-aware receivers handle the prefixed form.
-The QR and `shlink.txt` default to the bare `shlink:/` form simply because that's
-what KTC clinic scanners expect at check-in; prefer the bare form for that flow,
-the viewer link wherever a human will click rather than scan.
+(The control page is the capability that manages the link; the share link is the
+link itself — never swap their roles in the message.)
+
+**Share-link forms:** the default share link and QR are viewer-prefixed
+(`https://…/v#shlink:/…`) — any phone camera opens them, and SHL-aware clinic
+scanners extract the embedded `shlink:/` per spec. The bare URI in `shlink.txt` is
+the opt-in fallback for scanners that can't handle the prefix (the owner page has the
+same toggle; `--bare` at create time flips the default). The viewer-prefixed link is
+also the right thing to give a family member who should *show* the QR but not manage
+it — it opens a view-only page (QR + label + expiry, no controls), same as the owner
+page's "Preview" button.
 
 After handoff, management lives on the owner page (access log, re-arm, pause/resume,
 relabel, destroy); a clinician may review shared data before it appears in the chart.

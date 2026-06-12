@@ -1,10 +1,13 @@
 ## Handling the Owner Link and Shlink
 
-Two strings matter: the **owner link** (controls the share) and the **shlink** (read
-access; also encoded in `qr.png`). They're patient deliverables — `create-shl.ts`
-hands you the closing message containing both (`handoffMarkdown`), and giving them to
-the patient is the point. This conversation is the patient's own channel; the secrets
-appearing in it is fine. If the patient asks for the link again later, give it again
+Two strings matter: the **owner link** (controls the share) and the **share link**
+(read access). Both arrive in `create-shl.ts`'s stdout inside `handoffMarkdown` —
+exactly the two links your closing message must carry, already placed. The share
+link is the viewer-prefixed form by default and embeds the bare `shlink:/` URI as a
+substring (same secret either way; the bare form sits in `shlink.txt` if ever needed).
+They're patient deliverables — giving them to the patient is the point. This
+conversation is the patient's own channel; the secrets appearing in it is fine. If
+the patient asks for the link again later, give it again
 (`manage-shl.ts <shl-out-dir> status` echoes the owner link).
 
 **The two real rules:**

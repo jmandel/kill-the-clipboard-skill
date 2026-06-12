@@ -45,6 +45,7 @@ export function OwnerView({
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   const [bookmarkable, setBookmarkable] = useState(false);
+  const [bareFormat, setBareFormat] = useState(false);
   const [editingLabel, setEditingLabel] = useState(false);
   const [labelDraft, setLabelDraft] = useState('');
   const [rearmHours, setRearmHours] = useState(DEFAULT_REARM_HOURS);
@@ -134,7 +135,11 @@ export function OwnerView({
   const maxUses = state.maxUses;
   const pct = maxUses === null ? 0 : Math.min(uses / maxUses, 1);
   const usesLeft = maxUses === null ? null : Math.max(maxUses - uses, 0);
-  const viewerUrl = shlink ? `${location.origin}/v#${shlink}` : null;
+  // Viewer-prefixed form is the default share/QR form (docs/DESIGN.md decision 11):
+  // any phone camera resolves it; SHL-aware scanners extract the embedded shlink:/.
+  // The bare toggle exists for scanners that choke on the prefix — same secret either way.
+  const previewUrl = shlink ? `${location.origin}/v#${shlink}` : null;
+  const shareUrl = bareFormat ? shlink : previewUrl;
 
   return (
     <>
@@ -199,15 +204,15 @@ export function OwnerView({
           )}
         </div>
 
-        {shlink && !destroyed && (
+        {shareUrl && !destroyed && (
           <>
-            <QrCard shlink={shlink} dimmed={!live} />
+            <QrCard value={shareUrl} dimmed={!live} />
 
             <div className="copy-row">
               <button
                 type="button"
                 className={`btn-block${copied === 'link' ? ' copied' : ''}`}
-                onClick={async () => { if (await copyText(shlink)) flashCopied('link'); }}
+                onClick={async () => { if (await copyText(shareUrl)) flashCopied('link'); }}
               >
                 {copied === 'link' ? Icon.check : Icon.copy}
                 {copied === 'link' ? 'Copied!' : 'Copy'}
@@ -215,19 +220,19 @@ export function OwnerView({
               <button
                 type="button"
                 className="btn-block secondary grow"
-                onClick={() => void shareOrCopy({ title: label ?? 'SMART Health Link', url: shlink })}
+                onClick={() => void shareOrCopy({ title: label ?? 'SMART Health Link', url: shareUrl })}
               >
                 {Icon.share}
                 Share
               </button>
-              {viewerUrl && (
-                <button type="button" className="btn-block secondary grow" onClick={() => window.open(viewerUrl, '_blank', 'noopener')}>
+              {previewUrl && (
+                <button type="button" className="btn-block secondary grow" onClick={() => window.open(previewUrl, '_blank', 'noopener')}>
                   {Icon.eye}
                   Preview
                 </button>
               )}
             </div>
-            <div className="url-preview">{shlink.slice(0, 56)}…</div>
+            <div className="url-preview">{shareUrl.slice(0, 56)}…</div>
             <p className="row-hint" style={{ marginTop: -16, marginBottom: 24 }}>
               Copy shares the link itself · Preview opens what a recipient sees
             </p>
@@ -271,6 +276,19 @@ export function OwnerView({
             value={bookmarkable}
             onChange={setBookmarkable}
           />
+
+          {!destroyed && (
+            <ToggleRow
+              label="Use bare SHL format"
+              description={
+                bareFormat
+                  ? 'QR and copied link carry the raw shlink:/ URI — only SHL-aware scanners and apps can read it.'
+                  : "By default the QR and copied link open from any phone camera. Turn this on only if a clinic's scanner can't handle the link prefix."
+              }
+              value={bareFormat}
+              onChange={setBareFormat}
+            />
+          )}
 
           <div className="row-divider" />
 
