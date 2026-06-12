@@ -98,6 +98,57 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
   const requireLink = async (auth: string): Promise<LinkRow | null> =>
     store.getLinkByAuthHash(db, await authHash(auth));
 
+  // --- live change feed (owner page) ------------------------------------------------
+  // Signal-only SSE: every event is an empty `change`; the client re-fetches state
+  // through the normal authenticated GET. Nothing readable rides the stream, the
+  // capability stays in the Authorization header (fetch-streaming client — native
+  // EventSource can't set headers), and wrong auth is the same 404 as everywhere else.
+  const watchers = new Map<string, Set<() => void>>();
+  const notifyWatchers = (linkId: string): void => {
+    for (const fn of watchers.get(linkId) ?? []) fn();
+  };
+  const eventsRoutes: RouteSet = {
+    GET: async (req) => {
+      const link = await requireLink(authOf(req));
+      if (!link) return notFound();
+      const id = link.id;
+      const enc = new TextEncoder();
+      let cleanup = (): void => {};
+      const stream = new ReadableStream<Uint8Array>({
+        start: (controller) => {
+          const send = (s: string): void => {
+            try {
+              controller.enqueue(enc.encode(s));
+            } catch {
+              cleanup();
+            }
+          };
+          const onChange = () => send('event: change\ndata: {}\n\n');
+          const set = watchers.get(id) ?? new Set<() => void>();
+          set.add(onChange);
+          watchers.set(id, set);
+          // unref: a parked heartbeat must not keep the process (or tests) alive
+          const ping = setInterval(() => send(': ping\n\n'), 25_000);
+          (ping as unknown as { unref?: () => void }).unref?.();
+          cleanup = () => {
+            clearInterval(ping);
+            set.delete(onChange);
+            if (set.size === 0) watchers.delete(id);
+            try {
+              controller.close();
+            } catch {}
+          };
+          req.signal.addEventListener('abort', () => cleanup());
+          send('retry: 3000\n\n');
+        },
+        cancel: () => cleanup(),
+      });
+      return new Response(stream, {
+        headers: { 'content-type': 'text/event-stream', 'cache-control': 'no-store', 'x-accel-buffering': 'no' },
+      });
+    },
+  };
+
   type RouteSet = Record<string, (req: Request & { params?: Record<string, string> }) => Response | Promise<Response>>;
   const manageRoutes: RouteSet = {
         GET: async (req) => {
@@ -147,12 +198,14 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
               patch.passcode !== undefined ? PASSCODE_BUDGET : link.passcode_attempts_remaining,
             now: epoch(),
           });
+          notifyWatchers(link.id);
           return json(manageState(store.getLinkById(db, link.id)!));
         },
         DELETE: async (req) => {
           const link = await requireLink(authOf(req));
           if (!link) return notFound();
           store.purgeLink(db, link.id, epoch());
+          notifyWatchers(link.id);
           return json(manageState(store.getLinkById(db, link.id)!));
         },
       };
@@ -176,6 +229,7 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
             ciphertext: body,
             now: epoch(),
           });
+          notifyWatchers(link.id);
           return json({ fileId } satisfies AddFileResponse);
         },
       };
@@ -197,6 +251,7 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
             ciphertext: body,
             now: epoch(),
           });
+          notifyWatchers(link.id);
           return json({ fileId: file.id } satisfies AddFileResponse);
         },
         DELETE: async (req) => {
@@ -208,6 +263,7 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
             return err('cannot delete the only file of an active U-flag link; pause or destroy it first', 400);
           }
           store.deleteFile(db, link.id, file.id);
+          notifyWatchers(link.id);
           return new Response(null, { status: 204 });
         },
       };
@@ -293,6 +349,7 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
           const now = epoch();
           const inactive = () => {
             store.audit(db, id, recipient, 'direct', 'inactive', now);
+            notifyWatchers(id);
             return notFound();
           };
           if (!link.flag.includes('U')) return inactive();
@@ -301,6 +358,7 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
           if (!file?.ciphertext) return inactive();
           if (!store.consumeUse(db, id, now)) return inactive();
           store.audit(db, id, recipient, 'direct', 'ok', now);
+          notifyWatchers(id);
           return jose(file.ciphertext);
         },
 
@@ -327,6 +385,7 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
           const now = epoch();
           const inactive = () => {
             store.audit(db, id, body.recipient, 'manifest', 'inactive', now);
+            notifyWatchers(id);
             return notFound();
           };
           if (!store.isLive(link, now)) return inactive();
@@ -336,11 +395,13 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
               const remaining = store.decrementPasscodeBudget(db, id);
               if (remaining === null) return inactive(); // raced past lockout: budget already spent
               store.audit(db, id, body.recipient, 'manifest', 'bad-passcode', now);
+              notifyWatchers(id);
               return json({ remainingAttempts: remaining } satisfies PasscodeError, 401);
             }
           }
           if (!store.consumeUse(db, id, now)) return inactive();
           store.audit(db, id, body.recipient, 'manifest', 'ok', now);
+          notifyWatchers(id);
 
           const out: ManifestFile[] = [];
           for (const f of store.listFilesWithCiphertext(db, id)) {
@@ -366,6 +427,7 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
           if (!file?.ciphertext) return notFound();
           // recipient was captured on the manifest access; the ticket doesn't carry it
           store.audit(db, id, '', 'file', 'ok', epoch());
+          notifyWatchers(id);
           return jose(file.ciphertext);
         },
       }),
@@ -438,6 +500,7 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
       },
 
       '/api/manage': manageRoutes,
+      '/api/manage/events': eventsRoutes,
       '/api/manage/files': manageFilesRoutes,
       '/api/manage/files/:fileId': manageFileIdRoutes,
     },

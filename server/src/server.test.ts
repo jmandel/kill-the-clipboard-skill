@@ -421,6 +421,91 @@ describe('audit log', () => {
   });
 });
 
+describe('change feed (/api/manage/events)', () => {
+  // Read the SSE stream until `predicate(textSoFar)` or timeout; returns all text seen.
+  async function readUntil(
+    body: ReadableStream<Uint8Array>,
+    predicate: (s: string) => boolean,
+    timeoutMs = 4000,
+  ): Promise<string> {
+    const reader = body.getReader();
+    const dec = new TextDecoder();
+    let text = '';
+    const deadline = Date.now() + timeoutMs;
+    try {
+      while (!predicate(text)) {
+        const remaining = deadline - Date.now();
+        if (remaining <= 0) throw new Error(`timed out waiting for stream content; saw: ${JSON.stringify(text)}`);
+        const chunk = await Promise.race([
+          reader.read(),
+          new Promise<never>((_, rej) => setTimeout(() => rej(new Error('read timeout')), remaining)),
+        ]);
+        if (chunk.done) break;
+        text += dec.decode(chunk.value, { stream: true });
+      }
+    } finally {
+      await reader.cancel().catch(() => {});
+    }
+    return text;
+  }
+
+  test('same capability gate as the rest of the control plane: bad/missing auth is 404', async () => {
+    const ctx = await makeServer();
+    await createLink(ctx);
+    const wrong = await fetch(`${ctx.base}/api/manage/events`, {
+      headers: { authorization: `Bearer ${'A'.repeat(43)}` },
+    });
+    expect(wrong.status).toBe(404);
+    const missing = await fetch(`${ctx.base}/api/manage/events`);
+    expect(missing.status).toBe(404);
+  });
+
+  test('data-plane access signals an empty change event — never link data', async () => {
+    const ctx = await makeServer();
+    const link = await createLink(ctx);
+    await uploadFile(ctx, link);
+
+    const ac = new AbortController();
+    const res = await fetch(`${ctx.base}/api/manage/events`, {
+      headers: { authorization: `Bearer ${link.auth}` },
+      signal: ac.signal,
+    });
+    expect(res.status).toBe(200);
+    expect(res.headers.get('content-type')).toBe('text/event-stream');
+
+    const seen = (async () =>
+      readUntil(res.body!, (s) => s.includes('event: change')))();
+    // Give the subscription a beat to register, then trigger a recipient access.
+    await new Promise((r) => setTimeout(r, 50));
+    await fetch(`${link.url}?recipient=${encodeURIComponent('Live Clinic')}`);
+
+    const text = await seen;
+    expect(text).toContain('event: change\ndata: {}');
+    // Signal-only: the stream must carry nothing about the link itself.
+    expect(text).not.toContain(link.id);
+    expect(text).not.toContain('Live Clinic');
+    expect(text.replace(/retry: \d+|: ping|event: change|data: \{\}|\n/g, '')).toBe('');
+    ac.abort();
+  });
+
+  test('manage mutations signal too (pause from another tab)', async () => {
+    const ctx = await makeServer();
+    const link = await createLink(ctx);
+    await uploadFile(ctx, link);
+
+    const ac = new AbortController();
+    const res = await fetch(`${ctx.base}/api/manage/events`, {
+      headers: { authorization: `Bearer ${link.auth}` },
+      signal: ac.signal,
+    });
+    const seen = (async () => readUntil(res.body!, (s) => s.includes('event: change')))();
+    await new Promise((r) => setTimeout(r, 50));
+    await patchLink(ctx, link.auth, { active: false });
+    expect(await seen).toContain('event: change');
+    ac.abort();
+  });
+});
+
 describe('control plane validation + capability lookup', () => {
   test('wrong auth → 404 (not 401; no oracle distinguishing wrong vs absent)', async () => {
     const ctx = await makeServer();

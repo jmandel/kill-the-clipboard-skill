@@ -134,6 +134,44 @@ function withState(auth: string, fn: (s: ManageState) => Response): Response {
   return fn(s);
 }
 
+// Signal-only change feed, mirroring the real server's /api/manage/events.
+const watchers = new Map<string, Set<() => void>>();
+function notifyWatchers(linkId: string): void {
+  for (const fn of watchers.get(linkId) ?? []) fn();
+}
+function eventStream(linkId: string, signal: AbortSignal): Response {
+  const enc = new TextEncoder();
+  let cleanup = (): void => {};
+  const stream = new ReadableStream<Uint8Array>({
+    start: (controller) => {
+      const send = (s: string): void => {
+        try {
+          controller.enqueue(enc.encode(s));
+        } catch {
+          cleanup();
+        }
+      };
+      const onChange = () => send('event: change\ndata: {}\n\n');
+      const set = watchers.get(linkId) ?? new Set<() => void>();
+      set.add(onChange);
+      watchers.set(linkId, set);
+      const ping = setInterval(() => send(': ping\n\n'), 25_000);
+      cleanup = () => {
+        clearInterval(ping);
+        set.delete(onChange);
+        if (set.size === 0) watchers.delete(linkId);
+        try {
+          controller.close();
+        } catch {}
+      };
+      signal.addEventListener('abort', () => cleanup());
+      send('retry: 3000\n\n');
+    },
+    cancel: () => cleanup(),
+  });
+  return new Response(stream, { headers: { 'content-type': 'text/event-stream', 'cache-control': 'no-store' } });
+}
+
 
 Bun.serve({
   port,
@@ -154,7 +192,15 @@ Bun.serve({
       if (!s || !computeLive(s)) return new Response(null, { status: 404, headers: CORS });
       s.uses += 1;
       s.accessLog.unshift({ ts: iso(nowSec()), recipient: url.searchParams.get('recipient')!, action: 'direct', outcome: 'ok' });
+      notifyWatchers(s.id);
       return new Response(jweById.get(req.params.id) ?? '', { status: 200, headers: { 'content-type': 'application/jose', ...CORS } });
+    },
+    '/api/manage/events': {
+      GET: (req) => {
+        const s = store.get(bearerOf(req));
+        if (!s) return json({ error: 'no such link' }, 404);
+        return eventStream(s.id, req.signal);
+      },
     },
     '/api/manage': {
       GET: (req) =>
@@ -172,6 +218,7 @@ Bun.serve({
         if (patch.active !== undefined) s.active = patch.active;
         if (patch.labelEnc !== undefined) s.labelEnc = patch.labelEnc;
         s.live = computeLive(s);
+        notifyWatchers(s.id);
         return json(s);
       },
       DELETE: (req) =>
@@ -180,6 +227,7 @@ Bun.serve({
           s.purgedAt = iso(nowSec());
           s.files = [];
           s.live = false;
+          notifyWatchers(s.id);
           return json(s);
         }),
     },

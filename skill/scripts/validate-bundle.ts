@@ -24,7 +24,7 @@
  * Warning codes:
  *   meta-profile docref-pataast patient-demographics rendered-missing
  *   rendered-coverage-unverified reference-unresolved reference-external
- *   attachment-content-type
+ *   attachment-content-type safety-core-missing
  */
 
 import type { ValidateOutput } from '../../lib/types.ts';
@@ -312,6 +312,25 @@ async function main() {
       // Missing data / url-based attachments already fire the bundle-wide attachment rules.
     });
   });
+
+  // The safety-critical core (workflow Step 2): a share without allergies, current
+  // meds, or problems is either a record with none, a deliberate patient opt-out, or
+  // an agent over-trimming a "focused" share — surface it so the agent must say which.
+  const presentTypes = new Set(entries.map((e) => resourceOf(e)?.resourceType).filter(Boolean));
+  const CORE_FAMILIES: { types: string[]; label: string }[] = [
+    { types: ['AllergyIntolerance'], label: 'allergies (AllergyIntolerance)' },
+    { types: ['MedicationRequest', 'MedicationStatement', 'MedicationDispense', 'Medication'], label: 'medications' },
+    { types: ['Condition'], label: 'problems (Condition)' },
+  ];
+  for (const fam of CORE_FAMILIES) {
+    if (!fam.types.some((t) => presentTypes.has(t))) {
+      warn(
+        'safety-core-missing',
+        'Bundle',
+        `bundle carries no ${fam.label} — fine only if the patient has none recorded or explicitly chose to omit them`,
+      );
+    }
+  }
 
   const docRefResources = entries.map(resourceOf).filter((r): r is AnyObj => r?.resourceType === 'DocumentReference');
   const hasRendered = docRefResources.some((r) => codings(r.type).some((c) => c.code === '60591-5'));

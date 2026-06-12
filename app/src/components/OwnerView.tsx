@@ -76,6 +76,21 @@ export function OwnerView({
     return () => { cancelled = true; };
   }, [client, masterSecret]);
 
+  // Live refresh: the server signals "something changed" (a scan, a re-arm from
+  // another tab) and we re-fetch through the normal authenticated GET — the access
+  // log and use counts stay current without reloading.
+  useEffect(() => {
+    if (!auth) return;
+    let cancelled = false;
+    const unsubscribe = client.subscribe(auth, () => {
+      void client.get(auth).then(
+        (s) => { if (!cancelled) setState(s); },
+        () => {}, // transient refetch failure: keep showing the last good state
+      );
+    });
+    return () => { cancelled = true; unsubscribe(); };
+  }, [client, auth]);
+
   // QR/shlink ALWAYS reconstructed from current state (docs/DESIGN.md §3) so label/exp
   // edits and re-arms propagate without anything being stored. The server holds the
   // label only as a client-encrypted blob; decrypt here for display and the payload.

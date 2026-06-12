@@ -1,6 +1,9 @@
 {
   "_valid-baseline.json": {
-    "errors": []
+    "errors": [],
+    "warnings": [
+      "safety-core-missing"
+    ]
   },
   "bundle-type.json": {
     "errors": [

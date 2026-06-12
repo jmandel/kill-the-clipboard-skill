@@ -71,8 +71,13 @@ recommendation, and ask whether they'd like to share broadly or focus:
 > your [cardiology visit], I'd suggest a solid clinical summary — problems,
 > medications, allergies, immunizations, recent vitals and labs — and then go
 > deeper on what matters for this visit: [the echo reports and consult notes
-> from your arrhythmia workup]. Want to share broadly like that, focus just on
-> [the heart-rhythm history], or adjust?"
+> from your arrhythmia workup]. Want to share broadly like that, or focus on
+> [the heart-rhythm history] plus the basics every clinic needs (your allergies,
+> current meds, and active problems), or adjust?"
+>
+> ("Focused" is a smaller share, never an unsafe one — the focused option you
+> offer ALWAYS spells out that allergies, current meds, and active problems
+> still ride along.)
 
 **Always include the safety-critical core: allergies, current medications, and
 active/relevant problems — in every share, regardless of focus, unless the patient
@@ -109,6 +114,11 @@ content; never invent ids). One sanctioned exception: re-homing document content
 inline, below. Include:
 
 - Exactly one Patient resource
+- **The safety-critical core, even in a focused share**: every AllergyIntolerance,
+  every current/active medication (MedicationRequest + the Medications they
+  reference), and active/relevant Conditions. Omit one of these ONLY if the patient
+  explicitly asked to drop it — a "focused" scope choice is not that ask.
+  (`validate-bundle.ts` warns when a family is absent; be ready to explain why.)
 - Every selected clinical resource, each with `resourceType` and `id`
 - Resources that selected resources reference, when available in the source
   (e.g. the Medication a MedicationRequest points to)

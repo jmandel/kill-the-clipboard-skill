@@ -51,4 +51,45 @@ export class ManageApi {
     await this.parse<unknown>(await fetch(this.url(), { method: 'DELETE', headers: this.headers(auth) }));
     return this.get(auth);
   }
+
+  /**
+   * Signal-only change feed: the server emits an empty `change` event whenever the
+   * link's state or access log moves; the caller re-fetches via get(). Implemented
+   * as fetch-streaming SSE because native EventSource can't carry the Authorization
+   * header (and the capability never goes in a URL). Returns an unsubscribe fn;
+   * reconnects with a flat 3s backoff until unsubscribed.
+   */
+  subscribe(auth: string, onChange: () => void): () => void {
+    const ctrl = new AbortController();
+    const loop = async (): Promise<void> => {
+      while (!ctrl.signal.aborted) {
+        try {
+          const res = await fetch(`${this.base}/api/manage/events`, {
+            headers: { ...this.headers(auth), accept: 'text/event-stream' },
+            signal: ctrl.signal,
+          });
+          if (!res.ok || !res.body) throw new Error(`events stream failed (${res.status})`);
+          const reader = res.body.getReader();
+          const dec = new TextDecoder();
+          let buf = '';
+          for (;;) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buf += dec.decode(value, { stream: true });
+            let sep: number;
+            while ((sep = buf.indexOf('\n\n')) !== -1) {
+              const frame = buf.slice(0, sep);
+              buf = buf.slice(sep + 2);
+              if (/^event: change$/m.test(frame)) onChange();
+            }
+          }
+        } catch {
+          // dropped connection or non-OK — fall through to retry
+        }
+        if (!ctrl.signal.aborted) await new Promise((r) => setTimeout(r, 3000));
+      }
+    };
+    void loop();
+    return () => ctrl.abort();
+  }
 }

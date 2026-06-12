@@ -249,6 +249,10 @@ GET   /api/manage                 → {url, flag, labelEnc, exp, maxUses, uses, 
                                      files:[{fileId, contentType, size, lastUpdated}],
                                      accessLog:[{ts, recipient, action, outcome}]}
 PATCH /api/manage                 {exp?, maxUses?, active?, passcode?, labelEnc?}
+GET   /api/manage/events          SSE, signal-only: empty `change` events on any access/
+                                  mutation; client re-fetches via GET. Same Bearer-header
+                                  gate (fetch-streaming client — EventSource can't set
+                                  headers, and the capability never rides a URL).
 POST  /api/manage/files           JWE body, Content-Type header → {fileId}
 PUT   /api/manage/files/{fileId}  replace ciphertext (client re-encrypts: same key, new IV)
 DELETE /api/manage/files/{fileId}
