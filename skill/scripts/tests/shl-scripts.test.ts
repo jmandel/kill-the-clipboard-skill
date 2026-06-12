@@ -5,8 +5,9 @@ import { afterAll, beforeAll, describe, expect, test } from 'bun:test';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { compactDecrypt } from 'jose';
 import QRCode from 'qrcode';
-import { b64url } from '../../../lib/encoding.ts';
+import { b64url, b64urlDecode } from '../../../lib/encoding.ts';
 import { authHash, deriveAuth, deriveKey } from '../../../lib/hkdf.ts';
 import { decryptJWE } from '../../../lib/jwe.ts';
 import { parseFragment, parseShlink } from '../../../lib/shlink.ts';
@@ -393,8 +394,25 @@ describe('create-shl', () => {
     const jwe = await res.text();
     const { plaintext, header } = await decryptJWE(jwe, key);
     expect(header.cty).toBe('application/fhir+json');
+    // Uncompressed by default: receiver interop beats size (modern `jose` dropped JWE
+    // zip support and hand-rolled SHL readers rarely inflate). --zip opts back in.
+    expect(header.zip).toBeUndefined();
+    expect(Buffer.from(plaintext).equals(Buffer.from(bundleBytes))).toBeTrue();
+    // The interop point itself: vanilla jose must decrypt a default-created link.
+    const { plaintext: viaJose } = await compactDecrypt(jwe, b64urlDecode(key));
+    expect(Buffer.from(viaJose).equals(Buffer.from(bundleBytes))).toBeTrue();
+  });
+
+  test('--zip opts into JWE zip: DEF; our reader still inflates it', async () => {
+    const { out, outDir } = await createLink('zip', ['--zip']);
+    const { key } = await ownerSecretsFrom(outDir);
+    const res = await fetchDataPlane(out.id);
+    expect(res.status).toBe(200);
+    const jwe = await res.text();
+    const { plaintext, header } = await decryptJWE(jwe, key);
     expect(header.zip).toBe('DEF');
     expect(Buffer.from(plaintext).equals(Buffer.from(bundleBytes))).toBeTrue();
+    expect(Buffer.byteLength(jwe)).toBeLessThan(bundleBytes.length); // compression actually happened
   });
 
   test('SECRETS: stdout carries the relay links; bare auth/key/M never appear standalone', async () => {

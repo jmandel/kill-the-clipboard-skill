@@ -181,7 +181,11 @@ key  = base64url( HKDF-SHA256(ikm=M, salt=<empty>, info="ktc-shl/v1/key",  L=32)
   One-way: server cannot reach M or key. Receiver (holding key) cannot reach M or auth.
 - `key` never leaves the client. JWE per base spec: compact serialization, `alg:dir`,
   `enc:A256GCM`, `cty:application/fhir+json`, unique IV per encryption (incl. file updates,
-  same key per spec), optional `zip:DEF`.
+  same key per spec), optional `zip:DEF`. AMENDED 2026-06-12: producers default to
+  UNCOMPRESSED — first field contact (a hand-rolled scanner) and modern `jose` (v5
+  removed JWE zip) both fail on `zip: DEF`, so receiver interop beats the ~6x size win;
+  `--zip` opts in for a specific reason only. Our readers (lib/jwe.ts, the viewer)
+  always honor `zip: DEF` on decrypt — maximally tolerant reader, conservative producer.
 - HKDF output is indistinguishable from the spec's "32 random bytes" — conformant in substance.
 
 **Fragment shapes** (the page's only inputs; fragments never reach servers):

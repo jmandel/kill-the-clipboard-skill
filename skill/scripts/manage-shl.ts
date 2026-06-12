@@ -12,8 +12,11 @@
 //                                (server maxUses is set to uses + N)
 //   pause | resume               Reversibly disable / re-enable serving
 //   relabel <text>               Replace the label (<=80 chars)
-//   replace --bundle new.json    Re-encrypt new content (same key, fresh IV) and
-//                                replace the link's single file in place
+//   replace --bundle new.json [--zip]
+//                                Re-encrypt new content (same key, fresh IV) and
+//                                replace the link's single file in place. --zip opts
+//                                into JWE zip: DEF — known receiver compat issues;
+//                                avoid unless there's a specific reason (create-shl.ts)
 //   destroy --yes                Permanently purge the link (irreversible)
 //
 // Options:
@@ -128,6 +131,7 @@ async function main(): Promise<void> {
   const maxUsesRaw = takeValue(args, '--max-uses');
   const bundlePath = takeValue(args, '--bundle');
   const yes = takeBool(args, '--yes');
+  const zip = takeBool(args, '--zip');
 
   const [target, verb, ...rest] = args;
   if (!target || !verb) throw new Error('missing <outdir|owner-link.txt> or <verb>');
@@ -213,7 +217,8 @@ async function main(): Promise<void> {
       if (!fileMeta) throw new Error('link has no file to replace (purged?)');
       const key = await deriveKey(ctx.masterSecret);
       progress('-> re-encrypting with the original key (fresh IV) ...');
-      const jwe = await encryptJWE(bytes, key, { cty: BUNDLE_CONTENT_TYPE, deflate: true });
+      // Uncompressed by default for receiver interop (create-shl.ts --zip rationale).
+      const jwe = await encryptJWE(bytes, key, { cty: BUNDLE_CONTENT_TYPE, deflate: zip });
       await expectOk(
         await fetchRetry(`${ctx.server}/api/manage/files/${fileMeta.fileId}`, {
           method: 'PUT',

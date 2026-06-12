@@ -16,6 +16,12 @@
 //                       SHL-aware apps, while the viewer-prefixed default opens from
 //                       any phone camera AND still carries the embedded shlink:/ for
 //                       SHL-aware scanners.
+//   --zip               Compress the bundle before encryption (JWE zip: DEF — spec-legal
+//                       MAY, ~6x smaller ciphertext). KNOWN COMPATIBILITY ISSUES: some
+//                       receivers can't inflate it (hand-rolled decryptors; modern
+//                       `jose` dropped zip support) — avoid unless there's a specific
+//                       reason, e.g. a very large bundle AND a receiver known to cope.
+//                       Readers we ship always inflate either way.
 //   --server <url>      Override the baked/config server base URL
 //   -o, --out <dir>     Output directory; must be empty or absent (never overwrites)
 //
@@ -50,7 +56,7 @@ import type {
 } from '../../lib/types.ts';
 import { expectOk, fetchRetry, resolveServerUrl } from './_resolve-server.ts';
 
-const USAGE = `Usage: create-shl.ts --bundle bundle.json --label "..." [--exp-hours 24] [--max-uses 5] [--flag U] [--bare] [--server URL] -o <outdir>`;
+const USAGE = `Usage: create-shl.ts --bundle bundle.json --label "..." [--exp-hours 24] [--max-uses 5] [--flag U] [--bare] [--zip] [--server URL] -o <outdir>`;
 const BUNDLE_CONTENT_TYPE = 'application/fhir+json';
 
 function takeValue(args: string[], ...names: string[]): string | undefined {
@@ -84,6 +90,7 @@ async function main(): Promise<void> {
   const maxUsesRaw = takeValue(args, '--max-uses') ?? '5';
   const flag = takeValue(args, '--flag') ?? 'U';
   const bare = takeFlag(args, '--bare');
+  const zip = takeFlag(args, '--zip');
   const serverArg = takeValue(args, '--server');
   const outDirRaw = takeValue(args, '-o', '--out');
 
@@ -138,8 +145,8 @@ async function main(): Promise<void> {
   );
   const { id, url } = (await createRes.json()) as CreateLinkResponse;
 
-  progress('-> encrypting bundle (A256GCM, zip DEF) ...');
-  const jwe = await encryptJWE(bundleBytes, key, { cty: BUNDLE_CONTENT_TYPE, deflate: true });
+  progress(`-> encrypting bundle (A256GCM${zip ? ', zip DEF' : ''}) ...`);
+  const jwe = await encryptJWE(bundleBytes, key, { cty: BUNDLE_CONTENT_TYPE, deflate: zip });
   const jweSize = Buffer.byteLength(jwe);
 
   progress(`-> uploading ciphertext (${jweSize} bytes) ...`);
