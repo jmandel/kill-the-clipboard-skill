@@ -44,6 +44,9 @@ export function parseRtf(rtf: string): Run[][] {
   let depth = 0;
   let skipDepth = 0;
   const skipStack: number[] = [];
+  // \ucN = how many fallback characters follow each \uN (group-scoped, default 1).
+  let uc = 1;
+  const ucStack: number[] = [];
 
   // One skip entry per group: `{\*\generator ...}` would otherwise push twice
   // (once for \*, once for the destination word) but pop only once on `}`.
@@ -73,6 +76,7 @@ export function parseRtf(rtf: string): Run[][] {
     if (ch === '{') {
       depth++;
       styleStack.push({ ...style });
+      ucStack.push(uc);
       i++;
       continue;
     }
@@ -82,6 +86,7 @@ export function parseRtf(rtf: string): Run[][] {
         skipDepth--;
       }
       style = styleStack.pop() ?? { b: false, i: false, u: false, s: false };
+      uc = ucStack.pop() ?? 1;
       depth--;
       i++;
       continue;
@@ -128,10 +133,20 @@ export function parseRtf(rtf: string): Run[][] {
         else if (word === 'ulnone') style = { ...style, u: false };
         else if (word === 'strike') style = { ...style, s: on };
         else if (word === 'plain') style = { b: false, i: false, u: false, s: false };
+        else if (word === 'uc' && num !== undefined) uc = Math.max(0, num);
         else if (word === 'u' && num !== undefined) {
           emit(String.fromCodePoint(((num % 65536) + 65536) % 65536));
-          // the spec puts a fallback character (usually '?') after \uN; swallow it
-          if (rtf[i + 1 + m[0].length] === '?') i++;
+          // \uN is followed by `uc` ANSI fallback characters that must be skipped —
+          // each is a plain char OR a full \'hh escape (Epic bullets: u8226 then '95,
+          // which double-rendered before this skip).
+          let j = i + 1 + m[0].length;
+          for (let left = uc; left > 0 && j < rtf.length; left--) {
+            if (rtf[j] === '\\' && rtf[j + 1] === "'") j += 4;
+            else if (rtf[j] === '{' || rtf[j] === '}' || rtf[j] === '\\') break;
+            else j++;
+          }
+          i = j;
+          continue;
         }
         i += 1 + m[0].length;
         continue;

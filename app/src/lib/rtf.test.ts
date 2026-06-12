@@ -31,6 +31,15 @@ describe('rtfToHtml', () => {
     expect(html).toContain('• ');
   });
 
+  test("\\uN fallback can be a \\'hh escape (real Epic bullet pattern) — no double render", () => {
+    // Epic notes encode bullets as u8226 followed by '95 — unicode bullet + cp1252 fallback.
+    const html = rtfToHtml("{\\rtf1\\uc1 \\u8226 \\'95\\cell Marital status\\par}");
+    expect(html).toContain('•');
+    expect(html).not.toContain('••');
+    const html0 = rtfToHtml('{\\rtf1\\uc0 \\u8226 no fallback\\par}');
+    expect(html0).toContain('•no fallback');
+  });
+
   test('skips non-content groups (font/color tables, pict, \\* destinations)', () => {
     const html = rtfToHtml(
       '{\\rtf1{\\fonttbl{\\f0 Calibri;}}{\\colortbl;\\red0\\green0\\blue0;}{\\*\\generator Epic}{\\pict 89504e47}Visible\\par}',
