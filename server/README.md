@@ -20,6 +20,15 @@ then `PORT` / `BASE_URL` env override. `DB_PATH` selects the SQLite file (defaul
 CONFIG_PATH=server/config.json PORT=8000 BASE_URL=https://shl.example.org bun run server/src/index.ts
 ```
 
+### Environment variables
+
+| Var | Default | Purpose |
+|---|---|---|
+| `CONFIG_PATH` | `./config.json` | Path to the JSON config file (see `config.json.example`). |
+| `PORT` | `8000` (config) | Listen port; overrides `server.port` from the config file. |
+| `BASE_URL` | config `server.baseURL` | Public base URL; overrides `server.baseURL`. Trailing slashes are stripped; must be `http(s)` and short enough to keep `<baseURL>/shl/<43-char id>` ≤128 chars. |
+| `DB_PATH` | `./data.sqlite` | SQLite file location. **On container platforms (Railway, Fly, etc.) the working directory is ephemeral** — point this at a mounted volume (e.g. `DB_PATH=/data/db.sqlite`) so links survive restarts and redeploys. |
+
 For production, see `kill-the-clipboard.service` (install notes in the file header).
 
 ## Routes
@@ -53,6 +62,9 @@ cross-origin). The control plane advertises none; management is same-origin by d
 
 ### Static / bundle
 
+- `GET /health` — unauthenticated liveness probe → `200 {"ok":true}`. Carries no link data
+  and bypasses the data plane's uniform-404 contract, so platform healthchecks are
+  unambiguous even before the landing app builds.
 - `GET /` — landing page
 - `GET /s` — handoff app (503 until `app/index.html` is built)
 - `GET /skill.zip` — built per request: `SKILL.md` composed by `skill/build-skill.ts`, scripts
