@@ -313,6 +313,10 @@ export async function createApp(config: ServerConfig, db: Database): Promise<Bun
       return err(e instanceof Error ? e.message : 'internal error', 500);
     },
     routes: {
+      // Unauthenticated liveness probe for orchestrators/PaaS healthchecks. Carries no
+      // link data and never touches the data plane's uniform-404 contract.
+      '/health': () => json({ ok: true }),
+
       '/': landingApp
         ? (landingApp as Response) // Bun HTMLBundle route value
         : () => err('landing not built', 503),

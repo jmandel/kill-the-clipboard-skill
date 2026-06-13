@@ -104,6 +104,16 @@ const patchLink = (ctx: Ctx, auth: string, patch: object) =>
     body: JSON.stringify(patch),
   });
 
+describe('health', () => {
+  test('GET /health → 200 {"ok":true}, unauthenticated', async () => {
+    const ctx = await makeServer();
+    const res = await fetch(`${ctx.base}/health`);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('content-type')).toContain('application/json');
+    expect(await res.json()).toEqual({ ok: true });
+  });
+});
+
 describe('round trip', () => {
   test('create → upload → direct GET → decrypt matches the original bundle', async () => {
     const ctx = await makeServer();
